@@ -1,5 +1,6 @@
 """Explicit, sanitized cloud checks and the pinned Documents API transport."""
 from __future__ import annotations
+from http.client import HTTPException
 import json
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
@@ -25,7 +26,7 @@ def request_json(url, payload=None, *, headers=None, method="POST", timeout=30):
         code = exc.code
         exc.close()
         raise ProviderError("Cloud", code) from None
-    except (URLError, OSError, ValueError, UnicodeError):
+    except (URLError, OSError, HTTPException, ValueError, UnicodeError):
         raise ProviderError("Cloud") from None
     if not isinstance(result, dict):
         raise ProviderError("Cloud")

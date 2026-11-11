@@ -108,7 +108,10 @@ def page_position(offset: int, starts: list[int], texts: list[str]) -> int:
 def extract(path: Path, root_dir: Path) -> dict:
     doc_id = "doc-" + path.stem.replace("_", "-")
     brand_key = path.stem.split("_")[0]
-    with pymupdf.open(path) as pdf:
+    # Bind extracted text and provenance to the same immutable source snapshot.
+    # build_corpus checks the on-disk hash again before publishing the result.
+    source_bytes = path.read_bytes()
+    with pymupdf.open(stream=source_bytes, filetype="pdf") as pdf:
         texts = [page.get_text("text", sort=False) for page in pdf]
         page_metadata = [
             {"number": index + 1, "widthPoints": page.rect.width,
@@ -168,8 +171,8 @@ def extract(path: Path, root_dir: Path) -> dict:
     low = [i + 1 for i, text in enumerate(texts) if len(text.strip()) < 80]
     return {
         "id": doc_id, "productId": f"product-{brand_key}", "brandKey": brand_key,
-        "path": path.relative_to(root_dir).as_posix(), "bytes": path.stat().st_size,
-        "sha256": digest(path.read_bytes()), "texts": texts, "starts": starts,
+        "path": path.relative_to(root_dir).as_posix(), "bytes": len(source_bytes),
+        "sha256": digest(source_bytes), "texts": texts, "starts": starts,
         "joined": joined, "pageMetadata": page_metadata, "marker": marker,
         "identity": identity_matches[0] if identity_matches else None, "identities": identity_matches,
         "approval": approval, "revision": revision, "candidates": candidates,
@@ -310,7 +313,9 @@ def _assemble(root_dir: Path, template_path: Path, output_path: Path, report_pat
         if record["marker"] and candidates:
             add_fragment_section(raw, record, "full-preamble", "fullPrescribingInformationPreamble",
                                  record["marker"].start(), candidates[0][0], "FULL PRESCRIBING INFORMATION: preamble (may include boxed warning)")
-        if record["marker"] and record["marker"].start() > 0:
+        # Without recognized sections, keep the complete page archive eligible
+        # for chunking; a highlights-only fragment would suppress the remainder.
+        if record["marker"] and candidates and record["marker"].start() > 0:
             add_fragment_section(raw, record, "highlights", "highlights", 0, record["marker"].start(), "Highlights and contents (candidate text order)")
         for index, (start, end, number, heading) in enumerate(candidates):
             limit = candidates[index + 1][0] if index + 1 < len(candidates) else (record["appendixOffset"] or len(record["joined"]))

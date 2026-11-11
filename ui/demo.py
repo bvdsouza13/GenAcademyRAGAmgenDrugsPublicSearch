@@ -98,9 +98,13 @@ def render(service, corpus, active):
             st.caption('PREPARED QUIZ · SESSION-ONLY PRACTICE')
             quiz = example.prepared['quiz']
             st.markdown(f"**{quiz['question']}**")
+            # The widget key is cleaned up when another tour step is shown.
+            if 'demo_answer' not in st.session_state:
+                st.session_state['demo_answer'] = st.session_state.get('demo_selected_answer')
             answer = st.radio('Your answer', range(len(quiz['choices'])),
                               format_func=lambda i: quiz['choices'][i], index=None, key='demo_answer',
                               on_change=lambda: st.session_state.pop('demo_checked', None))
+            st.session_state['demo_selected_answer'] = answer
             if st.button('Check answer', disabled=answer is None, key='demo_check'):
                 st.session_state['demo_checked'] = True
             if st.session_state.get('demo_checked'):

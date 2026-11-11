@@ -42,10 +42,27 @@ class OpenAIClient:
         response = self.transport("https://api.openai.com/v1/responses", payload,
                                   headers={"Authorization": "Bearer " + self.config.openai_api_key},
                                   timeout=ai["request_timeout_seconds"])
-        if response.get("status") != "completed":
+        if not isinstance(response, dict) or response.get("status") != "completed":
             raise ValueError("The generation did not complete; no partial clinical answer was published.")
-        texts = [part["text"] for item in response.get("output", []) if item.get("type") == "message"
-                 for part in item.get("content", []) if part.get("type") == "output_text"]
+        output = response.get("output")
+        if not isinstance(output, list):
+            raise ValueError("The provider returned an invalid output envelope.")
+        texts = []
+        for item in output:
+            if not isinstance(item, dict):
+                raise ValueError("The provider returned an invalid output item.")
+            if item.get("type") != "message":
+                continue
+            parts = item.get("content")
+            if not isinstance(parts, list):
+                raise ValueError("The provider returned invalid message content.")
+            for part in parts:
+                if not isinstance(part, dict):
+                    raise ValueError("The provider returned an invalid content item.")
+                if part.get("type") == "output_text":
+                    if not isinstance(part.get("text"), str):
+                        raise ValueError("The provider returned invalid output text.")
+                    texts.append(part["text"])
         try:
             data = json.loads("".join(texts))
         except (ValueError, TypeError):

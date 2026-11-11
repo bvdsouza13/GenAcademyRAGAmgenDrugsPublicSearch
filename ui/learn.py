@@ -150,7 +150,13 @@ def quiz_panel(service,product,document,key,ready):
         return
     quiz=record['quiz']
     st.markdown(f"**{quiz['question']}**")
-    answer = st.radio('Your answer',range(len(quiz['choices'])),format_func=lambda i:quiz['choices'][i],index=None,key=f'quiz_answer_{key}')
+    answer_key = f'quiz_answer_{key}'
+    # Streamlit removes widget keys when their page/scope is not rendered.
+    # Keep the choice with the session's quiz so navigation preserves progress.
+    if answer_key not in st.session_state:
+        st.session_state[answer_key] = record.get('answer')
+    answer = st.radio('Your answer',range(len(quiz['choices'])),format_func=lambda i:quiz['choices'][i],index=None,key=answer_key)
+    record['answer'] = answer
     if record.get('submitted') and record.get('checked_answer') != answer:
         record['submitted']=False
     if st.button('Check answer',disabled=answer is None,key=f'check_quiz_{key}'):

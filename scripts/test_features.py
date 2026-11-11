@@ -18,6 +18,8 @@ GROUPS = {
     "integration": ["tests/test_service.py"],
     "evaluation": ["tests/test_evaluations.py"],
     "demo": ["tests/test_demo.py", "tests/test_demo_navigation.py"],
+    "regression": ["tests/test_regression_indexing.py", "tests/test_regression_corpus.py",
+                   "tests/test_regression_evidence.py", "tests/test_regression_ui.py"],
 }
 
 def main():

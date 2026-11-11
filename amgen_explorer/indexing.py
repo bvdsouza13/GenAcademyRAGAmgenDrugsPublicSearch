@@ -261,6 +261,8 @@ class IndexService:
         with self._lock() as db:
             self.client.check()  # schema/model/host validation always precedes writes
             old = read_json(self._run_path(manifest["run_id"]))
+            if old is not None and (not isinstance(old, dict) or old.get("run_id") != manifest["run_id"]):
+                raise ValueError("Saved run manifest does not match its requested identity.")
             if old and old.get("status") == "verified":
                 manifest_records(old, self.config)
                 return old
@@ -332,6 +334,8 @@ class IndexService:
     def _publish(self, run_id):
         with self._lock():
             manifest = read_json(self._run_path(run_id))
+            if manifest is not None and (not isinstance(manifest, dict) or manifest.get("run_id") != run_id):
+                raise ValueError("Saved run manifest does not match its requested identity.")
             if not manifest or manifest.get("status") != "verified":
                 raise ValueError("Only a complete, verified run can be published.")
             records = manifest_records(manifest, self.config)

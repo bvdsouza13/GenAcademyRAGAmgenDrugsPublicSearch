@@ -99,11 +99,14 @@ This custom XML is not FDA SPL. Normalized clinical fields remain unknown/unrevi
 .venv-corpus/bin/python scripts/test_features.py integration
 .venv-corpus/bin/python scripts/test_features.py evaluation
 .venv-corpus/bin/python scripts/test_features.py demo
+.venv-corpus/bin/python scripts/test_features.py regression
 ```
 
 Offline tests use fake providers and temporary storage; they need no API keys and make no paid calls. They cover corrupt PDF/build preservation, source-hash review invalidation, chunk coverage and limits, interrupted/idempotent loads, locks, stale publication, rollback, manifest tampering, scope isolation, unsupported claims, source instructions, snapshot downloads and Streamlit actions/reruns.
 
 GitHub Actions runs the complete offline suite and checks the canonical XML against all included PDFs on each push and pull request. The [QA report](docs/implementation/release-qa-report.md) records the release checks and their limits.
+
+The [additional regression assessment](docs/implementation/additional-regression-assessment.md) records 60 further boundary and failure cases, the resulting fixes, and the confidence limits. The [future-feature roadmap](docs/future-features.md) prioritizes broader reviewed coverage, evaluation, learning features and shared deployment.
 
 Explicit live tests:
 

@@ -139,12 +139,15 @@ class ExplorerService:
 
     def _snapshot(self, plan):
         corpus = self.corpus()
+        xml_bytes = corpus.xml_path.read_bytes()
+        if corpus.xml_hash != plan.xml_hash or hashlib.sha256(xml_bytes).hexdigest() != plan.xml_hash:
+            raise ValueError("The XML changed before its source snapshot was created. Preview the load again.")
         folder = self.config.path("corpus_dir") / corpus.xml_hash
         folder.mkdir(parents=True, exist_ok=True)
-        self._immutable_bytes(folder / "AmgenProducts.xml", corpus.xml_path.read_bytes())
+        self._immutable_bytes(folder / "AmgenProducts.xml", xml_bytes)
         for doc_id in {c.metadata["document_id"] for c in plan.chunks}:
-            doc, path = self._verified_document(doc_id, corpus)
-            self._immutable_bytes(folder / (doc.sha256 + ".pdf"), path.read_bytes())
+            doc, _, payload = self._verified_document_bytes(doc_id, corpus)
+            self._immutable_bytes(folder / (doc.sha256 + ".pdf"), payload)
 
     @staticmethod
     def _immutable_bytes(path, payload):
@@ -172,6 +175,11 @@ class ExplorerService:
         return _read_corpus(str(path), stat.st_mtime_ns, stat.st_size)
 
     def _verified_document(self, document_id, corpus=None, xml_hash=None):
+        doc, path, _ = self._verified_document_bytes(document_id, corpus, xml_hash)
+        return doc, path
+
+    def _verified_document_bytes(self, document_id, corpus=None, xml_hash=None):
+        """Keep the bytes checked by the hash for subsequent rendering/copying."""
         corpus = corpus or self.corpus()
         doc = next((d for d in corpus.documents if d.id == document_id), None) if corpus else None
         if not doc:
@@ -181,22 +189,23 @@ class ExplorerService:
         path = (directory / filename).resolve()
         if not path.is_relative_to(directory) or not path.is_file():
             raise ValueError("The original source PDF is unavailable.")
-        if hashlib.sha256(path.read_bytes()).hexdigest() != doc.sha256:
+        payload = path.read_bytes()
+        if hashlib.sha256(payload).hexdigest() != doc.sha256:
             raise ValueError("The source PDF changed. Rebuild XML and review the new passages.")
-        return doc, path
+        return doc, path, payload
 
     def source_pdf(self, document_id, xml_hash=None):
         corpus = self._pinned_corpus(xml_hash) if xml_hash else None
-        _, path = self._verified_document(document_id, corpus, xml_hash)
-        return path.read_bytes()
+        _, _, payload = self._verified_document_bytes(document_id, corpus, xml_hash)
+        return payload
 
     def source_page(self, document_id, page, xml_hash=None):
         import fitz
         corpus = self._pinned_corpus(xml_hash) if xml_hash else None
-        doc, path = self._verified_document(document_id, corpus, xml_hash)
+        doc, _, payload = self._verified_document_bytes(document_id, corpus, xml_hash)
         if not isinstance(page, int) or not 1 <= page <= doc.page_count:
             raise ValueError("The PDF page number is out of range.")
-        with fitz.open(path) as pdf:
+        with fitz.open(stream=payload, filetype="pdf") as pdf:
             return pdf[page - 1].get_pixmap(matrix=fitz.Matrix(1.2, 1.2)).tobytes("png")
 
     def _evidence(self, question, product_id, document_id=None):
