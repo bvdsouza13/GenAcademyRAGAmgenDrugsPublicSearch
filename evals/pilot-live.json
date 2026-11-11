@@ -1,0 +1,244 @@
+{
+  "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+  "reviewed_block_ids": [
+    "doc-aimovig-prescribing-information-section-12-1-p0007",
+    "doc-repatha-contains-dry-natural-rubber-prescribing-information-section-12-1-p0010",
+    "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1-p0010",
+    "doc-tezspire-prescribing-information-section-12-1-p0005"
+  ],
+  "review_kind": "assistant source-fidelity demonstration; not clinical approval",
+  "chunk_count": 6,
+  "run": {
+    "api_version": "2026-07",
+    "batch_count": 1,
+    "config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+    "created_at": 1794376507.19258,
+    "document_ids": [
+      "doc-aimovig-prescribing-information",
+      "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+      "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+      "doc-tezspire-prescribing-information"
+    ],
+    "embedding_model": "llama-text-embed-v2",
+    "estimated_tokens": 2571,
+    "excluded_count": 4630,
+    "failed_ids": [],
+    "fingerprint": "3720b5410d405b89bdd1352cb804a8b3e9b39532bd2ea0bfbe48fcb79c3d061a",
+    "index_host": "amgenproduct-7tgd2ef.svc.aped-4627-b74a.pinecone.io",
+    "index_name": "amgenproduct",
+    "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+    "product_ids": [
+      "product-aimovig",
+      "product-repatha",
+      "product-tezspire"
+    ],
+    "record_count": 6,
+    "records_path": "data/manifests/0151ae1ffce57a120133810f997b724e065a5dbd7cd3570608872d6cfb34b043.chunks.json",
+    "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+    "run_id": "0151ae1ffce57a120133810f997b724e065a5dbd7cd3570608872d6cfb34b043",
+    "status": "verified",
+    "succeeded": 6,
+    "token_guard": "conservative UTF-8 bytes + 8 <= 2048; not exact tokenizer",
+    "usage": {
+      "embed_total_tokens": 906
+    },
+    "usage_may_include_unreported_retries": false,
+    "verified_at": 1794376509.815781,
+    "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+    "published_at": 1794376511.4505768,
+    "previous_run_id": null
+  },
+  "load_seconds": 4.597,
+  "answers": [
+    {
+      "product_id": "product-repatha",
+      "document_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+      "question": "How does this medicine work?",
+      "seconds": 6.1,
+      "response": {
+        "answer": "Evolocumab blocks a protein called PCSK9 from attaching to LDL receptors. This leaves more receptors available to remove LDL cholesterol from the blood, lowering LDL cholesterol levels. [1]",
+        "citations": [
+          {
+            "id": "chunk-0878a387f9853632443ab0403b4591b6625e858ee6d67228c0e602bf33c71598",
+            "source_id": "chunk-0878a387f9853632443ab0403b4591b6625e858ee6d67228c0e602bf33c71598",
+            "block_ids": [
+              "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1-p0010"
+            ],
+            "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+            "chunker_version": "section-sentence-v1",
+            "content_hash": "6505a127cfc24596227368c55d728443a1b2af0cb4144a1c6f6c4970e50dcd5d",
+            "document_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+            "document_sha256": "7cd077380de177a50ea2dc253abd095a6a91904a7cbc6cf673acdc4218b5c0b9",
+            "filename": "repatha_not_made_with_natural_rubber_latex_prescribing_information.pdf",
+            "page_end": 10,
+            "page_start": 10,
+            "parser_version": "text-layer-sections-v2",
+            "product_id": "product-repatha",
+            "product_name": "REPATHA",
+            "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+            "review_state": "accepted",
+            "section_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1",
+            "section_kind": "fullPrescribingInformation",
+            "section_title": "12.1 \nMechanism of Action  ",
+            "source_spans": "[{\"archive_block_id\":\"doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-page-0010-text\",\"block_end\":443,\"block_start\":0,\"end\":899,\"page\":10,\"source_block_id\":\"doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1-p0010\",\"start\":456}]",
+            "source_text": "12.1 \nMechanism of Action  \n \nEvolocumab is a human monoclonal IgG2 directed against human proprotein convertase subtilisin kexin \ntype 9 (PCSK9). PCSK9 binds to the low-density lipoprotein receptor (LDLR) on the surface of \nhepatocytes to promote LDLR degradation within the liver. By inhibiting the binding of PCSK9 to \nLDLR, evolocumab increases the number of LDLRs available to clear LDL from the blood, thereby \nlowering LDL-C levels. \n \n",
+            "source_variant_hint": "repatha_not_made_with_natural_rubber_latex_prescribing_information.pdf",
+            "token_count_is_exact": false,
+            "token_count_method": "utf8-byte-upper-bound+8-reserve",
+            "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+            "label_revision": "revision not identified",
+            "text": "12.1 \nMechanism of Action  \n \nEvolocumab is a human monoclonal IgG2 directed against human proprotein convertase subtilisin kexin \ntype 9 (PCSK9). PCSK9 binds to the low-density lipoprotein receptor (LDLR) on the surface of \nhepatocytes to promote LDLR degradation within the liver. By inhibiting the binding of PCSK9 to \nLDLR, evolocumab increases the number of LDLRs available to clear LDL from the blood, thereby \nlowering LDL-C levels. \n \n",
+            "supporting_quote": "By inhibiting the binding of PCSK9 to \nLDLR, evolocumab increases the number of LDLRs available to clear LDL from the blood, thereby \nlowering LDL-C levels.",
+            "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706"
+          }
+        ],
+        "abstained": false,
+        "followups": [],
+        "usage": {
+          "generation": {
+            "input_tokens": 1147,
+            "input_tokens_details": {
+              "cache_write_tokens": 1144,
+              "cached_tokens": 0
+            },
+            "output_tokens": 169,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 1316
+          },
+          "verification": {
+            "input_tokens": 324,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 16,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 340
+          }
+        }
+      }
+    },
+    {
+      "product_id": "product-aimovig",
+      "document_id": null,
+      "question": "How does this medicine work?",
+      "seconds": 6.79,
+      "response": {
+        "answer": "The draft could not be verified against the reviewed passages. Inspect the source or ask a narrower question.",
+        "citations": [],
+        "abstained": true,
+        "followups": [],
+        "usage": {}
+      }
+    },
+    {
+      "product_id": "product-tezspire",
+      "document_id": null,
+      "question": "How does this medicine work?",
+      "seconds": 7.27,
+      "response": {
+        "answer": "Tezepelumab-ekko binds to TSLP and stops it from attaching to its receptor. TSLP is a signal involved early in the chain of inflammation. [1]\n\nBlocking TSLP lowers markers and signals linked to inflammation. However, exactly how tezepelumab-ekko works in asthma and CRSwNP has not been firmly established. [2]",
+        "citations": [
+          {
+            "id": "chunk-f5bf85848e61465a3a40ffb5ce3053d8d1d389edd363e44fa5eac7eee5981f18",
+            "source_id": "chunk-f5bf85848e61465a3a40ffb5ce3053d8d1d389edd363e44fa5eac7eee5981f18",
+            "block_ids": [
+              "doc-tezspire-prescribing-information-section-12-1-p0005"
+            ],
+            "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+            "chunker_version": "section-sentence-v1",
+            "content_hash": "78f0407ebeec9c8bae1f7e84f7c9d1b14663bf1394ac765b4632e7723e1ceaa8",
+            "document_id": "doc-tezspire-prescribing-information",
+            "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+            "filename": "tezspire_prescribing_information.pdf",
+            "page_end": 5,
+            "page_start": 5,
+            "parser_version": "text-layer-sections-v2",
+            "product_id": "product-tezspire",
+            "product_name": "TEZSPIRE",
+            "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+            "review_state": "accepted",
+            "section_id": "doc-tezspire-prescribing-information-section-12-1",
+            "section_kind": "fullPrescribingInformation",
+            "section_title": "12.1 Mechanism of Action",
+            "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":474,\"block_start\":0,\"end\":3071,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":2597}]",
+            "source_text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2\u03bb that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. ",
+            "source_variant_hint": "tezspire_prescribing_information.pdf",
+            "token_count_is_exact": false,
+            "token_count_method": "utf8-byte-upper-bound+8-reserve",
+            "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+            "label_revision": "revision not identified",
+            "text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2\u03bb that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. ",
+            "supporting_quote": "Tezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2\u03bb that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.",
+            "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706"
+          },
+          {
+            "id": "chunk-cd0247728ff5464cac3c6f83c195d70e97c3820c2eba15820987baf57670470f",
+            "source_id": "chunk-cd0247728ff5464cac3c6f83c195d70e97c3820c2eba15820987baf57670470f",
+            "block_ids": [
+              "doc-tezspire-prescribing-information-section-12-1-p0005"
+            ],
+            "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+            "chunker_version": "section-sentence-v1",
+            "content_hash": "9821324a6d63a9102f978be88e65867d0f47238a1193dcc4493cd112b8302328",
+            "document_id": "doc-tezspire-prescribing-information",
+            "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+            "filename": "tezspire_prescribing_information.pdf",
+            "page_end": 5,
+            "page_start": 5,
+            "parser_version": "text-layer-sections-v2",
+            "product_id": "product-tezspire",
+            "product_name": "TEZSPIRE",
+            "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+            "review_state": "accepted",
+            "section_id": "doc-tezspire-prescribing-information-section-12-1",
+            "section_kind": "fullPrescribingInformation",
+            "section_title": "12.1 Mechanism of Action",
+            "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":1125,\"block_start\":825,\"end\":3722,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3422}]",
+            "source_text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+            "source_variant_hint": "tezspire_prescribing_information.pdf",
+            "token_count_is_exact": false,
+            "token_count_method": "utf8-byte-upper-bound+8-reserve",
+            "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+            "label_revision": "revision not identified",
+            "text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+            "supporting_quote": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.",
+            "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706"
+          }
+        ],
+        "abstained": false,
+        "followups": [],
+        "usage": {
+          "generation": {
+            "input_tokens": 2510,
+            "input_tokens_details": {
+              "cache_write_tokens": 2507,
+              "cached_tokens": 0
+            },
+            "output_tokens": 402,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 2912
+          },
+          "verification": {
+            "input_tokens": 597,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 0
+            },
+            "output_tokens": 16,
+            "output_tokens_details": {
+              "reasoning_tokens": 0
+            },
+            "total_tokens": 613
+          }
+        }
+      }
+    }
+  ]
+}

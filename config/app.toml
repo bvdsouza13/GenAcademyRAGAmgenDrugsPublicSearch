@@ -1,0 +1,69 @@
+# Nonsecret application settings. Python 3.11+; read by amgen_explorer.config.
+# Shared by the Streamlit application, pipeline and command-line checks.
+[app]
+name = "Amgen Medicine Explorer"
+mode = "local"
+auth_enabled = false
+auto_create_index = false
+auto_reindex = false
+
+[paths]
+# All paths resolve against the repository root, regardless of working directory.
+source_dir = "Documents"
+xml_template = "XML/prescribing-information-template.xml"
+xml_output = "XML/AmgenProducts.xml"
+extraction_report = "output/corpus/extraction-report.json"
+corpus_dir = "data/corpora"
+review_database = "data/review.sqlite"
+ingestion_database = "data/ingestion.sqlite"
+manifest_dir = "data/manifests"
+active_corpus_manifest = "data/active-corpus.json"
+
+[pinecone]
+api_family = "documents"
+api_version = "2026-07"
+index_name = "amgenproduct"
+# Paste the exact hostname from describe-index after explicit index creation.
+# Hostname only: no https://, port, credentials, or path.
+index_host = "amgenproduct-7tgd2ef.svc.aped-4627-b74a.pinecone.io"
+# Proposed deployment; confirm availability and location before index creation.
+cloud = "aws"
+region = "us-east-1"
+# This adapter supports this pinned integrated-embedding profile only.
+embedding_model = "llama-text-embed-v2"
+text_field = "chunk_text"
+dimension = 1024
+metric = "cosine"
+# Existing index schema is immutable. All inputs are locally bounded before
+# requests, so END never silently shortens accepted application text.
+truncate = "END"
+max_input_tokens = 2048
+batch_size = 64
+max_batch_bytes = 2000000
+# Publish only a verified staged build. Pin its concrete namespace and XML hash
+# in paths.active_corpus_manifest; retain the previous build for rollback.
+namespace_strategy = "local_manifest"
+namespace_prefix = "pi"
+
+[chunking]
+strategy = "section_aware"
+target_tokens = 600
+overlap_tokens = 80
+prefix_template = "Medicine: {product_name}\nSection: {section_title}\n\n"
+# Actual tokenizer/chunker versions and this template must be pinned in each
+# ingestion manifest. Token limits include the rendered prefix.
+
+[retrieval]
+top_k = 10
+evidence_token_budget = 4000
+
+[openai]
+provider = "openai"
+api = "responses"
+# Account access verified by the connectivity check on 2026-11-11.
+model = "gpt-6.1-sol"
+reasoning_effort = "low"
+# Combined reasoning and visible-output budget for the Responses API.
+max_output_tokens = 4096
+request_timeout_seconds = 60
+store_responses = false

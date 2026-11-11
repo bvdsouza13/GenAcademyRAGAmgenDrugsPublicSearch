@@ -1,0 +1,435 @@
+{
+  "alternate": {
+    "run_id": "c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b67999d3931a558698",
+    "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+    "fingerprint": "d89cf23a85fa1b40b4bcebf6b7d074d19b374937d18d6e46becf7d5f776f1179",
+    "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+    "config_hash": "0b20a07d345db2e3f5b458c351e14d93a377e344183eb2e1408dec6eec46295c",
+    "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+    "record_count": 5,
+    "excluded_count": 4630,
+    "estimated_tokens": 2509,
+    "batch_count": 1,
+    "product_ids": [
+      "product-aimovig",
+      "product-repatha",
+      "product-tezspire"
+    ],
+    "document_ids": [
+      "doc-aimovig-prescribing-information",
+      "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+      "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+      "doc-tezspire-prescribing-information"
+    ],
+    "profile": {
+      "api_family": "documents",
+      "api_version": "2026-07",
+      "index_name": "amgenproduct",
+      "index_host": "amgenproduct-7tgd2ef.svc.aped-4627-b74a.pinecone.io",
+      "cloud": "aws",
+      "region": "us-east-1",
+      "embedding_model": "llama-text-embed-v2",
+      "text_field": "chunk_text",
+      "dimension": 1024,
+      "metric": "cosine",
+      "truncate": "END",
+      "max_input_tokens": 2048,
+      "namespace_strategy": "local_manifest",
+      "namespace_prefix": "pi"
+    },
+    "index_host": "amgenproduct-7tgd2ef.svc.aped-4627-b74a.pinecone.io",
+    "index_name": "amgenproduct",
+    "embedding_model": "llama-text-embed-v2",
+    "api_version": "2026-07",
+    "token_guard": "conservative UTF-8 bytes + 8 <= 2048; not exact tokenizer",
+    "status": "verified",
+    "created_at": 1794377058.085378,
+    "succeeded": 5,
+    "failed_ids": [],
+    "usage": {
+      "embed_total_tokens": 1240
+    },
+    "usage_may_include_unreported_retries": false,
+    "records_path": "data/manifests/c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b67999d3931a558698.chunks.json",
+    "verified_at": 1794377060.2651389
+  },
+  "original_run_id": "0151ae1ffce57a120133810f997b724e065a5dbd7cd3570608872d6cfb34b043",
+  "comparison": {
+    "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+    "product_id": "product-tezspire",
+    "rows": [
+      {
+        "question": "How does this medicine work?",
+        "A": {
+          "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+          "seconds": 0.194,
+          "passages": [
+            {
+              "id": "chunk-cd0247728ff5464cac3c6f83c195d70e97c3820c2eba15820987baf57670470f",
+              "text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "9821324a6d63a9102f978be88e65867d0f47238a1193dcc4493cd112b8302328",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":1125,\"block_start\":825,\"end\":3722,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3422}]",
+                "source_text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            },
+            {
+              "id": "chunk-f5bf85848e61465a3a40ffb5ce3053d8d1d389edd363e44fa5eac7eee5981f18",
+              "text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. ",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "78f0407ebeec9c8bae1f7e84f7c9d1b14663bf1394ac765b4632e7723e1ceaa8",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":474,\"block_start\":0,\"end\":3071,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":2597}]",
+                "source_text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. ",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            },
+            {
+              "id": "chunk-c07106f84cc671b601527d1812492c0960a28dfeaaa87517c634ba26a0b20164",
+              "text": "Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "90cb0857507ff450f3c6c6013bbc36423ce888b25518e7d57df60524edcbc42d",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":825,\"block_start\":474,\"end\":3422,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3071}]",
+                "source_text": "Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            }
+          ],
+          "source_blocks": 1,
+          "warnings": []
+        },
+        "B": {
+          "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+          "seconds": 0.223,
+          "passages": [
+            {
+              "id": "chunk-80943360ca4a7159f14bd0b78109ba5dba2c50b386a5647499387127fdb121f5",
+              "text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "0b20a07d345db2e3f5b458c351e14d93a377e344183eb2e1408dec6eec46295c",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "9821324a6d63a9102f978be88e65867d0f47238a1193dcc4493cd112b8302328",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":1125,\"block_start\":825,\"end\":3722,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3422}]",
+                "source_text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            },
+            {
+              "id": "chunk-7baa8e52564f10bec0338639010439339d59711a2aba2d0c2ae51bd7ad9754cd",
+              "text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "0b20a07d345db2e3f5b458c351e14d93a377e344183eb2e1408dec6eec46295c",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "91049ac9a349ef54c080a7ad5028797e7dce1f48465449a84477a94d9a3bf6dc",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":825,\"block_start\":0,\"end\":3422,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":2597}]",
+                "source_text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            }
+          ],
+          "source_blocks": 1,
+          "warnings": []
+        }
+      },
+      {
+        "question": "Is its mechanism definitively established in asthma and CRSwNP?",
+        "A": {
+          "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+          "seconds": 0.23,
+          "passages": [
+            {
+              "id": "chunk-cd0247728ff5464cac3c6f83c195d70e97c3820c2eba15820987baf57670470f",
+              "text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "9821324a6d63a9102f978be88e65867d0f47238a1193dcc4493cd112b8302328",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":1125,\"block_start\":825,\"end\":3722,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3422}]",
+                "source_text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            },
+            {
+              "id": "chunk-f5bf85848e61465a3a40ffb5ce3053d8d1d389edd363e44fa5eac7eee5981f18",
+              "text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. ",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "78f0407ebeec9c8bae1f7e84f7c9d1b14663bf1394ac765b4632e7723e1ceaa8",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":474,\"block_start\":0,\"end\":3071,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":2597}]",
+                "source_text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. ",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            },
+            {
+              "id": "chunk-c07106f84cc671b601527d1812492c0960a28dfeaaa87517c634ba26a0b20164",
+              "text": "Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "a75069450564274f32216a43857bfab5320794c9252075a0132ef0cb43b4cc13",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "90cb0857507ff450f3c6c6013bbc36423ce888b25518e7d57df60524edcbc42d",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":825,\"block_start\":474,\"end\":3422,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3071}]",
+                "source_text": "Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-0151ae1ffce57a120133810f997b724e065a5dbd7cd35706",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            }
+          ],
+          "source_blocks": 1,
+          "warnings": []
+        },
+        "B": {
+          "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+          "seconds": 0.233,
+          "passages": [
+            {
+              "id": "chunk-80943360ca4a7159f14bd0b78109ba5dba2c50b386a5647499387127fdb121f5",
+              "text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "0b20a07d345db2e3f5b458c351e14d93a377e344183eb2e1408dec6eec46295c",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "9821324a6d63a9102f978be88e65867d0f47238a1193dcc4493cd112b8302328",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":1125,\"block_start\":825,\"end\":3722,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":3422}]",
+                "source_text": "Blocking TSLP with tezepelumab-ekko \nreduces biomarkers and cytokines associated with inflammation including blood \neosinophils, airway submucosal eosinophils, IgE, FeNO, IL-5, and IL-13; however, the \nmechanism of tezepelumab-ekko action in asthma and CRSwNP has not been \ndefinitively established.\n",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            },
+            {
+              "id": "chunk-7baa8e52564f10bec0338639010439339d59711a2aba2d0c2ae51bd7ad9754cd",
+              "text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+              "metadata": {
+                "block_ids": [
+                  "doc-tezspire-prescribing-information-section-12-1-p0005"
+                ],
+                "chunk_config_hash": "0b20a07d345db2e3f5b458c351e14d93a377e344183eb2e1408dec6eec46295c",
+                "chunker_version": "section-sentence-v1",
+                "content_hash": "91049ac9a349ef54c080a7ad5028797e7dce1f48465449a84477a94d9a3bf6dc",
+                "document_id": "doc-tezspire-prescribing-information",
+                "document_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+                "filename": "tezspire_prescribing_information.pdf",
+                "page_end": 5,
+                "page_start": 5,
+                "parser_version": "text-layer-sections-v2",
+                "product_id": "product-tezspire",
+                "product_name": "TEZSPIRE",
+                "review_hash": "8bf4b40daaf22ea9f3755ff1c719000a1a7b96200b007a782e965d5ed102aa89",
+                "review_state": "accepted",
+                "section_id": "doc-tezspire-prescribing-information-section-12-1",
+                "section_kind": "fullPrescribingInformation",
+                "section_title": "12.1 Mechanism of Action",
+                "source_spans": "[{\"archive_block_id\":\"doc-tezspire-prescribing-information-page-0005-text\",\"block_end\":825,\"block_start\":0,\"end\":3422,\"page\":5,\"source_block_id\":\"doc-tezspire-prescribing-information-section-12-1-p0005\",\"start\":2597}]",
+                "source_text": "12.1 Mechanism of Action\nTezepelumab-ekko is a thymic stromal lymphopoietin (TSLP) blocker, human \nmonoclonal antibody IgG2λ that binds to human TSLP with a dissociation constant \nof 15.8 pM and blocks its interaction with the heterodimeric TSLP receptor. TSLP \nis a cytokine mainly derived from epithelial cells and occupies an upstream \nposition in inflammatory cascades.\nAirway and mucosal inflammation are important components of the pathogenesis of \nasthma and CRSwNP. Multiple cell types (e.g., mast cells, eosinophils, neutrophils, \nmacrophages, lymphocytes, ILC2 cells) and mediators (e.g., histamine, eicosanoids, \nleukotrienes, cytokines) are involved in airway and mucosal inflammation. \nIncreased levels of TSLP mRNA and protein are found in the airways of patients \nwith asthma as well as in nasal polyp tissue. ",
+                "source_variant_hint": "tezspire_prescribing_information.pdf",
+                "token_count_is_exact": false,
+                "token_count_method": "utf8-byte-upper-bound+8-reserve",
+                "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+              },
+              "namespace": "pi-c7e77fbb90f02a4ac864de47ee7dc5db05ed14af9c8a75b6",
+              "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+            }
+          ],
+          "source_blocks": 1,
+          "warnings": []
+        }
+      }
+    ],
+    "evidence_token_budget": 4000,
+    "note": "Same questions, product and evidence budget. Inspect source coverage and qualifiers; these are retrieval observations, not clinical accuracy scores."
+  },
+  "publication_verified": true,
+  "rollback_verified": true
+}

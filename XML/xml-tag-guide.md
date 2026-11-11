@@ -1,0 +1,37 @@
+# Local prescribing-information XML guide
+
+Namespace: `urn:local:pi-corpus:1`; extraction extensions: `urn:local:pi-corpus:extraction:1` (`corpus:`). This is a custom local corpus, **not FDA Structured Product Labeling**.
+
+`prescribing-information.xsd` is a compatible local **structural schema**. It validates the collection envelope, product/document child order, known local content vocabulary, XML IDs and attribute syntax supported by that envelope. Generic content nodes intentionally permit the illustrative template's optional fact/list/table/figure structures and extraction extensions. It does not assert clinical correctness, infer missing facts, or prove a table's reading order. `load_corpus()` additionally validates hashes, references, page bounds and exact character spans. Both the supplied illustrative template and built collection validate against the structural schema. The template is illustrative and cannot be loaded as an extracted corpus because it has no PDF hashes/pages.
+
+## Records and unknown values
+
+- `products/product`: stable product identity and raw, evidence-backed title names. Unknown clinical fields retain `presence="unknown" derivation="unassessed"`. Filename-derived display fallbacks are catalog labels, not verified clinical facts.
+- `documents/document`: one record per distinct input file, including duplicate bytes and both Repatha files. `acquisition/localPath`, `sha256` and `byteSize` describe the actual local PDF. Source download URLs/current-label/supersession facts remain unknown.
+- `coverage/productRef`: product association; `corpus:sourceScope` retains a filename hint with `applicabilityStatus="unverified"`. This never establishes a device's applicability. The template's unresolved variant identifier is explicitly marked `placeholderNotAnIdentifiedPresentation`; it is never emitted as a verified variant.
+- `labelMetadata`: initial approval and printed revision are extracted only when the source supports them. Month precision stays `YYYY-MM`. The Python document contract exposes a revision as verified only when its element explicitly has `reviewStatus="reviewed"`; parsing alone never supplies that status.
+- `structuredLabel`: initial extraction leaves normalized clinical fields unknown. Accepting a raw passage in the review database does not approve unrelated normalized fields.
+
+## Exact source text and sections
+
+Every physical PDF page has a `rawSections/section kind="sourcePageArchive"`. `corpus:pdfPage` is one-based physical page number, independent of printed page label. Its paragraph retains `page.get_text("text", sort=False)` without whitespace normalization, including a hash and `xml:space="preserve"`. XML-incompatible characters or carriage returns cause an explicit failed build rather than silent data loss. Text-layer reading order can be incorrect on complex layouts and requires source inspection.
+
+Candidate full-PI top-level sections and numbered subsections use exact page slices. `highlights`, `medicationGuide`, `patientInformation` and `instructionsForUse` remain separate kinds. Headings are candidate structural detection, never clinical interpretation. Every fragment paragraph has an `evidence` reference to its page archive with `corpus:characterStart`, `corpus:characterEndExclusive` and `corpus:fragmentRef`. Offsets count Python Unicode characters in the archived page text. Candidate paragraph text must equal that exact half-open page slice and match its SHA-256.
+
+Page archives and section slices overlap intentionally; chunk preparation excludes page archives whenever candidate sections exist for that document. All archive text remains available for inspection. Candidate Table/Figure headings mark associated fragment paragraphs with hard exclusions `unresolved_table`/`unresolved_figure`. This heuristic cannot identify every table or layout error. Reviewers must inspect the PDF even where no heuristic warning exists. A corrected verified table must keep its headers, units and footnotes together (`verifiedTable` blocks); oversized tables are excluded without truncation.
+
+No OCR engine is installed/required by this build. Pages with no usable text retain the exact empty/short archive and page-specific `noUsableTextOcrUnavailable` status; they are not represented as readable or reviewed. Short text alone does not prove a blank page. All documents/pages are counted. Corrupt PDFs cause an attached failure report and preserve the last canonical artifact.
+
+## Review and chunk provenance
+
+SQLite decisions are append-only accepted/rejected/needs-review records bound to PDF hash, passage hash, parser version, block ID, section/product/document scope, warnings and precise evidence coordinates. Reviewer, UTC timestamp, note and `scope="raw-passage-only"` are retained. Changing any bound value invalidates that passage's acceptance. A single read snapshot supplies preview statuses and its review fingerprint.
+
+Chunks retain exact source spans in `source_spans` (flat JSON string in search metadata). Each span includes source passage ID, archived page ID, physical page, source-page offsets, and offsets within the passage. Text drawn from successive pages has a documented inserted newline between page fragments; the source spans retain original positions. Prefix text is contextual metadata rather than a source quote. `source_text` is the selected source text before prefix. Chunk IDs bind document hash, content hash, exact spans, section and chunk configuration. No chunk crosses products, documents or section kinds.
+
+Defaults are a 600-unit target and 80-unit overlap. **The default unit is UTF-8 byte upper bound, not exact model tokens.** Every complete embedded string, including prefix, must satisfy `len(text.encode("utf-8")) + 8 <= 2048`. Eight units reserve special-token overhead for the Llama byte-level tokenizer. A hash-pinned local `tokenizer.json` can give an exact count for that local artifact, but provider tokenizer parity remains unverified and the independent byte guard still applies. Ordinary sentences and verified tables are indivisible; long complete sentences can exceed the soft target but never the hard model guard. Oversized indivisible units appear with exact exclusion spans and no silent truncation. Overlap keeps whole sentences where they fit its budget; actual overlap can be zero when the last complete sentence exceeds that budget.
+
+## Build and rollback
+
+Run `.venv-corpus/bin/python scripts/build_amgen_xml.py` to stage, verify source hashes/text roundtrip, validate structure and atomically replace `XML/AmgenProducts.xml`. The preceding bytes are preserved at `XML/snapshots/<previous-sha256>.xml`. `AmgenProducts.report.json` records the output hash, source inventory, counts, extraction issues and schema status. The XML replacement is atomic; the report is separately atomically written and must be interpreted against its `artifactSha256`. Rebuilding invokes no embedding, upload, network, clinical approval or activation operation.
+
+Run `.venv-corpus/bin/python scripts/build_amgen_xml.py --validate-only` for local structure/provenance verification. This read-only command validates retained XML structure/evidence and calls `validate_source_files(corpus, source_dir)` to compare the exact current PDF inventory, every current PDF SHA-256, physical page counts and every source-order archived page text. New, missing or changed PDFs fail validation and require an explicit rebuild. Validation does not rewrite XML, snapshots or review records.

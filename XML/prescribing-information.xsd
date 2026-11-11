@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='utf-8'?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:local:pi-corpus:1" xmlns:p="urn:local:pi-corpus:1" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:documentation>Compatible local structural envelope, known content vocabulary and XML ID constraints. Clinical facts, source spans and references require application validation. Not FDA SPL.</xs:documentation>
+  </xs:annotation>
+  <xs:complexType name="contentNode" mixed="true">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="abuseDependence" type="p:contentNode" />
+      <xs:element name="acquisition" type="p:contentNode" />
+      <xs:element name="administration" type="p:contentNode" />
+      <xs:element name="adverseReaction" type="p:contentNode" />
+      <xs:element name="altText" type="p:contentNode" />
+      <xs:element name="boxedWarning" type="p:contentNode" />
+      <xs:element name="brandName" type="p:contentNode" />
+      <xs:element name="byteSize" type="p:contentNode" />
+      <xs:element name="caption" type="p:contentNode" />
+      <xs:element name="cell" type="p:contentNode" />
+      <xs:element name="condition" type="p:contentNode" />
+      <xs:element name="contraindication" type="p:contentNode" />
+      <xs:element name="coverage" type="p:contentNode" />
+      <xs:element name="device" type="p:contentNode" />
+      <xs:element name="documentKind" type="p:contentNode" />
+      <xs:element name="documentTitle" type="p:contentNode" />
+      <xs:element name="dosageForm" type="p:contentNode" />
+      <xs:element name="dose" type="p:contentNode" />
+      <xs:element name="doseModification" type="p:contentNode" />
+      <xs:element name="drugInteraction" type="p:contentNode" />
+      <xs:element name="duration" type="p:contentNode" />
+      <xs:element name="effectiveTime" type="p:contentNode" />
+      <xs:element name="efficacyResult" type="p:contentNode" />
+      <xs:element name="etag" type="p:contentNode" />
+      <xs:element name="evidence" type="p:contentNode" />
+      <xs:element name="extractionQuality" type="p:contentNode" />
+      <xs:element name="figure" type="p:contentNode" />
+      <xs:element name="finalUrl" type="p:contentNode" />
+      <xs:element name="footnote" type="p:contentNode" />
+      <xs:element name="frequency" type="p:contentNode" />
+      <xs:element name="genericName" type="p:contentNode" />
+      <xs:element name="heading" type="p:contentNode" />
+      <xs:element name="httpStatus" type="p:contentNode" />
+      <xs:element name="indication" type="p:contentNode" />
+      <xs:element name="ingredient" type="p:contentNode" />
+      <xs:element name="initialApprovalYear" type="p:contentNode" />
+      <xs:element name="issue" type="p:contentNode" />
+      <xs:element name="item" type="p:contentNode" />
+      <xs:element name="jurisdiction" type="p:contentNode" />
+      <xs:element name="labelMetadata" type="p:contentNode" />
+      <xs:element name="labelRevision" type="p:contentNode" />
+      <xs:element name="language" type="p:contentNode" />
+      <xs:element name="lastModified" type="p:contentNode" />
+      <xs:element name="limitationOfUse" type="p:contentNode" />
+      <xs:element name="list" type="p:contentNode" />
+      <xs:element name="localPath" type="p:contentNode" />
+      <xs:element name="manufacturer" type="p:contentNode" />
+      <xs:element name="matchBasis" type="p:contentNode" />
+      <xs:element name="mechanismOfAction" type="p:contentNode" />
+      <xs:element name="mediaType" type="p:contentNode" />
+      <xs:element name="ndc" type="p:contentNode" />
+      <xs:element name="nonclinicalToxicology" type="p:contentNode" />
+      <xs:element name="normalizedValue" type="p:contentNode" />
+      <xs:element name="note" type="p:contentNode" />
+      <xs:element name="overdosage" type="p:contentNode" />
+      <xs:element name="packageDescription" type="p:contentNode" />
+      <xs:element name="pageCount" type="p:contentNode" />
+      <xs:element name="pagesProcessed" type="p:contentNode" />
+      <xs:element name="paragraph" type="p:contentNode" />
+      <xs:element name="patientCounseling" type="p:contentNode" />
+      <xs:element name="pharmacodynamics" type="p:contentNode" />
+      <xs:element name="pharmacokinetics" type="p:contentNode" />
+      <xs:element name="population" type="p:contentNode" />
+      <xs:element name="populationGuidance" type="p:contentNode" />
+      <xs:element name="printedPageLabel" type="p:contentNode" />
+      <xs:element name="productRef" type="p:contentNode" />
+      <xs:element name="quote" type="p:contentNode" />
+      <xs:element name="rawSections" type="p:contentNode" />
+      <xs:element name="recentChange" type="p:contentNode" />
+      <xs:element name="regimen" type="p:contentNode" />
+      <xs:element name="retrievedAt" type="p:contentNode" />
+      <xs:element name="route" type="p:contentNode" />
+      <xs:element name="row" type="p:contentNode" />
+      <xs:element name="section" type="p:contentNode" />
+      <xs:element name="setId" type="p:contentNode" />
+      <xs:element name="sha256" type="p:contentNode" />
+      <xs:element name="sourceIndex" type="p:contentNode" />
+      <xs:element name="sourceUrl" type="p:contentNode" />
+      <xs:element name="splMatch" type="p:contentNode" />
+      <xs:element name="splUrl" type="p:contentNode" />
+      <xs:element name="storageCondition" type="p:contentNode" />
+      <xs:element name="strength" type="p:contentNode" />
+      <xs:element name="structuredLabel" type="p:contentNode" />
+      <xs:element name="study" type="p:contentNode" />
+      <xs:element name="studyDesign" type="p:contentNode" />
+      <xs:element name="table" type="p:contentNode" />
+      <xs:element name="textRaw" type="p:contentNode" />
+      <xs:element name="toolName" type="p:contentNode" />
+      <xs:element name="toolVersion" type="p:contentNode" />
+      <xs:element name="variant" type="p:contentNode" />
+      <xs:element name="variants" type="p:contentNode" />
+      <xs:element name="versionNumber" type="p:contentNode" />
+      <xs:element name="warningPrecaution" type="p:contentNode" />
+      <xs:any namespace="##other" processContents="lax" />
+    </xs:choice>
+    <xs:attribute name="id" type="xs:ID" />
+    <xs:anyAttribute processContents="lax" />
+  </xs:complexType>
+  <xs:element name="products">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="product" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="brandName" type="p:contentNode" />
+              <xs:element name="genericName" type="p:contentNode" />
+              <xs:element name="manufacturer" type="p:contentNode" />
+              <xs:element name="variants" type="p:contentNode" />
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID" use="required" />
+            <xs:anyAttribute processContents="lax" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="documents">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="document" minOccurs="0" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="coverage" type="p:contentNode" />
+              <xs:element name="acquisition" type="p:contentNode" />
+              <xs:element name="labelMetadata" type="p:contentNode" />
+              <xs:element name="splMatch" type="p:contentNode" />
+              <xs:element name="rawSections" type="p:contentNode" />
+              <xs:element name="structuredLabel" type="p:contentNode" />
+              <xs:element name="extractionQuality" type="p:contentNode" />
+            </xs:sequence>
+            <xs:attribute name="id" type="xs:ID" use="required" />
+            <xs:anyAttribute processContents="lax" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="prescribingInformationCollection">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sourceIndex" type="p:contentNode" />
+        <xs:element ref="p:products" />
+        <xs:element ref="p:documents" />
+      </xs:sequence>
+      <xs:attribute name="schemaVersion" type="xs:string" use="required" />
+      <xs:anyAttribute processContents="lax" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

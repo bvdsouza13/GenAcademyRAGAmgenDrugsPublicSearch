@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ILLUSTRATIVE CUSTOM TEMPLATE ONLY. No drug facts or PDF text have been extracted here.
+     This is not FDA Structured Product Labeling (SPL). Read xml-tag-guide.md first.
+     Copy blocks as needed; replace template IDs; preserve evidence and variant scope.
+     Omit unknown typed values rather than inventing dates, numbers, or checksums. -->
+<prescribingInformationCollection xmlns="urn:local:pi-corpus:1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:local:pi-corpus:1 prescribing-information.xsd"
+    schemaVersion="1.0" contentStatus="illustrative">
+  <!-- Add snapshotCapturedAt and snapshotSha256 only from an actual saved index snapshot. -->
+  <sourceIndex indexUrl="https://www.amgen.com/products"/>
+  <products>
+    <!-- One stable product identity; separate variant IDs for formulation/device differences. -->
+    <product id="template-product">
+      <brandName presence="unknown" derivation="unassessed"/>
+      <genericName presence="unknown" derivation="unassessed"/>
+      <manufacturer presence="unknown" derivation="unassessed"/>
+      <variants>
+        <variant id="template-variant">
+          <ingredient presence="unknown" derivation="unassessed" kind="active"/>
+          <strength presence="unknown" derivation="unassessed">
+            <!-- After verification: textRaw, then normalizedValue elements with kinds
+                 numerator, denominator, or totalContent, units, then evidence. -->
+          </strength>
+          <dosageForm presence="unknown" derivation="unassessed"/>
+          <route presence="unknown" derivation="unassessed"/>
+          <device presence="unknown" derivation="unassessed"/>
+          <packageDescription presence="unknown" derivation="unassessed"/>
+          <ndc presence="unknown" derivation="unassessed" kind="package"/>
+        </variant>
+      </variants>
+    </product>
+  </products>
+  <documents>
+    <!-- Repeat document for each distinct PDF version, even when the product is the same.
+         Set recordVersion only for the local extraction record's actual revision number.
+         Add supersedesDocumentRef only after establishing a same-scope version relationship. -->
+    <document id="template-document" contentStatus="illustrative">
+      <coverage>
+        <productRef ref="template-product" variantRefs="template-variant" coverageStatus="unknown"/>
+      </coverage>
+      <acquisition status="placeholder">
+        <!-- In this order, add observed values only:
+             sourceUrl (original PI link), finalUrl (after redirects),
+             retrievedAt (xs:dateTime with timezone), localPath, mediaType,
+             byteSize (nonnegative integer), sha256 (64 lowercase hexadecimal digits),
+             httpStatus (100 to 599), etag, lastModified (raw HTTP header).
+             The real acquisition inventory accompanies the PDFs separately. -->
+      </acquisition>
+      <labelMetadata>
+        <documentTitle presence="unknown" derivation="unassessed"/>
+        <!-- Optional fields in schema order: jurisdiction, language, documentKind,
+             initialApprovalYear (YYYY), labelRevision (YYYY, YYYY-MM, or YYYY-MM-DD),
+             evidence (repeatable), note.
+             Preserve printed date precision. Initial approval is not label revision. -->
+      </labelMetadata>
+      <splMatch status="notAssessed">
+        <!-- Optional, in order: setId, versionNumber (positive integer),
+             effectiveTime (exact SPL value), splUrl, matchBasis.
+             A brand-name search result is not a verified match. -->
+      </splMatch>
+      <rawSections coverage="notExtracted">
+        <!-- Placeholder block inventory; no text below claims to be from a PDF.
+             Replace with the document's actual order and section numbering. -->
+        <section id="template-raw-section" kind="fullPrescribingInformation"
+                 presence="unknown" fidelity="unverified">
+          <heading><!-- Exact printed heading. --></heading>
+          <paragraph id="template-paragraph" xml:space="preserve"><!-- Exact paragraph. --></paragraph>
+          <list ordered="false">
+            <item><!-- Exact list item. --></item>
+          </list>
+          <table id="template-table">
+            <caption><!-- Exact table title. --></caption>
+            <row>
+              <cell header="true"><!-- Column heading, including units. --></cell>
+              <cell header="true"><!-- Column heading, including denominator. --></cell>
+            </row>
+            <row>
+              <cell><!-- Row label. --></cell>
+              <cell footnoteRefs="template-footnote"><!-- Exact cell; preserve symbols. --></cell>
+            </row>
+            <footnote id="template-footnote"><!-- Exact marker and footnote. --></footnote>
+          </table>
+          <figure id="template-figure" altTextDerivation="unassessed">
+            <!-- Add file, pageStart/pageEnd and sha256 only for a real retained image. -->
+            <caption><!-- Exact figure caption. --></caption>
+            <altText><!-- Omit unless available or deliberately authored and marked inferred. --></altText>
+          </figure>
+          <section id="template-subsection" presence="unknown" fidelity="unverified">
+            <heading><!-- Exact subsection heading; add its printed number attribute. --></heading>
+            <paragraph figureRefs="template-figure"><!-- Exact referencing paragraph. --></paragraph>
+          </section>
+        </section>
+      </rawSections>
+      <structuredLabel>
+        <!-- Every clinical item uses the same fact pattern. Once extracted, supply:
+             textRaw: exact source statement;
+             normalizedValue: optional controlled term, numeric lexical value, or summary;
+             evidence: documentRef, sectionRef/blockRef, 1-based PDF pageStart/pageEnd,
+                       printedPageLabel, and optionally quote;
+             note: normalization rule, uncertainty, or reason for a verified absence.
+             Set presence, derivation, reviewStatus, and scope accurately.
+             scope=selectedVariants requires variantRefs; unspecified means applicability unknown. -->
+        <boxedWarning presence="unknown" derivation="unassessed"/>
+        <indication id="template-indication">
+          <condition presence="unknown" derivation="unassessed"/>
+          <population presence="unknown" derivation="unassessed"/>
+          <limitationOfUse presence="unknown" derivation="unassessed"/>
+        </indication>
+        <regimen id="template-regimen">
+          <!-- Add indicationRefs/variantRefs only after checking actual applicability. -->
+          <population presence="unknown" derivation="unassessed"/>
+          <dose presence="unknown" derivation="unassessed" kind="initial"/>
+          <dose presence="unknown" derivation="unassessed" kind="maintenance"/>
+          <frequency presence="unknown" derivation="unassessed"/>
+          <duration presence="unknown" derivation="unassessed"/>
+          <administration presence="unknown" derivation="unassessed"/>
+          <doseModification presence="unknown" derivation="unassessed"/>
+        </regimen>
+        <contraindication presence="unknown" derivation="unassessed"/>
+        <warningPrecaution presence="unknown" derivation="unassessed"/>
+        <adverseReaction presence="unknown" derivation="unassessed" kind="clinicalTrials"/>
+        <adverseReaction presence="unknown" derivation="unassessed" kind="postmarketing"/>
+        <drugInteraction presence="unknown" derivation="unassessed"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="pregnancy"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="lactation"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="reproductivePotential"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="pediatric"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="geriatric"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="renalImpairment"/>
+        <populationGuidance presence="unknown" derivation="unassessed" kind="hepaticImpairment"/>
+        <mechanismOfAction presence="unknown" derivation="unassessed"/>
+        <pharmacodynamics presence="unknown" derivation="unassessed"/>
+        <pharmacokinetics presence="unknown" derivation="unassessed" kind="absorption"/>
+        <pharmacokinetics presence="unknown" derivation="unassessed" kind="distribution"/>
+        <pharmacokinetics presence="unknown" derivation="unassessed" kind="metabolism"/>
+        <pharmacokinetics presence="unknown" derivation="unassessed" kind="elimination"/>
+        <study id="template-study">
+          <studyDesign presence="unknown" derivation="unassessed"/>
+          <population presence="unknown" derivation="unassessed"/>
+          <efficacyResult presence="unknown" derivation="unassessed"/>
+        </study>
+        <storageCondition presence="unknown" derivation="unassessed" kind="unopened"/>
+        <storageCondition presence="unknown" derivation="unassessed" kind="inUse"/>
+        <recentChange presence="unknown" derivation="unassessed"/>
+        <patientCounseling presence="unknown" derivation="unassessed"/>
+        <overdosage presence="unknown" derivation="unassessed"/>
+        <abuseDependence presence="unknown" derivation="unassessed"/>
+        <nonclinicalToxicology presence="unknown" derivation="unassessed"/>
+      </structuredLabel>
+      <extractionQuality status="notStarted" method="none" reviewStatus="unreviewed">
+        <!-- Add toolName, toolVersion, pageCount, pagesProcessed, issue in that order.
+             Add extractedAt/reviewedAt/reviewer attributes only when actually known. -->
+        <issue severity="info">Illustrative schema template; no clinical content has been extracted or reviewed.</issue>
+      </extractionQuality>
+    </document>
+  </documents>
+</prescribingInformationCollection>

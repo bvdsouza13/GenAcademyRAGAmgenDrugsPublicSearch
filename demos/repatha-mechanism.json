@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "kind": "prepared-source-backed-example",
+  "origin": "Prepared from a previously exercised cited answer; no provider request runs during the tour.",
+  "question": "What target does this medicine bind to, according to section 12.1?",
+  "answer": "Evolocumab binds to human PCSK9, short for proprotein convertase subtilisin kexin type 9. [1]",
+  "citation": {
+    "document_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+    "document_sha256": "7cd077380de177a50ea2dc253abd095a6a91904a7cbc6cf673acdc4218b5c0b9",
+    "filename": "repatha_not_made_with_natural_rubber_latex_prescribing_information.pdf",
+    "page_start": 10,
+    "page_end": 10,
+    "product_id": "product-repatha",
+    "product_name": "REPATHA",
+    "section_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1",
+    "section_title": "12.1 \nMechanism of Action  ",
+    "block_ids": [
+      "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1-p0010"
+    ],
+    "source_text": "12.1 \nMechanism of Action  \n \nEvolocumab is a human monoclonal IgG2 directed against human proprotein convertase subtilisin kexin \ntype 9 (PCSK9). PCSK9 binds to the low-density lipoprotein receptor (LDLR) on the surface of \nhepatocytes to promote LDLR degradation within the liver. By inhibiting the binding of PCSK9 to \nLDLR, evolocumab increases the number of LDLRs available to clear LDL from the blood, thereby \nlowering LDL-C levels. \n \n",
+    "supporting_quote": "Evolocumab is a human monoclonal IgG2 directed against human proprotein convertase subtilisin kexin \ntype 9 (PCSK9).",
+    "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572"
+  },
+  "source_spans": [
+    {
+      "archive_block_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-page-0010-text",
+      "block_end": 443,
+      "block_start": 0,
+      "end": 899,
+      "page": 10,
+      "source_block_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information-section-12-1-p0010",
+      "start": 456
+    }
+  ],
+  "quiz": {
+    "question": "According to this source passage, which target is evolocumab directed against?",
+    "choices": [
+      "Human PCSK9",
+      "The source passage does not name a target"
+    ],
+    "correct_index": 0,
+    "rationale": "The passage states that evolocumab is directed against human proprotein convertase subtilisin kexin type 9 (PCSK9). [1]"
+  }
+}
