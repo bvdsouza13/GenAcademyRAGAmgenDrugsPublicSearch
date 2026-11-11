@@ -1,6 +1,6 @@
 # Bulk library and global content search — release verification
 
-Date: 2026-11-11. This report supersedes the earlier manual-review pilot reports for the current workflow. Release verification is in progress; completed observations are distinguished from pending checks below.
+Date: 2026-11-11. This report supersedes the earlier manual-review pilot reports for the current workflow. Local release verification is complete; measured results and operating limits are recorded below.
 
 ## Delivered behavior
 
@@ -46,12 +46,34 @@ Raw local smoke output: `output/bulk-live-check.json` (ignored runtime artifact)
 
 ## Chunk comparison and release completion
 
-A separate 900/80 full-library candidate and the source-bound saved-question comparison are running. The baseline remains active. Final measured scores, activate/revert verification, clean-checkout/remote CI and publication status will be recorded here before completion.
+The separate **900/80** candidate contains **6,369 records** with the same complete source coverage. Provider-reported embedding usage was **2,279,817 tokens**. The controlled comparison completed without semantic degradation, using 42 retrieval questions. Results are observed suite measurements, not clinical accuracy or production latency guarantees.
+
+| Measured metric | 600/80 baseline | 900/80 candidate |
+|---|---:|---:|
+| Expected-document recall at k | 96.772% | 96.085% |
+| Mean reciprocal rank | 0.9881 | 1.0000 |
+| Expected quote/span coverage | 86.378% | 88.759% |
+| Citation resolution | 100% | 100% |
+| Explicit-scope contamination | 0% | 0% |
+| Mean observed search latency | 1,295 ms | 1,111 ms |
+
+The candidate improved expected-text coverage by about 2.38 percentage points and used fewer chunks, while expected-document recall was about 0.69 points lower. Keep 600/80 as the default; these tradeoffs do not establish a universal winner. Both versions are retained for further comparison. The compact [live evidence summary](../../evals/bulk-live-summary.json) includes settings, source/suite identities, per-case metrics and provider usage.
+
+A clean local clone of implementation commit `b095c33` passed **349 tests plus 21 subtests** with a second shuffled order (seed `314159`), networking blocked and zero network attempts. It contained no runtime databases or secrets. Live activation of the candidate succeeded, all 37 documents remained present, and a conversation explicitly pinned to the prior run retrieved its original evidence after the switch. Revert then restored the 600/80 baseline with all 9,110 records. Both configurations and the legacy pilot remain retained. Remote checks are available in [GitHub Actions](https://github.com/bvdsouza13/GenAcademyRAGWeek2/actions/workflows/tests.yml); the final handoff reports the observed push result.
 
 The evaluation suite includes 37 source-linked mechanism fixtures, five global discovery queries and 13 retained behavioral fixtures. The 42 retrieval cases use equal evidence budgets and alternating evaluation order. Behavioral cases remain separate regression checks, not unearned generated-answer accuracy scores. Source updates materialize a new pinned suite: unique exact quotations may be rebound, unavailable expectations remain zero-coverage cases, and new documents receive source-bound coverage cases.
+
+## Browser verification
+
+Native Chrome checks confirmed the new Search & Learn navigation, 37/36 searchable counts, ACTIMMUNE body-text results and citations, Admin's 9,110 verified-record count, and chunk controls at 600/80. Reset defaults retained the controls without running an experiment. The Amgen-branded Admin layout was visually inspected; long search groups now show three passages with an expander for additional matches. Automated UI checks cover the full demo and per-page source actions.
 
 ## Documentation and operating limits
 
 README, product/technical design, setup/Pinecone instructions, architecture, demo, evaluation notes and roadmap were refreshed. Architecture, data-flow and deployment diagrams have editable Mermaid/renderer sources and regenerated SVG/PNG outputs. Historical reports are marked as such.
 
 This remains a local educational application. The Admin view is not server-side authorization. OCR, clinical review, hosted multi-user isolation, load testing and lifecycle cleanup of retained namespaces are future work. Retained versions consume storage; reset/revert does not delete them. Credentials remain in ignored local secrets/environment variables; no `.env` loader was introduced.
+
+
+## Confidence assessment
+
+Engineering confidence is **high for the supplied local educational workflow (8.5/10, a judgment rather than a measured probability)**. Evidence includes full source coverage, 349 tests plus 21 subtests, two network-blocked shuffled runs including a clean clone, actual provider retrieval/teaching, controlled A/B scoring, and verified activation/revert. Confidence is lower for untested hosted concurrency, image-only documents and clinical interpretation; those remain outside this release. The supplied documents are not asserted to be current prescribing labels.

@@ -1,0 +1,1697 @@
+{
+  "date": "2026-11-11",
+  "baseline": {
+    "run_id": "fac1a4e52d6904672ccf1882b520b83beaef77bf581aa729b5d7461e5bb110a6",
+    "namespace": "pi-fac1a4e52d6904672ccf1882b520b83beaef77bf581aa729",
+    "record_count": 9110,
+    "document_count": 37,
+    "product_count": 36,
+    "page_count": 1439,
+    "coverage": {
+      "expected_characters": 3398430,
+      "covered_characters": 3398430,
+      "expected_pages": 1439,
+      "blank_pages": [],
+      "missing_intervals": [],
+      "complete": true
+    },
+    "chunk_settings": {
+      "target_tokens": 600,
+      "overlap_tokens": 80,
+      "prefix_template": "Medicine: {product_name}\nSection: {section_title}\n\n",
+      "strategy": "section_aware",
+      "tokenizer": "utf8-byte-upper-bound",
+      "tokenizer_version": "1",
+      "prefix_version": "1",
+      "chunker_version": "section-sentence-v1",
+      "provenance_policy_version": "exact-spans-v1",
+      "max_input_tokens": 2048,
+      "tokenizer_path": "",
+      "tokenizer_sha256": ""
+    },
+    "usage": {
+      "embed_total_tokens": 2693514
+    }
+  },
+  "candidate": {
+    "run_id": "301119df0a1c26272eb5fc588bea84cd5c1b58fbf0b0b366c94ff43a30f7949b",
+    "namespace": "pi-301119df0a1c26272eb5fc588bea84cd5c1b58fbf0b0b366",
+    "record_count": 6369,
+    "coverage": {
+      "expected_characters": 3398430,
+      "covered_characters": 3398430,
+      "expected_pages": 1439,
+      "blank_pages": [],
+      "missing_intervals": [],
+      "complete": true
+    },
+    "chunk_settings": {
+      "target_tokens": 900,
+      "overlap_tokens": 80,
+      "prefix_template": "Medicine: {product_name}\nSection: {section_title}\n\n",
+      "strategy": "section_aware",
+      "tokenizer": "utf8-byte-upper-bound",
+      "tokenizer_version": "1",
+      "prefix_version": "1",
+      "chunker_version": "section-sentence-v1",
+      "provenance_policy_version": "exact-spans-v1",
+      "max_input_tokens": 2048,
+      "tokenizer_path": "",
+      "tokenizer_sha256": ""
+    },
+    "usage": {
+      "embed_total_tokens": 2279817
+    }
+  },
+  "comparison": {
+    "suite_id": "global-search",
+    "suite_hash": "a22d12401d84bba6938a735e82161ce3a635412382fd1702e3683249d944fe1a",
+    "compatibility_fingerprint": "9222fb4b0604bf65ac13b621579eb6b974aa91625c7708851633c01b062d9f41",
+    "compatible": true,
+    "controls": {
+      "xml_hash": "94dfcc3aea57dfab6f2cf6df57d01d8655bcca0d0ac60784c0099e74b01df572",
+      "source_registry": "e8542f6fdd21adb8bd75467aaba7222be6406c3e8d510e2041a8df0e465a0482",
+      "eligibility": "c9162ee76d4b276640ae2e50617eb97772c955d890f38d40c1826378230db5d4",
+      "profile": {
+        "api_family": "documents",
+        "api_version": "2026-07",
+        "index_name": "amgenproduct",
+        "index_host": "amgenproduct-7tgd2ef.svc.aped-4627-b74a.pinecone.io",
+        "cloud": "aws",
+        "region": "us-east-1",
+        "embedding_model": "llama-text-embed-v2",
+        "text_field": "chunk_text",
+        "dimension": 1024,
+        "metric": "cosine",
+        "truncate": "END",
+        "max_input_tokens": 2048,
+        "namespace_strategy": "local_manifest",
+        "namespace_prefix": "pi"
+      },
+      "suite_hash": "a22d12401d84bba6938a735e82161ce3a635412382fd1702e3683249d944fe1a",
+      "ranking_version": "global-rrf-v1",
+      "retrieval": {
+        "top_k": 10,
+        "evidence_token_budget": 4000
+      },
+      "generation": {
+        "provider": "openai",
+        "api": "responses",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "low",
+        "max_output_tokens": 4096,
+        "request_timeout_seconds": 60,
+        "store_responses": false
+      }
+    },
+    "metrics": {
+      "baseline": {
+        "document_recall_at_k": 0.96772,
+        "mean_reciprocal_rank": 0.988095,
+        "quote_coverage": 0.863782,
+        "citation_resolution": 1.0,
+        "contamination_rate": 0.0,
+        "mean_latency_ms": 1294.98169,
+        "question_count": 42
+      },
+      "candidate": {
+        "document_recall_at_k": 0.960852,
+        "mean_reciprocal_rank": 1.0,
+        "quote_coverage": 0.887592,
+        "citation_resolution": 1.0,
+        "contamination_rate": 0.0,
+        "mean_latency_ms": 1111.130643,
+        "question_count": 42
+      }
+    },
+    "usage": {
+      "baseline": {
+        "read_units": 42,
+        "egress_bytes": 3233554,
+        "embed_total_tokens": 645
+      },
+      "candidate": {
+        "read_units": 42,
+        "egress_bytes": 3619099,
+        "embed_total_tokens": 645
+      }
+    },
+    "warnings": [
+      "A source has extraction/layout limitations. View its PDF page before interpreting table or figure relationships."
+    ],
+    "behavioral_cases_retained": 13,
+    "latency_conditions": "Sequential calls with alternating baseline/candidate order; includes local integrity checks. Provider caches are uncontrolled.",
+    "note": "Expected-document and exact-span retrieval measurements under the same evidence budget. Behavioral fixtures remain separate regression cases. These are not clinical accuracy scores."
+  },
+  "cases": [
+    {
+      "id": "source-doc-actimmune-prescribing-information",
+      "question": "What mechanism of action does the supplied ACTIMMUNE label describe?",
+      "expected_document_ids": [
+        "doc-actimmune-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3702,
+        "expected_characters": 180,
+        "covered_expected_characters": 0,
+        "latency_ms": 1220.024,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3976,
+        "expected_characters": 180,
+        "covered_expected_characters": 0,
+        "latency_ms": 1111.006,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-aimovig-prescribing-information",
+      "question": "What mechanism of action does the supplied AIMOVIG label describe?",
+      "expected_document_ids": [
+        "doc-aimovig-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3836,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1308.745,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3832,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1078.565,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-amjevita-prescribing-information",
+      "question": "What mechanism of action does the supplied AMJEVITA label describe?",
+      "expected_document_ids": [
+        "doc-amjevita-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3955,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1676.249,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3912,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1302.686,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-aranesp-prescribing-information",
+      "question": "What mechanism of action does the supplied ARANESP label describe?",
+      "expected_document_ids": [
+        "doc-aranesp-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3831,
+        "expected_characters": 119,
+        "covered_expected_characters": 119,
+        "latency_ms": 1255.197,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3889,
+        "expected_characters": 119,
+        "covered_expected_characters": 119,
+        "latency_ms": 1095.676,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-avsola-prescribing-information",
+      "question": "What mechanism of action does the supplied AVSOLA label describe?",
+      "expected_document_ids": [
+        "doc-avsola-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3830,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1400.888,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3762,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1088.938,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-bkemv-prescribing-information",
+      "question": "What mechanism of action does the supplied BKEMV label describe?",
+      "expected_document_ids": [
+        "doc-bkemv-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3731,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1211.394,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3883,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1098.554,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-blincyto-prescribing-information",
+      "question": "What mechanism of action does the supplied BLINCYTO label describe?",
+      "expected_document_ids": [
+        "doc-blincyto-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3049,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1352.937,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3880,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1071.273,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-corlanor-prescribing-information",
+      "question": "What mechanism of action does the supplied CORLANOR label describe?",
+      "expected_document_ids": [
+        "doc-corlanor-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3801,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1149.282,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3407,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1024.181,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-enbrel-prescribing-information",
+      "question": "What mechanism of action does the supplied ENBREL label describe?",
+      "expected_document_ids": [
+        "doc-enbrel-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2839,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1512.034,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3991,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1169.407,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-epogen-prescribing-information",
+      "question": "What mechanism of action does the supplied EPOGEN label describe?",
+      "expected_document_ids": [
+        "doc-epogen-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 1322,
+        "expected_characters": 117,
+        "covered_expected_characters": 117,
+        "latency_ms": 1274.619,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2364,
+        "expected_characters": 117,
+        "covered_expected_characters": 117,
+        "latency_ms": 1031.152,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-evenity-prescribing-information",
+      "question": "What mechanism of action does the supplied EVENITY label describe?",
+      "expected_document_ids": [
+        "doc-evenity-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3966,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1166.306,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3510,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1115.675,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-imdelltra-prescribing-information",
+      "question": "What mechanism of action does the supplied IMDELLTRA label describe?",
+      "expected_document_ids": [
+        "doc-imdelltra-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3660,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1302.491,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3686,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1107.688,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-imlygic-prescribing-information",
+      "question": "What mechanism of action does the supplied IMLYGIC label describe?",
+      "expected_document_ids": [
+        "doc-imlygic-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3652,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1157.292,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3586,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1131.825,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-kanjinti-prescribing-information",
+      "question": "What mechanism of action does the supplied KANJINTI label describe?",
+      "expected_document_ids": [
+        "doc-kanjinti-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3214,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1207.769,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3882,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1057.254,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-krystexxa-prescribing-information",
+      "question": "What mechanism of action does the supplied KRYSTEXXA label describe?",
+      "expected_document_ids": [
+        "doc-krystexxa-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3998,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1229.311,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3960,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1048.996,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-kyprolis-prescribing-information",
+      "question": "What mechanism of action does the supplied KYPROLIS label describe?",
+      "expected_document_ids": [
+        "doc-kyprolis-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3131,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1470.578,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3890,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1759.614,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-lumakras-prescribing-information",
+      "question": "What mechanism of action does the supplied LUMAKRAS label describe?",
+      "expected_document_ids": [
+        "doc-lumakras-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3835,
+        "expected_characters": 28,
+        "covered_expected_characters": 28,
+        "latency_ms": 1229.962,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3734,
+        "expected_characters": 28,
+        "covered_expected_characters": 28,
+        "latency_ms": 1036.185,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-mvasi-prescribing-information",
+      "question": "What mechanism of action does the supplied MVASI label describe?",
+      "expected_document_ids": [
+        "doc-mvasi-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2698,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1296.363,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3708,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1056.697,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-neulasta-prescribing-information",
+      "question": "What mechanism of action does the supplied NEULASTA label describe?",
+      "expected_document_ids": [
+        "doc-neulasta-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3962,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1308.172,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3544,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1134.445,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-neupogen-prescribing-information",
+      "question": "What mechanism of action does the supplied NEUPOGEN label describe?",
+      "expected_document_ids": [
+        "doc-neupogen-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3778,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1315.983,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3982,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1073.338,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-nplate-prescribing-information",
+      "question": "What mechanism of action does the supplied NPLATE label describe?",
+      "expected_document_ids": [
+        "doc-nplate-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3980,
+        "expected_characters": 162,
+        "covered_expected_characters": 162,
+        "latency_ms": 1530.744,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3729,
+        "expected_characters": 162,
+        "covered_expected_characters": 162,
+        "latency_ms": 1215.435,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-otezla-prescribing-information",
+      "question": "What mechanism of action does the supplied OTEZLA label describe?",
+      "expected_document_ids": [
+        "doc-otezla-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3375,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1218.744,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3900,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1195.405,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-parsabiv-prescribing-information",
+      "question": "What mechanism of action does the supplied PARSABIV label describe?",
+      "expected_document_ids": [
+        "doc-parsabiv-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3946,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1327.609,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3984,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1071.11,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-pavblu-prescribing-information",
+      "question": "What mechanism of action does the supplied PAVBLU label describe?",
+      "expected_document_ids": [
+        "doc-pavblu-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3518,
+        "expected_characters": 180,
+        "covered_expected_characters": 0,
+        "latency_ms": 1204.822,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3840,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1032.562,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-procysbi-prescribing-information",
+      "question": "What mechanism of action does the supplied PROCYSBI label describe?",
+      "expected_document_ids": [
+        "doc-procysbi-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3966,
+        "expected_characters": 180,
+        "covered_expected_characters": 0,
+        "latency_ms": 1239.469,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3962,
+        "expected_characters": 180,
+        "covered_expected_characters": 0,
+        "latency_ms": 1066.881,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-prolia-prescribing-information",
+      "question": "What mechanism of action does the supplied PROLIA label describe?",
+      "expected_document_ids": [
+        "doc-prolia-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3657,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1296.497,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3776,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1013.148,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-ravicti-prescribing-information",
+      "question": "What mechanism of action does the supplied RAVICTI label describe?",
+      "expected_document_ids": [
+        "doc-ravicti-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3693,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1265.892,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3656,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1177.271,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-repatha-contains-dry-natural-rubber-prescribing-information",
+      "question": "What mechanism of action does the supplied REPATHA label describe?",
+      "expected_document_ids": [
+        "doc-repatha-contains-dry-natural-rubber-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3868,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1300.618,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3984,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1129.743,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+      "question": "What mechanism of action does the supplied REPATHA label describe?",
+      "expected_document_ids": [
+        "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3875,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1371.645,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3978,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1103.399,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-riabni-prescribing-information",
+      "question": "What mechanism of action does the supplied RIABNI label describe?",
+      "expected_document_ids": [
+        "doc-riabni-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3881,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1401.194,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3468,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1132.372,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-sensipar-prescribing-information",
+      "question": "What mechanism of action does the supplied SENSIPAR label describe?",
+      "expected_document_ids": [
+        "doc-sensipar-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3731,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1258.628,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3798,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1068.692,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-tavneos-prescribing-information",
+      "question": "What mechanism of action does the supplied TAVNEOS label describe?",
+      "expected_document_ids": [
+        "doc-tavneos-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3695,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1178.616,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3969,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1036.486,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-tepezza-prescribing-information",
+      "question": "What mechanism of action does the supplied TEPEZZA label describe?",
+      "expected_document_ids": [
+        "doc-tepezza-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3493,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1164.21,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3609,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1036.236,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-tezspire-prescribing-information",
+      "question": "What mechanism of action does the supplied TEZSPIRE label describe?",
+      "expected_document_ids": [
+        "doc-tezspire-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3885,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1235.213,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3624,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1100.998,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-uplizna-prescribing-information",
+      "question": "What mechanism of action does the supplied UPLIZNA label describe?",
+      "expected_document_ids": [
+        "doc-uplizna-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3850,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1186.186,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3883,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1088.337,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-vectibix-prescribing-information",
+      "question": "What mechanism of action does the supplied VECTIBIX label describe?",
+      "expected_document_ids": [
+        "doc-vectibix-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3633,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1321.074,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3807,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1069.339,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "source-doc-xgeva-prescribing-information",
+      "question": "What mechanism of action does the supplied Xgeva label describe?",
+      "expected_document_ids": [
+        "doc-xgeva-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3948,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1342.248,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3793,
+        "expected_characters": 180,
+        "covered_expected_characters": 180,
+        "latency_ms": 1077.58,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "global-01",
+      "question": "ACTIMMUNE",
+      "expected_document_ids": [
+        "doc-actimmune-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2704,
+        "expected_characters": 9,
+        "covered_expected_characters": 9,
+        "latency_ms": 1327.951,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3483,
+        "expected_characters": 9,
+        "covered_expected_characters": 9,
+        "latency_ms": 1070.072,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "global-02",
+      "question": "latex",
+      "expected_document_ids": [
+        "doc-actimmune-prescribing-information",
+        "doc-aimovig-prescribing-information",
+        "doc-amjevita-prescribing-information",
+        "doc-aranesp-prescribing-information",
+        "doc-enbrel-prescribing-information",
+        "doc-evenity-prescribing-information",
+        "doc-neulasta-prescribing-information",
+        "doc-neupogen-prescribing-information",
+        "doc-prolia-prescribing-information",
+        "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+        "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+        "doc-tezspire-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 0.5,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2075,
+        "expected_characters": 60,
+        "covered_expected_characters": 0,
+        "latency_ms": 1119.273,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 0.5,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2426,
+        "expected_characters": 60,
+        "covered_expected_characters": 0,
+        "latency_ms": 1063.741,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "global-04",
+      "question": "interferons bind",
+      "expected_document_ids": [
+        "doc-actimmune-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3736,
+        "expected_characters": 16,
+        "covered_expected_characters": 16,
+        "latency_ms": 1137.736,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 1.0,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 1.0,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3810,
+        "expected_characters": 16,
+        "covered_expected_characters": 16,
+        "latency_ms": 1042.219,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "global-05",
+      "question": "protect from light",
+      "expected_document_ids": [
+        "doc-aimovig-prescribing-information",
+        "doc-amjevita-prescribing-information",
+        "doc-aranesp-prescribing-information",
+        "doc-avsola-prescribing-information",
+        "doc-bkemv-prescribing-information",
+        "doc-blincyto-prescribing-information",
+        "doc-enbrel-prescribing-information",
+        "doc-epogen-prescribing-information",
+        "doc-evenity-prescribing-information",
+        "doc-imdelltra-prescribing-information",
+        "doc-kanjinti-prescribing-information",
+        "doc-krystexxa-prescribing-information",
+        "doc-kyprolis-prescribing-information",
+        "doc-neulasta-prescribing-information",
+        "doc-neupogen-prescribing-information",
+        "doc-nplate-prescribing-information",
+        "doc-parsabiv-prescribing-information",
+        "doc-pavblu-prescribing-information",
+        "doc-procysbi-prescribing-information",
+        "doc-prolia-prescribing-information",
+        "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+        "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+        "doc-riabni-prescribing-information",
+        "doc-tepezza-prescribing-information",
+        "doc-tezspire-prescribing-information",
+        "doc-xgeva-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 0.2692307692307692,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.15384615384615385,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 2537,
+        "expected_characters": 468,
+        "covered_expected_characters": 72,
+        "latency_ms": 1291.444,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 0.23076923076923078,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.15384615384615385,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3657,
+        "expected_characters": 468,
+        "covered_expected_characters": 72,
+        "latency_ms": 1100.835,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    },
+    {
+      "id": "global-06",
+      "question": "single-dose prefilled",
+      "expected_document_ids": [
+        "doc-aimovig-prescribing-information",
+        "doc-amjevita-prescribing-information",
+        "doc-aranesp-prescribing-information",
+        "doc-enbrel-prescribing-information",
+        "doc-neulasta-prescribing-information",
+        "doc-neupogen-prescribing-information",
+        "doc-pavblu-prescribing-information",
+        "doc-prolia-prescribing-information"
+      ],
+      "baseline": {
+        "document_recall_at_k": 0.875,
+        "reciprocal_rank": 0.5,
+        "quote_coverage": 0.125,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3711,
+        "expected_characters": 168,
+        "covered_expected_characters": 21,
+        "latency_ms": 1623.822,
+        "degraded": false,
+        "citation_resolution": 1.0
+      },
+      "candidate": {
+        "document_recall_at_k": 0.625,
+        "reciprocal_rank": 1.0,
+        "quote_coverage": 0.125,
+        "contamination_rate": 0.0,
+        "evidence_bytes_with_reserve": 3627,
+        "expected_characters": 168,
+        "covered_expected_characters": 21,
+        "latency_ms": 1182.471,
+        "degraded": false,
+        "citation_resolution": 1.0
+      }
+    }
+  ],
+  "search_smoke": [
+    {
+      "query": "ACTIMMUNE",
+      "hits": 20,
+      "documents": [
+        "doc-actimmune-prescribing-information"
+      ],
+      "latency_ms": 1597.7092091925442,
+      "usage": {
+        "read_units": 1,
+        "egress_bytes": 153817,
+        "embed_total_tokens": 7
+      },
+      "degraded": false
+    },
+    {
+      "query": "latex",
+      "hits": 20,
+      "documents": [
+        "doc-actimmune-prescribing-information",
+        "doc-aimovig-prescribing-information",
+        "doc-amjevita-prescribing-information",
+        "doc-aranesp-prescribing-information",
+        "doc-avsola-prescribing-information",
+        "doc-corlanor-prescribing-information",
+        "doc-enbrel-prescribing-information",
+        "doc-evenity-prescribing-information",
+        "doc-imdelltra-prescribing-information",
+        "doc-krystexxa-prescribing-information",
+        "doc-lumakras-prescribing-information",
+        "doc-neulasta-prescribing-information",
+        "doc-neupogen-prescribing-information",
+        "doc-nplate-prescribing-information",
+        "doc-procysbi-prescribing-information",
+        "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+        "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+        "doc-riabni-prescribing-information",
+        "doc-tavneos-prescribing-information",
+        "doc-tezspire-prescribing-information"
+      ],
+      "latency_ms": 1312.38374998793,
+      "usage": {
+        "read_units": 1,
+        "egress_bytes": 131646,
+        "embed_total_tokens": 4
+      },
+      "degraded": false
+    },
+    {
+      "query": "storage temperature",
+      "hits": 20,
+      "documents": [
+        "doc-actimmune-prescribing-information",
+        "doc-aimovig-prescribing-information",
+        "doc-amjevita-prescribing-information",
+        "doc-aranesp-prescribing-information",
+        "doc-avsola-prescribing-information",
+        "doc-blincyto-prescribing-information",
+        "doc-corlanor-prescribing-information",
+        "doc-enbrel-prescribing-information",
+        "doc-evenity-prescribing-information",
+        "doc-imdelltra-prescribing-information",
+        "doc-lumakras-prescribing-information",
+        "doc-neulasta-prescribing-information",
+        "doc-nplate-prescribing-information",
+        "doc-otezla-prescribing-information",
+        "doc-pavblu-prescribing-information",
+        "doc-procysbi-prescribing-information",
+        "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+        "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+        "doc-tezspire-prescribing-information",
+        "doc-uplizna-prescribing-information"
+      ],
+      "latency_ms": 1108.4090829826891,
+      "usage": {
+        "read_units": 1,
+        "egress_bytes": 154756,
+        "embed_total_tokens": 5
+      },
+      "degraded": false
+    },
+    {
+      "query": "interferons bind",
+      "hits": 20,
+      "documents": [
+        "doc-actimmune-prescribing-information",
+        "doc-amjevita-prescribing-information",
+        "doc-avsola-prescribing-information",
+        "doc-blincyto-prescribing-information",
+        "doc-enbrel-prescribing-information",
+        "doc-imdelltra-prescribing-information",
+        "doc-imlygic-prescribing-information",
+        "doc-krystexxa-prescribing-information",
+        "doc-mvasi-prescribing-information",
+        "doc-neulasta-prescribing-information",
+        "doc-neupogen-prescribing-information",
+        "doc-nplate-prescribing-information",
+        "doc-pavblu-prescribing-information",
+        "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+        "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+        "doc-riabni-prescribing-information",
+        "doc-tepezza-prescribing-information",
+        "doc-vectibix-prescribing-information"
+      ],
+      "latency_ms": 1377.9156664386392,
+      "usage": {
+        "read_units": 1,
+        "egress_bytes": 156968,
+        "embed_total_tokens": 6
+      },
+      "degraded": false
+    }
+  ],
+  "teaching_smoke": [
+    {
+      "product_id": "product-actimmune",
+      "document_id": "doc-actimmune-prescribing-information",
+      "question": "What mechanism of action does the source describe?",
+      "abstained": false,
+      "citation_count": 3,
+      "usage": {
+        "generation": {
+          "input_tokens": 5886,
+          "input_tokens_details": {
+            "cache_write_tokens": 5883,
+            "cached_tokens": 0
+          },
+          "output_tokens": 386,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 6272
+        },
+        "verification": {
+          "input_tokens": 616,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          },
+          "output_tokens": 16,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 632
+        }
+      },
+      "seconds": 9.35
+    },
+    {
+      "product_id": "product-repatha",
+      "document_id": "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+      "question": "What does this source say about latex?",
+      "abstained": false,
+      "citation_count": 2,
+      "usage": {
+        "generation": {
+          "input_tokens": 6245,
+          "input_tokens_details": {
+            "cache_write_tokens": 6242,
+            "cached_tokens": 0
+          },
+          "output_tokens": 436,
+          "output_tokens_details": {
+            "reasoning_tokens": 0
+          },
+          "total_tokens": 6681
+        },
+        "verification": {
+          "input_tokens": 629,
+          "input_tokens_details": {
+            "cache_write_tokens": 0,
+            "cached_tokens": 0
+          },
+          "output_tokens": 33,
+          "output_tokens_details": {
+            "reasoning_tokens": 15
+          },
+          "total_tokens": 662
+        }
+      },
+      "seconds": 8.502
+    },
+    {
+      "product_id": "product-tezspire",
+      "document_id": "doc-tezspire-prescribing-information",
+      "question": "What mechanism of action does the source describe?",
+      "abstained": true,
+      "citation_count": 1,
+      "usage": {
+        "explanation_verified": false,
+        "source_fallback": true,
+        "provider_problem": false
+      },
+      "seconds": 1.135
+    }
+  ],
+  "activation_revert": {
+    "activated_candidate": "301119df0a1c26272eb5fc588bea84cd5c1b58fbf0b0b366c94ff43a30f7949b",
+    "candidate_records": 6369,
+    "pinned_prior_run_retrieval": "fac1a4e52d6904672ccf1882b520b83beaef77bf581aa729b5d7461e5bb110a6",
+    "restored_baseline": "fac1a4e52d6904672ccf1882b520b83beaef77bf581aa729b5d7461e5bb110a6",
+    "final_records": 9110,
+    "all_documents_retained": true
+  }
+}
