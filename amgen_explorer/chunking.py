@@ -2,8 +2,9 @@
 
 The default counter is a conservative UTF-8 byte upper bound, not an exact
 model token count. Every embedded string also passes bytes+8 <=2048, including
-prefix. Sentences and verified tables are indivisible; over-cap units are
-reported in full as exclusions, never truncated.
+prefix. Legacy manual plans retain indivisible sentences/tables. Bulk plans
+split oversized units at Unicode character boundaries with exact continuation
+metadata, preserving every archived interval without provider truncation.
 """
 from __future__ import annotations
 from dataclasses import dataclass, asdict
@@ -14,6 +15,7 @@ import re
 from string import Formatter
 from .models import Chunk, ChunkPlan
 from .review import digest, canonical
+from .eligibility import BULK_POLICY, MANUAL_POLICY, SCHEMA_VERSION, assess_corpus, coverage_for, policy_for
 
 
 @dataclass(frozen=True)
@@ -82,24 +84,31 @@ def _source_spans(group, start, end):
             if sa<sb:
                 result.append({'source_block_id':block.id,'page':source['page'],'archive_block_id':source.get('block_id',''),
                                'start':source['start']+sa-cursor,'end':source['start']+sb-cursor,
-                               'block_start':sa,'block_end':sb})
+                               'block_start':sa+block.source_offset,'block_end':sb+block.source_offset})
             cursor+=length
         if cursor != len(block.text): raise ValueError('Source span length does not match passage')
     return result
 
 
-def prepare_chunks(corpus, reviews, config: ChunkConfig) -> ChunkPlan:
+def prepare_chunks(corpus, reviews, config: ChunkConfig, *, policy=MANUAL_POLICY, source_dir=None) -> ChunkPlan:
+    policy_for({'eligibility_policy':policy})
+    bulk = policy == BULK_POLICY
+    assessment = assess_corpus(corpus, source_dir, policy, reviews) if bulk else None
     excluded=[]; groups=[]; current=[]; previous_key=None
-    review_statuses, review_hash = reviews.snapshot(corpus)
+    if bulk:
+        review_statuses, review_hash = {}, ''
+    else:
+        review_statuses, review_hash = reviews.snapshot(corpus)
     def flush():
         nonlocal current
         if current: groups.append(current); current=[]
     products={p.id:p for p in corpus.products}; documents={d.id:d for d in corpus.documents}
     has_sections={b.document_id for b in corpus.blocks if b.section_kind!='sourcePageArchive'}
-    for block in corpus.blocks:
+    for block in (assessment.eligible_span_units if bulk else corpus.blocks):
         reason=None
-        status=review_statuses[block.id]
-        if status!='accepted': reason='review_'+status
+        status=review_statuses.get(block.id)
+        if bulk: pass
+        elif status!='accepted': reason='review_'+status
         elif not block.text.strip(): reason='no_usable_text'
         elif any(w.startswith('unresolved_') or w.startswith('no_usable_text') for w in block.warnings): reason='unresolved_extraction_structure'
         elif block.section_kind=='sourcePageArchive' and block.document_id in has_sections: reason='duplicate_page_archive_use_section_passages'
@@ -112,6 +121,7 @@ def prepare_chunks(corpus, reviews, config: ChunkConfig) -> ChunkPlan:
             excluded.append({'block_id':block.id,'reason':reason,'document_id':block.document_id,'content_hash':block.content_hash,'character_count':len(block.text)})
             continue
         key=(block.product_id,block.document_id,block.document_sha256,block.section_id,block.section_kind,block.section_title,block.parser_version)
+        if bulk: key += (block.id, block.source_offset)
         if key!=previous_key: flush()
         current.append(block); previous_key=key
     flush()
@@ -125,6 +135,31 @@ def prepare_chunks(corpus, reviews, config: ChunkConfig) -> ChunkPlan:
         prefix=config.prefix_template.format(product_name=product.name,section_title=first.section_title)
         atomic=first.section_kind in {'table','verifiedTable'}
         units=_units(text,atomic=atomic)
+        forced_split=False
+        if bulk:
+            safe=[]
+            for start,end in units:
+                if len((prefix+text[start:end]).encode())+8 <= 2048 and token_count(prefix+text[start:end],config) <= 2048:
+                    safe.append((start,end)); continue
+                forced_split=True
+                cursor=start
+                while cursor<end:
+                    lo,hi=cursor+1,end
+                    best=cursor
+                    # Character indices preserve UTF-8 boundaries and exact offsets.
+                    while lo<=hi:
+                        middle=(lo+hi)//2
+                        candidate=prefix+text[cursor:middle]
+                        if len(candidate.encode())+8<=2048 and token_count(candidate,config)<=config.target_tokens:
+                            best=middle; lo=middle+1
+                        else: hi=middle-1
+                    if best==cursor: raise ValueError('Chunk prefix leaves no room for a complete source character.')
+                    if best<end:
+                        boundary=max(text.rfind(' ',cursor,best),text.rfind('\n',cursor,best))
+                        if boundary>cursor: best=boundary+1
+                    safe.append((cursor,best)); cursor=best
+            units=safe
+        group_chunk_start=len(chunks)
         position=0
         while position<len(units):
             start,end=units[position]; selected=position
@@ -149,6 +184,12 @@ def prepare_chunks(corpus, reviews, config: ChunkConfig) -> ChunkPlan:
                       'parser_version':first.parser_version,'chunker_version':config.chunker_version,'chunk_config_hash':config_hash,
                       'xml_hash':corpus.xml_hash,'source_spans':canonical(spans),'source_text':text[start:end],
                       'token_count_is_exact':False,'token_count_method':config.tokenizer + '+8-reserve' if config.tokenizer=='utf8-byte-upper-bound' else 'local-artifact-exact-provider-parity-unverified'}
+            if bulk:
+                metadata.pop('review_state')
+                metadata.update(eligibility_policy=BULK_POLICY, eligibility_fingerprint=assessment.fingerprint,
+                                source_verified=True, human_review_status='not_assessed',
+                                extraction_method=first.parser_version,
+                                extraction_limitations=list(dict.fromkeys(w for b in blocks for w in b.warnings)))
             if doc.variant_hint: metadata['source_variant_hint']=doc.variant_hint
             if doc.revision: metadata['label_revision']=doc.revision
             cid='chunk-'+digest({'document_hash':doc.sha256,'text_hash':metadata['content_hash'],'section_id':first.section_id,'spans':spans,'config':config_hash})
@@ -163,6 +204,21 @@ def prepare_chunks(corpus, reviews, config: ChunkConfig) -> ChunkPlan:
                 if overlap_start>position and token_count(text[units[overlap_start][0]:end],config)<=config.overlap_tokens:
                     next_position=overlap_start
             position=next_position
-    fingerprint=digest({'xml_hash':corpus.xml_hash,'reviews':review_hash,'config':config_hash,'chunks':[c.id for c in chunks],'excluded':excluded})
+        if bulk and forced_split:
+            continuations=chunks[group_chunk_start:]
+            for index,chunk in enumerate(continuations):
+                chunk.metadata.update(continuation_parent_ids=list(dict.fromkeys(b.id for b in blocks)),
+                                      continuation_index=index, continuation_count=len(continuations))
+    fingerprint=digest({'xml_hash':corpus.xml_hash,'reviews':review_hash,'config':config_hash,'chunks':[c.id for c in chunks],'excluded':excluded, **({'policy':policy,'eligibility':assessment.fingerprint} if bulk else {})})
     settings=config.as_dict(); settings.update(token_count_is_exact=False,token_count_method='UTF-8 byte upper bound + 8 reserve' if config.tokenizer=='utf8-byte-upper-bound' else 'local tokenizer artifact; provider parity unverified',target_overlap_units='UTF-8 bytes + reserve' if config.tokenizer=='utf8-byte-upper-bound' else 'local tokenizer tokens')
-    return ChunkPlan(chunks,excluded,fingerprint,corpus.xml_hash,config_hash,review_hash,settings)
+    plan=ChunkPlan(chunks,excluded,fingerprint,corpus.xml_hash,config_hash,review_hash,settings)
+    if bulk:
+        plan.schema_version=SCHEMA_VERSION
+        plan.eligibility_policy=policy
+        plan.eligibility_fingerprint=assessment.fingerprint
+        plan.expected_document_ids=assessment.expected_document_ids
+        plan.expected_product_ids=assessment.expected_product_ids
+        plan.coverage=coverage_for(corpus, [(c.metadata['document_sha256'],span) for c in chunks
+                                          for span in json.loads(c.metadata['source_spans'])])
+        if not plan.coverage['complete']: raise ValueError('Bulk chunks do not cover every readable archived source interval.')
+    return plan

@@ -4,7 +4,7 @@ import streamlit as st
 from amgen_explorer.demo import DemoUnavailable, load_example
 from ui.common import hero, navigate, source_text
 
-STEPS = ('Source PDF', 'Canonical XML', 'Chunk preview', 'Cited lesson', 'Knowledge check')
+STEPS = ('Bulk library setup', 'Global content search', 'Chunk comparison', 'Cited lesson', 'Knowledge check')
 STEP_KEY = 'demo_step'
 
 
@@ -21,7 +21,7 @@ def _restart():
 
 def _exit():
     st.query_params.pop('demo', None)
-    navigate('Explore medicines')
+    navigate('Explore medicines' if st.query_params.get('legacy') == '1' else 'Search & Learn')
 
 
 def _reference(example, *, show_quote=True):
@@ -39,7 +39,7 @@ def _reference(example, *, show_quote=True):
 def render(service, corpus, active):
     """Same page contract as the app; deliberately no methods on service called."""
     hero('From source to understanding.',
-         'Follow one passage through five short stops: the PDF, its XML, a chunk, a cited explanation, and a quiz.',
+         'Explore bulk setup, content search, a controlled chunk comparison, a cited lesson, and a quiz.',
          'THE THREE-MINUTE GUIDED DEMO')
     st.info('Prepared source-backed example · No live provider result is generated in this tour. Navigation reads included local files only.')
     step = st.session_state.get(STEP_KEY, 0)
@@ -67,21 +67,40 @@ def render(service, corpus, active):
             st.caption('The PDF bytes, XML hash, exact passage and page spans are checked locally on each step.')
             st.download_button('Download example PDF', example.pdf_bytes, file_name=example.citation['filename'],
                                mime='application/pdf', key='demo_pdf_download')
-        st.caption('Tour state stays in this session. Prepared content does not record lesson completion or approve sources.')
+        st.caption('Tour state stays in this session. Prepared content does not record lesson completion or approve sources. No live library is built or activated here.')
     with main:
         if step == 0:
-            st.subheader('1 · Begin with the original page')
-            st.write('A cited answer should lead back to a specific source. This tour follows section 12.1 on physical page 10 of the included PDF.')
+            st.subheader('1 · Build the entire source library')
+            st.markdown('In **Admin → Library**, add all source PDFs and select **Build / update entire library**. One build verifies the complete inventory, prepares every readable text interval and enables global search without individual passage decisions.')
+            st.write('Reading documents → Preparing text → Uploading → Checking search → Ready')
+            st.caption('PDFs and XML stay local. Extracted chunks and metadata go to Pinecone only during a real build. Automatic source verification establishes provenance, not clinical accuracy.')
+            st.write('This prepared tour follows one source: section 12.1 on physical page 10. Its original page is shown below.')
             st.image(example.page_image(), caption='Included source PDF · physical page 10', width='stretch')
         elif step == 1:
-            st.subheader('2 · Preserve the source in canonical XML')
-            st.write('The XML keeps the extracted passage alongside its document reference, PDF page and character offsets. These offsets connect the passage to the archived page text.')
+            st.subheader('2 · Preserve sources and search their content')
+            st.markdown('Use **Search all medicine information** to discover body text across the library. A medicine selection is optional. A content query such as **PCSK9** can find this source without naming REPATHA.')
+            st.caption('PREPARED SEARCH EXAMPLE · No search provider called')
+            st.markdown(f"**REPATHA · {example.citation['filename']} · 12.1 Mechanism of Action**")
+            source_text(example.citation['supporting_quote'])
+            st.write('View source opens the original PDF. Ask about this source starts a source-scoped conversation and carries the result’s library version; it waits for you to submit a question.')
+            st.write('The canonical XML preserves document identity, physical page and exact character offsets for that citation.')
             st.caption('Actual section from XML/AmgenProducts.xml · local extraction format')
             st.code(example.canonical_xml, language='xml', wrap_lines=True)
             st.caption('Structural validation and exact text checks preserve provenance; they do not establish clinical approval.')
         elif step == 2:
             st.subheader('3 · Keep context with each chunk')
-            st.write('A small source passage can travel with its medicine, section and page references. This prepared preview shows the passage and a context prefix without building or loading an index.')
+            st.markdown('In **Admin → Chunk experiments**, adjust **Chunk size** and **Overlap**, then choose **Test settings**. A real test builds an isolated full-library candidate and compares both versions using identical sources, questions and evidence budgets.')
+            left,right=st.columns(2)
+            with left:
+                st.markdown('**Current configuration**')
+                st.write('Size 600 · Overlap 80')
+                st.caption('Not measured in this prepared tour: recall, quote coverage, latency and provider usage.')
+            with right:
+                st.markdown('**Example draft configuration**')
+                st.write('Size 900 · Overlap 80')
+                st.caption('Not measured in this prepared tour. A larger size does not demonstrate improvement.')
+            st.write('Use this configuration activates a successfully tested full library. Reset to defaults changes only draft controls; Revert restores the previous full-library version. Every source remains in scope.')
+            st.caption('The exact source-backed passage below illustrates preserved provenance. No candidate was built and no evaluation ran for this tour.')
             st.code(example.chunk_text, language=None, wrap_lines=True)
             st.caption(f'{len(example.chunk_text.encode("utf-8")) + 8} · UTF-8 byte upper bound + 8 reserve, not an exact model token count')
             _reference(example, show_quote=False)
@@ -114,7 +133,7 @@ def render(service, corpus, active):
                     st.info(f"Look again at the supporting quote: {quiz['choices'][quiz['correct_index']]}")
                 st.write(quiz['rationale'])
                 _reference(example)
-            st.write('You have followed the complete path: source → XML → chunk → cited explanation → knowledge check.')
+            st.write('You have followed the complete path: bulk setup → global search → controlled chunk test → cited explanation → knowledge check.')
     st.divider()
     back, forward, restart, leave = st.columns(4)
     back.button('← Back', disabled=step == 0, on_click=_move, args=(step - 1,), key='demo_back', width='stretch')

@@ -98,6 +98,63 @@ class ExplorerService:
         plan.settings["selection"] = {"product_id": product_id, "document_id": document_id}
         return plan
 
+    def source_registry(self):
+        from .source_import import read_registry
+        return read_registry(self.config, self.corpus())
+
+    def import_documents(self, files):
+        from .source_import import import_documents
+        return import_documents(self.config, files, self.corpus())
+
+    def preview_library(self, chunk_config):
+        from .library import preview_library
+        return preview_library(self, chunk_config)
+
+    def build_library(self, chunk_config, *, activate=True, on_progress=None):
+        from .library import build_library
+        return build_library(self, chunk_config, activate=activate, on_progress=on_progress)
+
+    def library_status(self):
+        from .library import status
+        return status(self)
+
+    def latest_library_settings(self):
+        from .library import latest_settings
+        return latest_settings(self)
+
+    def library_version(self, run_id=None):
+        from .library import version
+        return version(self, run_id)
+
+    def library_corpus(self, run_id=None):
+        run = self.library_version(run_id)
+        return self._pinned_corpus(run['xml_hash']) if run else None
+
+    def use_configuration(self, run_id):
+        from .library import use_configuration
+        return use_configuration(self, run_id)
+
+    def revert_library(self):
+        from .library import revert_library
+        return revert_library(self)
+
+    def search_library(self, query, *, run_id=None, product_ids=None, document_ids=None, limit=20):
+        from .search import search_library
+        run = self.library_version(run_id)
+        if not run:
+            raise ValueError('Build the full library in Admin before searching.')
+        corpus = self._pinned_corpus(run['xml_hash'])
+        return search_library(query, run, self.config, corpus,
+                              product_ids=product_ids, document_ids=document_ids, limit=limit)
+
+    def evaluate_versions(self, baseline_run_id, candidate_run_id, suite_id='global-search', *, generate_answers=False):
+        from .evaluation import evaluate_versions
+        return evaluate_versions(self, baseline_run_id, candidate_run_id, suite_id, generate_answers=generate_answers)
+
+    def test_chunk_configuration(self, chunk_config, suite_id='global-search', *, on_progress=None):
+        from .evaluation import test_chunk_configuration
+        return test_chunk_configuration(self, chunk_config, suite_id, on_progress=on_progress)
+
     def review(self, block_id, decision, reviewer, note=""):
         corpus = self.corpus()
         if corpus is None:
@@ -208,9 +265,9 @@ class ExplorerService:
         with fitz.open(stream=payload, filetype="pdf") as pdf:
             return pdf[page - 1].get_pixmap(matrix=fitz.Matrix(1.2, 1.2)).tobytes("png")
 
-    def _evidence(self, question, product_id, document_id=None):
+    def _evidence(self, question, product_id, document_id=None, *, run_id=None):
         from amgen_explorer.retrieval import retrieve
-        active = self.active()
+        active = self.library_version(run_id) if run_id else self.active()
         if not active:
             return None
         corpus = self._pinned_corpus(active.get("xml_hash"))
@@ -219,23 +276,48 @@ class ExplorerService:
                 if document.id in active.get("document_ids", []):
                     self._verified_document(document.id, corpus, active["xml_hash"])
         evidence = retrieve(question, product_id, active, self.config, document_id=document_id)
-        # Revoked reviews must immediately stop their passages from being used.
-        blocks = {b.id: b for b in corpus.blocks}
-        for passage in evidence.passages:
-            meta = passage.get("metadata", passage)
-            block_ids = meta.get("block_ids", [])
-            if isinstance(block_ids, str):
-                try: block_ids = json.loads(block_ids)
-                except ValueError: block_ids = [block_ids]
-            if not block_ids or any(i not in blocks or self.reviews.status(blocks[i]) != "accepted" for i in block_ids):
-                raise ValueError("A retrieved passage needs review. Publish an updated corpus before using it.")
+        self._validate_evidence_policy(evidence, corpus)
         return evidence
 
-    def answer(self, question, product_id, mode="Plain language", document_id=None, history=None):
+    def _validate_evidence_policy(self, evidence, corpus):
+        from .eligibility import MANUAL_POLICY, policy_for, validate_record_policy
+        policy = policy_for(evidence)
+        if getattr(evidence, 'run_id', ''):
+            run = self.library_version(evidence.run_id)
+            if (run['namespace'] != evidence.namespace or run['xml_hash'] != evidence.xml_hash
+                    or policy_for(run) != policy
+                    or run.get('eligibility_fingerprint', '') != getattr(evidence, 'eligibility_fingerprint', '')):
+                raise ValueError('The supporting evidence does not match its pinned library version.')
+        expected_records = None
+        if policy != MANUAL_POLICY:
+            if not getattr(evidence, 'run_id', ''):
+                raise ValueError('Bulk evidence requires its pinned library version.')
+            from .indexing import manifest_records
+            expected_records = {r['_id']: r for r in manifest_records(run, self.config)}
+        blocks = {b.id: b for b in corpus.blocks}
+        for passage in evidence.passages:
+            metadata = passage.get('metadata', passage)
+            validate_record_policy(metadata, policy, getattr(evidence, 'eligibility_fingerprint', ''))
+            if expected_records is not None:
+                record = expected_records.get(passage.get('id'))
+                field = self.config.settings['pinecone']['text_field']
+                if (not record or passage.get('text') != record.get('source_text', record[field])
+                        or metadata != {k: v for k, v in record.items() if k not in {'_id', field}}
+                        or passage.get('namespace') != evidence.namespace or passage.get('xml_hash') != evidence.xml_hash):
+                    raise ValueError('A supporting passage differs from its immutable source record.')
+            if policy == MANUAL_POLICY:
+                ids = metadata.get('block_ids', [])
+                if isinstance(ids, str):
+                    try: ids = json.loads(ids)
+                    except ValueError: ids = [ids]
+                if not ids or any(i not in blocks or self.reviews.status(blocks[i]) != 'accepted' for i in ids):
+                    raise ValueError('A supporting passage needs review before it can be used again.')
+
+    def answer(self, question, product_id, mode="Plain language", document_id=None, history=None, *, run_id=None):
         from amgen_explorer.teaching import teach
-        evidence = self._evidence(question, product_id, document_id)
+        evidence = self._evidence(question, product_id, document_id, run_id=run_id)
         if evidence is None:
-            return TeachingResponse("This medicine has no published learning corpus yet. Open Manage sources to review passages, load Pinecone and publish them.", abstained=True)
+            return TeachingResponse("This medicine has no published learning corpus yet. Open Admin to build the entire searchable library.", abstained=True)
         response = teach(question, evidence, self.config, mode=mode, history=history)
         response.evidence = evidence
         return response
@@ -247,23 +329,21 @@ class ExplorerService:
         if evidence is None or prior_response.abstained or evidence.question != question or evidence.product_id != product_id:
             raise ValueError("Choose a supported answer from this medicine to change its explanation style.")
         corpus = self._pinned_corpus(evidence.xml_hash)
-        blocks = {b.id: b for b in corpus.blocks}
+        self._validate_evidence_policy(evidence, corpus)
         for passage in evidence.passages:
             metadata = passage["metadata"]
             if document_id and metadata["document_id"] != document_id:
                 raise ValueError("This answer belongs to a different source scope.")
             self._verified_document(metadata["document_id"], corpus, evidence.xml_hash)
-            if any(i not in blocks or self.reviews.status(blocks[i]) != "accepted" for i in metadata["block_ids"]):
-                raise ValueError("A supporting passage needs review before it can be explained again.")
         response = teach(question, evidence, self.config, mode=mode)
         response.evidence = evidence
         return response
 
-    def quiz(self, product_id, document_id=None):
+    def quiz(self, product_id, document_id=None, *, run_id=None):
         from amgen_explorer.teaching import make_quiz
-        evidence = self._evidence("How does this medicine work? Explain its mechanism of action.", product_id, document_id)
+        evidence = self._evidence("How does this medicine work? Explain its mechanism of action.", product_id, document_id, run_id=run_id)
         if evidence is None or not evidence.passages:
-            return {"error": "Publish reviewed mechanism passages before starting a knowledge check."}
+            return {"error": "Build the full library and select a source with mechanism information before starting a knowledge check."}
         return make_quiz(evidence, self.config)
 
     def presets(self):

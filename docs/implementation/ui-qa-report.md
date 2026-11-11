@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # UI QA report
 
 Scope: `ui/common.py`, `ui/explore.py`, `ui/learn.py`, `ui/sources.py`, and `tests/test_app_flows.py`. App navigation and native-browser inspection remain with the root worker. No live reviews, publications, provider requests, or source changes were performed.

@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # SDD ledger — plan: docs/superpowers/plans/2026-11-11-amgen-medicine-explorer.md
 
 Implementation authorized by user; build full app and tests, start with live connectivity. Credentials now saved; two unquoted strings fixed locally, no values logged.

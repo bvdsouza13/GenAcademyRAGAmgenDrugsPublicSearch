@@ -36,6 +36,7 @@ class SourceBlock:
     spans: list[dict[str, Any]] = field(default_factory=list)
     parser_version: str = "1"
     warnings: list[str] = field(default_factory=list)
+    source_offset: int = 0
 
 @dataclass
 class Corpus:
@@ -62,6 +63,12 @@ class ChunkPlan:
     config_hash: str
     review_hash: str
     settings: dict[str, Any] = field(default_factory=dict)
+    schema_version: int = 1
+    eligibility_policy: str = "manual_review_v1"
+    eligibility_fingerprint: str = ""
+    coverage: dict[str, Any] = field(default_factory=dict)
+    expected_document_ids: list[str] = field(default_factory=list)
+    expected_product_ids: list[str] = field(default_factory=list)
 
 @dataclass
 class EvidenceBundle:
@@ -71,6 +78,9 @@ class EvidenceBundle:
     xml_hash: str
     passages: list[dict[str, Any]]
     warnings: list[str] = field(default_factory=list)
+    eligibility_policy: str = "manual_review_v1"
+    eligibility_fingerprint: str = ""
+    run_id: str = ""
 
 @dataclass
 class TeachingResponse:

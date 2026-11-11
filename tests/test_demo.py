@@ -116,7 +116,7 @@ def test_all_steps_back_quiz_and_restart_have_zero_service_or_network_calls(demo
     assert not at.exception
     assert at.button(key='demo_back').disabled
     assert any('Prepared source-backed example' in x.value for x in at.info)
-    expected = ('canonical XML', 'each chunk', 'its evidence', 'passage says')
+    expected = ('Preserve sources', 'each chunk', 'its evidence', 'passage says')
     for heading in expected:
         click(at, 'demo_next')
         assert any(heading in x.value for x in at.subheader)
@@ -149,7 +149,7 @@ def test_exit_returns_to_catalog_and_clears_only_demo_query(demo_app):
     at.query_params['keep'] = 'yes'
     at.run()
     click(at, 'demo_exit')
-    assert at.session_state['nav'] == 'Explore medicines'
+    assert at.session_state['nav'] == 'Search & Learn'
     assert 'demo' not in at.query_params
     assert at.query_params['keep'] == 'yes'
     assert not at.session_state['service_calls'] and not network_calls
@@ -170,5 +170,17 @@ def test_source_changes_during_tour_hide_prepared_content(demo_app, change):
     click(at, 'demo_restart_missing')
     assert at.session_state['demo_step'] == 0
     click(at, 'demo_exit_missing')
-    assert at.session_state['nav'] == 'Explore medicines'
+    assert at.session_state['nav'] == 'Search & Learn'
+    assert not at.session_state['service_calls'] and not network_calls
+
+
+def test_tour_explains_bulk_setup_content_search_and_controlled_comparison(demo_app):
+    at,network_calls,_=demo_app;at.run()
+    assert any('Build / update entire library' in m.value for m in at.markdown)
+    click(at,'demo_next')
+    assert any('Search all medicine information' in m.value for m in at.markdown)
+    assert any('PCSK9' in m.value for m in at.markdown)
+    click(at,'demo_next')
+    assert any('Test settings' in m.value for m in at.markdown)
+    assert any('Not measured' in c.value for c in at.caption)
     assert not at.session_state['service_calls'] and not network_calls

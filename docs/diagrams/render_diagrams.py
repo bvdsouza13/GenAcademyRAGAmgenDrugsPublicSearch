@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Editable diagram source for the proposed Amgen Medicine Explorer.
+"""Editable diagrams for the bulk-library Amgen Medicine Explorer.
 
 Run from the project root:
     .venv-corpus/bin/python docs/diagrams/render_diagrams.py
 
 SVGs use ordinary editable vector shapes and text. PNG rendering uses PyMuPDF,
 already available in .venv-corpus. No Graphviz or network access is required.
-The diagrams describe a proposed application; they do not claim a live deployment.
+The diagrams describe application contracts, not measured cloud-release outcomes.
 """
 
 from html import escape
@@ -35,7 +35,7 @@ class Diagram:
         self.parts = [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="{height}" viewBox="0 0 1680 {height}" role="img" aria-labelledby="title desc">',
             f'<title id="title">{escape(title)}</title>',
-            f'<desc id="desc">{escape(subtitle)} Implemented local architecture. Source-fidelity pilot is published; broad clinical review remains separate.</desc>',
+            f'<desc id="desc">{escape(subtitle)} Local bulk-library architecture. Release verification and clinical review are separate.</desc>',
             '<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 9 4.5 L 0 9 z" fill="#0063C3"/></marker></defs>',
             '<style>text { font-family: Helvetica, Arial, sans-serif; } .body { font-size: 19px; } </style>',
             f'<rect width="1680" height="{height}" fill="{WHITE}"/>',
@@ -81,7 +81,7 @@ class Diagram:
     def footer(self, y, lines):
         self.rect(60, y, 1560, 93, AMBER, "#E7C990", 12)
         self.lines(82, y + 34, lines, 19, INK, 29)
-        self.text(60, self.height - 26, "LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = review or current-state constraint", 15, MUTED)
+        self.text(60, self.height - 26, "LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint", 15, MUTED)
 
     def save(self):
         svg = "\n".join(self.parts + ["</svg>"])
@@ -95,195 +95,161 @@ class Diagram:
 
 
 def architecture():
-    d = Diagram("01-solution-architecture", "01", "Solution architecture", "Responsibilities, evidence ownership and service boundaries")
+    d = Diagram("01-solution-architecture", "01", "Whole-library solution architecture", "One registered library, global content discovery and version-pinned source teaching")
     d.rect(60, 185, 1560, 142, NAVY, NAVY)
-    d.text(85, 222, "STREAMLIT EXPERIENCE  ·  IMPLEMENTED", 18, WHITE, 700)
-    for x, title, detail in [(85, "Explore medicines", "Browse the source library"), (600, "Learn with chat", "Lessons, questions and PDF citations"), (1115, "Manage sources", "Local operator actions")]:
+    d.text(85, 222, "LOCAL STREAMLIT EXPERIENCE", 18, WHITE, 700)
+    for x, title, detail in [(85, "Search & Learn", "Body text, names, source excerpts"), (600, "Admin: Library", "Build / update entire collection"), (1115, "Chunk experiments", "Test, Use, Default, Restore, Revert")]:
         d.text(x, 264, title, 24, WHITE, 700)
-        d.text(x, 298, detail, 19, "#C7E7FF")
-
+        d.text(x, 298, detail, 18, "#C7E7FF")
     d.rect(60, 395, 1130, 490, ICE, LINE)
-    d.text(85, 431, "LOCAL PYTHON APPLICATION  ·  IMPLEMENTED", 18, BLUE, 700)
+    d.text(85, 431, "LOCAL PYTHON APPLICATION", 18, BLUE, 700)
     d.arrow([(355, 327), (355, 395)])
-    d.text(375, 352, "Local UI calls application services", 18, MUTED)
-
-    d.card(85, 458, 340, 221, "Source preparation", [
-        "Existing PDF → XML extractor",
-        "Hash-bound passage review",
-        "Section-aware chunking",
-        "600 / 80 conservative budgets",
-        "Local previews; no upload",
-    ], body=18)
-    d.card(455, 458, 340, 221, "Index and publication", [
-        "Preflight and explicit load",
-        "Batch writes + checkpoints",
-        "New staged namespace",
-        "Verify → explicit publication",
-        "Retain previous build",
-    ], body=18)
-    d.card(825, 458, 340, 221, "Learning and citations", [
-        "Pin one active corpus per answer",
-        "Resolve medicine / variant scope",
-        "Retrieve reviewed evidence",
-        "OpenAI generates explanation",
-        "Validate claims and PDF citations",
-    ], body=17.8)
+    d.text(375, 352, "Explicit submissions; rerenders do not call providers", 18, MUTED)
+    d.card(85, 458, 340, 221, "Complete source preparation", [
+        "Authoritative source registry", "PDF identity + exact XML spans", "Versioned automatic eligibility",
+        "All readable page intervals", "Source-scoped chunks: 600 / 80",
+    ], body=17.5)
+    d.card(455, 458, 340, 221, "Build, search and activation", [
+        "New namespace + checkpoints", "Matching SQLite lexical artifact", "FTS5 / deterministic fallback",
+        "Verify both; activate together", "Retain previous full library",
+    ], body=17.5)
+    d.card(825, 458, 340, 221, "Discovery and teaching", [
+        "Global lexical + semantic fusion", "Group medicine / document hits", "Ask one selected source",
+        "Pin run through chat and quiz", "Check support; cite snapshot PDF",
+    ], body=17.5)
     d.arrow([(425, 568), (455, 568)])
     d.arrow([(795, 568), (825, 568)])
     for x in [255, 625, 995]:
         d.arrow([(x, 679), (x, 722)], both=True)
-
     d.card(85, 722, 1080, 135, "Local evidence and durable state", [
-        "Original PDFs • canonical XML • immutable corpus snapshots • citation resolver",
-        "SQLite review / job state • chunk and ingestion manifests • active-build information",
-    ], body=20, gap=31)
-
-    d.card(1250, 395, 370, 225, "Pinecone · connected", [
-        "Serverless Documents API",
-        "Integrated llama-text-embed-v2",
-        "1,024 dimensions • cosine",
-        "Reviewed text + flat metadata",
-        "Staged and active namespaces",
-    ], fill=ICE, body=18)
+        "Original PDFs / canonical XML / immutable source snapshots / source registry history",
+        "Ingestion SQLite / retained manual reviews / run records + lexical artifacts / atomic active pointer",
+    ], body=18, gap=31)
+    d.card(1250, 395, 370, 225, "Pinecone Documents API", [
+        "Integrated llama-text-embed-v2", "1,024 dimensions / cosine", "Chunk text + flat metadata",
+        "Whole-library namespaces", "Verified global / scoped searches",
+    ], fill=ICE, body=17.5)
     d.arrow([(625, 458), (625, 368), (1435, 368), (1435, 395)])
-    d.text(1050, 353, "Reviewed chunk batches · HTTPS", 17, BLUE, anchor="middle")
+    d.text(1050, 353, "Explicit text uploads / HTTPS", 17, BLUE, anchor="middle")
     d.arrow([(1165, 580), (1250, 580)], both=True)
-    d.text(1207, 537, "Scoped", 15, BLUE, anchor="middle")
-    d.text(1207, 558, "search", 15, BLUE, anchor="middle")
-
-    d.card(1250, 680, 370, 177, "OpenAI API · connected", [
-        "Input: question + retrieved excerpts",
-        "Output: generated explanation",
-        "Local service checks citations",
-    ], fill=ICE, body=18)
+    d.text(1207, 537, "Search", 14, BLUE, anchor="middle")
+    d.card(1250, 680, 370, 177, "OpenAI Responses API", [
+        "Question + source-scoped excerpts", "Explanation / cited support checks", "store=false; no full PDF upload",
+    ], fill=ICE, body=17)
     d.arrow([(1165, 643), (1215, 643), (1215, 769), (1250, 769)], both=True)
-    d.text(1435, 655, "HTTPS · evidence-backed generation", 17, BLUE, anchor="middle")
-
     d.footer(956, [
-        "Current assets: 37 PDFs • 36 product identities • 1,439 pages • scripts/build_amgen_xml.py → XML/AmgenProducts.xml.",
-        "XML structure and provenance are validated. Chat uses only reviewed, published evidence; most passages remain unreviewed.",
+        "Supplied inventory: 37 PDFs / 36 medicines. Actual searchable counts come from a verified complete run.",
+        "Source verification establishes extraction provenance, not clinical approval. Admin is a local workflow, not hosted authorization.",
     ])
     d.save()
 
 
 def data_flow():
-    d = Diagram("02-data-flow", "02", "Data flow", "Two separate flows: operator-controlled publication and a scoped, cited answer", height=1240)
-    d.rect(60, 185, 1560, 535, ICE, LINE)
-    d.text(85, 224, "A  PREPARE AND PUBLISH A CORPUS", 23, NAVY, 700)
-    d.text(85, 254, "Local work stays local until the operator selects Load Pinecone. Blue cloud cards identify remote processing.", 19, MUTED)
+    d = Diagram("02-data-flow", "02", "Build, discover and compare", "Whole-library versions retain exact source evidence through search, teaching and rollback", height=1550)
     cols = [85, 390, 695, 1000, 1305]
     width = 275
+    d.rect(60, 185, 1560, 505, ICE, LINE)
+    d.text(85, 224, "A  BUILD / UPDATE ENTIRE LIBRARY", 23, NAVY, 700)
     top = [
-        ("1  Source PDFs", ["37 files / 36 products", "1,439 physical pages", "Original bytes retained"], WHITE, LINE),
-        ("2  Build XML", ["Existing local Python script", "One consolidated collection", "First-pass / unreviewed"], WHITE, LINE),
-        ("3  Review gate", ["Check against source PDF", "Approve exact passages", "Hash-bound decisions"], AMBER, AMBER_LINE),
-        ("4  Chunk settings", ["Section-aware boundaries", "Target 600 / overlap 80", "Preserve scope + qualifiers"], WHITE, LINE),
-        ("5  Local preview", ["Inspect exact chunk text", "Counts, tokens, exclusions", "Pin XML + review snapshot"], WHITE, LINE),
+        ("1  Registered PDFs", ["All expected sources", "Missing files block release", "Uploads stay local"], WHITE, LINE),
+        ("2  Single XML", ["Build / reuse exact sources", "Page archives + sections", "Original PDFs retained"], WHITE, LINE),
+        ("3  Verify provenance", ["Hashes, ownership, spans", "Unique readable intervals", "No passage acceptance"], AMBER, AMBER_LINE),
+        ("4  Prepare all text", ["Sections + archive gap fill", "Safe source continuations", "Layout warnings retained"], WHITE, LINE),
+        ("5  Pin run records", ["Immutable records + XML", "Retained source snapshots", "Same policy / source identity"], WHITE, LINE),
     ]
     for x, (title, lines, fill, stroke) in zip(cols, top):
-        d.card(x, 285, width, 158, title, lines, fill, stroke, 21, 17.5, 27)
+        d.card(x, 268, width, 158, title, lines, fill, stroke, 20, 17, 27)
     for x in cols[:-1]:
-        d.arrow([(x + width, 364), (x + 305, 364)])
+        d.arrow([(x+width,347),(x+305,347)])
     lower = [
-        ("10  Active corpus", ["Concrete namespace + hash", "Previous build retained", "Ready for scoped retrieval"], WHITE, BLUE),
-        ("9  Explicit publish", ["Operator activates build", "Update active-build pointer", "data/active-corpus.json"], WHITE, BLUE),
-        ("8  Verify readiness", ["Expected IDs and hashes", "Records visible to search", "Failed build stays inactive"], AMBER, AMBER_LINE),
-        ("7  Staged namespace", ["Pinecone Documents API", "Integrated embedding", "Chunk text + flat metadata"], "#DCEEFE", BLUE),
-        ("6  Explicit load", ["Preflight configuration", "Submit displayed batch", "Persist resumable progress"], WHITE, LINE),
+        ("10  Ready", ["Actual searchable counts", "One full library version", "Previous version retained"], WHITE, BLUE),
+        ("9  Atomic activation", ["Select semantic + lexical", "One active manifest", "Failure keeps old library"], WHITE, BLUE),
+        ("8  Check search", ["Exact records + every doc", "Full inventory + coverage", "Local artifact validation"], AMBER, AMBER_LINE),
+        ("7  Local lexical", ["SQLite FTS5 if available", "Deterministic fallback", "Run + ranking identity"], WHITE, LINE),
+        ("6  Upload chunks", ["New Pinecone namespace", "Resumable batch writes", "Text + flat metadata"], "#DCEEFE", BLUE),
     ]
     for x, (title, lines, fill, stroke) in zip(cols, lower):
-        d.card(x, 495, width, 158, title, lines, fill, stroke, 21, 17.5, 27)
-    d.arrow([(1442, 443), (1442, 495)])
+        d.card(x, 475, width, 158, title, lines, fill, stroke, 20, 17, 27)
+    d.arrow([(1442,426),(1442,475)])
     for x in cols[1:]:
-        d.arrow([(x, 574), (x - 30, 574)])
-    d.text(85, 690, "Review decisions, chunk settings, build hashes and batch checkpoints are persisted locally. Rebuilds never auto-publish.", 19, MUTED)
-
-    d.rect(60, 760, 1560, 309, WHITE, LINE)
-    d.text(85, 799, "B  ANSWER A LEARNER", 23, NAVY, 700)
-    d.text(85, 829, "Each answer uses one pinned, verified corpus through retrieval and citation resolution.", 19, MUTED)
+        d.arrow([(x,554),(x-30,554)])
+    d.text(85, 667, "Automatic extraction verification is not human/clinical approval. Blank or image-only pages are reported; OCR is outside scope.", 17.5, MUTED)
+    d.rect(60, 730, 1560, 280, WHITE, LINE)
+    d.text(85, 769, "B  EXPLICIT GLOBAL DISCOVERY → ONE SELECTED SOURCE", 23, NAVY, 700)
     query = [
-        ("1  Ask a question", ["Selected medicine + question", "Resolve ambiguous scope", "Local Streamlit session"], WHITE, LINE),
-        ("2  Pin active build", ["Resolve concrete namespace", "Pin XML hash for this answer", "No mixed corpus versions"], WHITE, LINE),
-        ("3  Retrieve evidence", ["Pinecone scoped search", "Product / variant filters", "Return reviewed passages"], "#DCEEFE", BLUE),
-        ("4  Draft explanation", ["OpenAI API", "Question + selected evidence", "Plain language or technical"], "#DCEEFE", BLUE),
-        ("5  Validate and cite", ["Check claim / source support", "Show explanation + citations", "Resolve original PDF page"], WHITE, LINE),
+        ("Submit content query", ["Body / heading / brand", "Generic names included", "Medicine choice optional"], WHITE, LINE),
+        ("Pin verified run", ["Check immutable records", "Check lexical artifact", "Use pinned XML catalog"], WHITE, LINE),
+        ("Fuse verified ranks", ["Local + semantic search", "Bounded name boost", "Labeled degraded fallback"], "#DCEEFE", BLUE),
+        ("Grouped sources", ["Deduplicate overlap", "Keep source variants apart", "View / Ask about source"], WHITE, LINE),
+        ("Scoped teaching", ["Pinned product + doc + run", "Checked OpenAI explanation", "Snapshot PDF citations"], "#DCEEFE", BLUE),
     ]
     for x, (title, lines, fill, stroke) in zip(cols, query):
-        d.card(x, 858, width, 158, title, lines, fill, stroke, 21, 17.5, 27)
+        d.card(x, 804, width, 158, title, lines, fill, stroke, 20, 17, 27)
     for x in cols[:-1]:
-        d.arrow([(x + width, 937), (x + 305, 937)])
-    d.text(85, 1046, "Missing or conflicting evidence produces a visible limitation. Citations resolve against the retained build and original PDF.", 19, MUTED)
-    d.footer(1100, [
-        "Remote payloads: Pinecone receives reviewed chunk text + compact metadata; OpenAI receives the question + retrieved excerpts.",
-        "Original PDFs and canonical XML remain local. A verified six-chunk pilot is published; broader source review remains required.",
+        d.arrow([(x+width,883),(x+305,883)])
+    d.text(85, 988, "Activation affects fresh searches; existing conversations, quizzes and citations keep their selected library version.", 18, MUTED)
+    d.rect(60, 1050, 1560, 270, ICE, LINE)
+    d.text(85, 1089, "C  CONTROLLED CHUNK EXPERIMENT", 23, NAVY, 700)
+    controls = [
+        ("Draft 600 / 80", ["Conservative byte budgets", "Preview runs locally", "Not exact model tokens"]),
+        ("Test settings", ["Explicit full-library build", "Isolated candidate", "Same sources and policy"]),
+        ("Equal evaluation", ["Same suite / search profile", "Equal evidence budget", "Recall / spans / latency"]),
+        ("Use configuration", ["Verified candidate only", "Atomic pointer change", "All medicines remain"]),
+        ("Reset / Revert", ["Defaults: draft controls only", "Restore: current controls", "Revert: prior full library"]),
+    ]
+    for x,(title,lines) in zip(cols,controls):
+        d.card(x,1124,width,158,title,lines,WHITE,LINE,20,17,27)
+    for x in cols[:-1]:
+        d.arrow([(x+width,1203),(x+305,1203)])
+    d.footer(1370, [
+        "Provider usage occurs only on explicit build/search/evaluate/teach actions. Default/current control resets call no provider.",
+        "Retrieval observations and source provenance do not establish clinical accuracy. Retain all version artifacts for old citations.",
     ])
     d.save()
 
 
 def deployment():
-    d = Diagram("03-deployment", "03", "Local deployment design", "One local Python process, durable local evidence, and two server-side HTTPS integrations")
-    d.rect(60, 190, 1030, 735, ICE, LINE)
-    d.text(85, 232, "USER’S COMPUTER  ·  LOCAL RUNTIME PLANNED", 22, NAVY, 700)
-    d.rect(1160, 190, 460, 735, "#F5F9FC", LINE, dashed=True)
-    d.text(1185, 232, "REMOTE SERVICES  ·  IMPLEMENTED", 21, NAVY, 700)
-
-    d.card(90, 285, 400, 190, "Browser on this computer", [
-        "Explore / Learn / Manage sources",
-        "Rendered pages and cited responses",
-        "Provider API keys never enter browser",
-    ], body=18.5)
-    d.card(600, 285, 450, 240, "Python + Streamlit", [
-        "localhost:8501 • one local process",
-        "UI / source review / chunking / indexing",
-        "Retrieval / generation / citation service",
-        "Checkpointed jobs + ingestion lock",
-        "Local operator mode for source controls",
-    ], body=18.5)
-    d.arrow([(490, 374), (600, 374)], both=True)
-    d.lines(514, 329, ["Local", "HTTP"], 17, BLUE, 23)
-
-    d.card(90, 620, 450, 245, "Local files and durable state", [
-        "Existing: Documents/*.pdf",
-        "Existing: XML/AmgenProducts.xml",
-        "Planned: corpus snapshots + manifests",
-        "Planned: SQLite review and job ledger",
-        "Original PDF pages resolve locally",
-    ], body=18.5)
-    d.card(600, 620, 450, 245, "Server-side configuration", [
-        "config/app.toml • non-secret settings",
-        ".streamlit/secrets.toml • provider keys",
-        "Environment variables override secrets",
-        "Config loader + offline checks exist",
-        "Keys are used only by the local server",
-    ], body=18.5)
-    d.arrow([(670, 525), (670, 560), (315, 560), (315, 620)], both=True)
-    d.text(360, 549, "Read / write evidence and checkpoints", 17, BLUE)
-    d.arrow([(825, 620), (825, 525)])
-    d.text(845, 584, "Settings + credentials", 17, BLUE)
-
-    d.card(1190, 285, 400, 250, "Pinecone", [
-        "Serverless Documents API",
-        "Integrated llama-text-embed-v2",
-        "1,024 dimensions • cosine",
-        "Reviewed chunks + flat metadata",
-        "Queries and returned passages",
-        "Staged / active namespaces",
-    ], fill=WHITE, body=18.5, gap=28)
-    d.arrow([(1050, 374), (1190, 374)], both=True)
-    d.text(1120, 355, "HTTPS", 18, BLUE, anchor="middle")
-    d.card(1190, 650, 400, 185, "OpenAI API", [
-        "Question + retrieved evidence",
-        "Returns generated explanations",
-        "Local service validates citations",
-    ], fill=WHITE, body=18.5)
-    d.arrow([(1050, 475), (1120, 475), (1120, 743), (1190, 743)], both=True)
-    d.rect(1091, 597, 58, 28, WHITE, WHITE, 3)
-    d.text(1120, 618, "HTTPS", 18, BLUE, anchor="middle")
-    d.text(1185, 891, "No full PDFs uploaded by this design", 18, MUTED)
-
-    d.footer(956, [
-        "Deployment status: proposed local runtime; no live Streamlit app, connected Pinecone corpus or OpenAI integration is claimed.",
-        "Existing assets are the source PDFs, local extractor and first-pass XML. Hosted deployment is outside the first-version scope.",
+    d = Diagram("03-deployment", "03", "Local deployment and durable versions", "A local browser and Python server; retained source artifacts; two server-side provider integrations")
+    d.rect(60,190,1030,735,ICE,LINE)
+    d.text(85,232,"USER COMPUTER / LOCAL RUNTIME",22,NAVY,700)
+    d.rect(1160,190,460,735,"#F5F9FC",LINE,dashed=True)
+    d.text(1185,232,"REMOTE PROVIDER BOUNDARY",21,NAVY,700)
+    d.card(90,285,400,190,"Local browser",[
+        "Search & Learn / Admin", "Session learning and prepared demo", "Keys stay in server-side Python",
+    ],body=18)
+    d.card(600,285,450,240,"Python + Streamlit",[
+        "127.0.0.1:8501 / local process", "Whole-library build + search + teach", "Explicit submissions; persisted jobs",
+        "Run-pinned chat, quiz and citations", "Local operator controls; no hosted auth",
+    ],body=18)
+    d.arrow([(490,374),(600,374)],both=True)
+    d.lines(514,329,["Local","HTTP"],17,BLUE,23)
+    d.card(90,620,450,245,"Durable local evidence",[
+        "Registered Documents/*.pdf", "Canonical XML + immutable snapshots", "Source registry + version history",
+        "Run records + SQLite lexical artifacts", "Review/job SQLite + active manifest",
+    ],body=18)
+    d.card(600,620,450,245,"Server-side configuration",[
+        "config/app.toml: unchanged structure", "Ignored secrets TOML / exported keys", "Nonblank environment values win",
+        "No .env loader; no automatic indexing", "Keep data/ for citations and rollback",
+    ],body=18)
+    d.arrow([(670,525),(670,560),(315,560),(315,620)],both=True)
+    d.text(360,549,"Evidence / checkpoints / artifact validation",16,BLUE)
+    d.arrow([(825,620),(825,525)])
+    d.text(845,584,"Settings + credentials",17,BLUE)
+    d.card(1190,285,400,250,"Pinecone Documents API",[
+        "Integrated llama-text-embed-v2", "1,024 dimensions / cosine", "Chunks + compact flat metadata",
+        "Whole-library version namespaces", "Global / source-scoped queries", "No full PDF or XML uploads",
+    ],body=18,gap=28)
+    d.arrow([(1050,374),(1190,374)],both=True)
+    d.text(1120,355,"HTTPS",18,BLUE,anchor="middle")
+    d.card(1190,650,400,185,"OpenAI Responses API",[
+        "Question + selected scoped excerpts", "Checked source-backed explanations", "store=false / no full PDF uploads",
+    ],body=18)
+    d.arrow([(1050,475),(1120,475),(1120,743),(1190,743)],both=True)
+    d.rect(1091,597,58,28,WHITE,WHITE,3)
+    d.text(1120,618,"HTTPS",18,BLUE,anchor="middle")
+    d.footer(956,[
+        "Retained snapshots and manifests keep old conversations resolvable. Semantic and lexical versions activate together.",
+        "Shared hosting is outside scope: it needs server-enforced roles, durable shared storage, learner isolation and operational recovery.",
     ])
     d.save()
 

@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # QA, demo and GitHub publication
 
 User authorized thorough testing, automatic fixes, a short demo, local launch and upload to https://github.com/bvdsouza13/GenAcademyRAGWeek2.git.

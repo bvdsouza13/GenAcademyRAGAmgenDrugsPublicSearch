@@ -1,3 +1,5 @@
+> Historical pilot evidence. See [the current bulk-library release report](../docs/implementation/bulk-refactor-release-report.md) for the refactored application.
+
 # Live pilot and handoff — November 11, 2026
 
 The local Streamlit app is running at `http://127.0.0.1:8501`. Both keys authenticate. OpenAI returned a completed Responses answer using the configured `gpt-6.1-sol` model; the Pinecone control plane described the existing `amgenproduct` index as ready and compatible. No new index was created.

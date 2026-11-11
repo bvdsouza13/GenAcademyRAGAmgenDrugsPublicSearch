@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Additional regression assessment — 2026-11-11
 
 Engineering confidence: **8/10 for the current local, single-user educational pilot**. This is a judgment based on the tested behavior and source protections; it is not a measured availability or clinical-accuracy percentage. Shared/public hosting and clinical production use remain outside the validated scope.

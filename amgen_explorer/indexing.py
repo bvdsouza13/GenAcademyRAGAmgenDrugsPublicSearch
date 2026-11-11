@@ -12,6 +12,7 @@ import tempfile
 import time
 import fcntl
 from .connectivity import DocumentsClient, ProviderError
+from .eligibility import BULK_POLICY, SCHEMA_VERSION, policy_for, validate_record_policy, validate_record_sources
 
 
 def digest(value):
@@ -97,17 +98,33 @@ def validate_manifest_records(manifest, records, config):
         raise ValueError("Staged records failed content-hash or unique-ID validation.")
     if products != manifest.get("product_ids") or documents != manifest.get("document_ids"):
         raise ValueError("Run scope does not match the staged records.")
+    policy = policy_for(manifest)
+    if policy == BULK_POLICY:
+        _validate_bulk_inventory(manifest, records)
     for record in records:
+        validate_record_policy(record, policy, manifest.get('eligibility_fingerprint',''))
         if (record.get("xml_hash") != manifest.get("xml_hash")
                 or record.get("chunk_config_hash") != manifest.get("config_hash")
-                or record.get("review_hash") != manifest.get("review_hash")
-                or record.get("review_state") != "accepted"):
+                or record.get("review_hash") != manifest.get("review_hash")):
             raise ValueError("A staged record failed source/review/configuration pin validation.")
     # These duplicated display fields must not contradict the authoritative
     # profile; older manifests may omit them.
     for key in ("index_host", "index_name", "embedding_model", "api_version"):
         if key in manifest and manifest[key] != manifest["profile"][key]:
             raise ValueError("Run destination metadata contradicts its pinned profile.")
+
+
+def _validate_bulk_inventory(value, records):
+    coverage = value.get('coverage',{})
+    if (value.get('schema_version') != SCHEMA_VERSION
+            or not re.fullmatch('[a-f0-9]{64}',value.get('eligibility_fingerprint',''))
+            or coverage.get('complete') is not True or coverage.get('missing_intervals') != []
+            or not coverage.get('expected_characters')
+            or coverage.get('covered_characters') != coverage.get('expected_characters')):
+        raise ValueError('Bulk inventory/coverage verification is incomplete.')
+    if (sorted({r['product_id'] for r in records}) != value.get('expected_product_ids')
+            or sorted({r['document_id'] for r in records}) != value.get('expected_document_ids')):
+        raise ValueError('Bulk record inventory does not match all expected documents/products.')
 
 
 def manifest_records(manifest, config):
@@ -157,13 +174,14 @@ class IndexService:
                     raise ValueError(f"Missing citation metadata: {field}.")
             if type(metadata["page_start"]) is not int or type(metadata["page_end"]) is not int or not 1 <= metadata["page_start"] <= metadata["page_end"]:
                 raise ValueError("Citation pages must be valid 1-based PDF page bounds.")
-            if metadata.get("review_state") != "accepted":
-                raise ValueError("Only explicitly accepted reviewed chunks can be loaded.")
+            validate_record_policy(metadata, policy_for(plan), plan.eligibility_fingerprint)
             metadata.update(xml_hash=plan.xml_hash, chunk_config_hash=plan.config_hash, review_hash=plan.review_hash)
             if self.config.settings["pinecone"]["text_field"] in metadata:
                 raise ValueError("Metadata cannot overwrite document text.")
             flat_metadata(metadata)
             records.append({**metadata, "_id": chunk.id, self.config.settings["pinecone"]["text_field"]: chunk.text})
+        if policy_for(plan) == BULK_POLICY:
+            _validate_bulk_inventory(vars(plan), records)
         return records
 
     def _batches(self, records):
@@ -191,7 +209,7 @@ class IndexService:
         profile = self._profile()
         run_id = digest({"plan": plan.fingerprint, "records": records, "profile": profile})
         batches = list(self._batches(records))
-        return {"run_id": run_id, "namespace": self.config.settings["pinecone"]["namespace_prefix"] + "-" + run_id[:48],
+        result = {"run_id": run_id, "namespace": self.config.settings["pinecone"]["namespace_prefix"] + "-" + run_id[:48],
                 "fingerprint": plan.fingerprint, "xml_hash": plan.xml_hash, "config_hash": plan.config_hash,
                 "review_hash": plan.review_hash, "record_count": len(records), "excluded_count": len(plan.excluded),
                 "estimated_tokens": sum(c.token_count for c in plan.chunks), "batch_count": len(batches),
@@ -200,6 +218,11 @@ class IndexService:
                 "index_host": profile["index_host"], "index_name": profile["index_name"],
                 "embedding_model": profile["embedding_model"], "api_version": profile["api_version"],
                 "token_guard": "conservative UTF-8 bytes + 8 <= 2048; not exact tokenizer"}
+        if policy_for(plan) == BULK_POLICY:
+            result.update(schema_version=plan.schema_version, eligibility_policy=plan.eligibility_policy,
+                          eligibility_fingerprint=plan.eligibility_fingerprint, coverage=plan.coverage,
+                          expected_document_ids=plan.expected_document_ids, expected_product_ids=plan.expected_product_ids)
+        return result
 
     @contextmanager
     def _lock(self):
@@ -339,6 +362,25 @@ class IndexService:
             if not manifest or manifest.get("status") != "verified":
                 raise ValueError("Only a complete, verified run can be published.")
             records = manifest_records(manifest, self.config)
+            if policy_for(manifest) == BULK_POLICY:
+                if not manifest.get('search_artifact'):
+                    raise ValueError('Bulk publication requires a matching local search artifact.')
+                from .search import validate_search_artifact
+                from .xml_store import load_corpus
+                xml_hash = manifest.get('xml_hash', '')
+                if not isinstance(xml_hash,str) or not re.fullmatch('[a-f0-9]{64}',xml_hash):
+                    raise ValueError('The pinned XML snapshot identity is invalid.')
+                snapshot = self.config.path('corpus_dir') / xml_hash / 'AmgenProducts.xml'
+                try:
+                    if hashlib.sha256(snapshot.read_bytes()).hexdigest() != xml_hash:
+                        raise ValueError()
+                    corpus = load_corpus(snapshot)
+                    if corpus.xml_hash != xml_hash:
+                        raise ValueError()
+                except (OSError, ValueError):
+                    raise ValueError('The pinned XML snapshot is unavailable or changed.') from None
+                validate_record_sources(records, corpus, manifest, self.config.settings["pinecone"]["text_field"])
+                validate_search_artifact(manifest, records, self.config, corpus)
             self.client.check()
             self._verify(manifest, records)
             previous = self.active()

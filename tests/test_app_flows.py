@@ -1,4 +1,7 @@
-"""Exercise the real Streamlit UI with a provider-free facade."""
+"""Exercise the explicit ?legacy=1 recovery UI with a provider-free facade.
+
+Old review/publication assertions stay intact outside the routine bulk navigation.
+"""
 from pathlib import Path
 from types import SimpleNamespace
 import sys
@@ -61,6 +64,7 @@ def app(monkeypatch,tmp_path):
     service = FakeService(tmp_path)
     monkeypatch.setitem(sys.modules,'amgen_explorer.service',SimpleNamespace(ExplorerService=lambda:service))
     at = AppTest.from_file(str(ROOT/'app.py'), default_timeout=15)
+    at.query_params['legacy']='1'
     return at, service
 
 def navigate(at, name):
@@ -426,7 +430,9 @@ def offline_service(monkeypatch,tmp_path):
 def test_real_service_source_and_unpublished_library_render_without_network(monkeypatch,offline_service):
     service=offline_service
     monkeypatch.setitem(sys.modules,'amgen_explorer.service',SimpleNamespace(ExplorerService=lambda:service))
-    at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=15).run()
+    at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=15)
+    at.query_params['legacy']='1'
+    at.run()
     assert not at.exception
     navigate(at,'Learn with chat')
     assert at.chat_input[0].disabled
@@ -465,7 +471,9 @@ def test_real_service_provider_outage_shows_exact_source_without_false_missing_l
     service.config.settings['pinecone']['index_host']='offline-fixture.pinecone.io'
     service.config.settings['openai']['model']='fixture-model'
     monkeypatch.setitem(sys.modules,'amgen_explorer.service',SimpleNamespace(ExplorerService=lambda:service))
-    at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=15).run()
+    at=AppTest.from_file(str(ROOT/'app.py'),default_timeout=15)
+    at.query_params['legacy']='1'
+    at.run()
     navigate(at,'Learn with chat')
     assert not at.chat_input[0].disabled
     at.chat_input[0].set_value('What approved uses does the source describe?').run()

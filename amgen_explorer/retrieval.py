@@ -4,6 +4,7 @@ from pathlib import Path
 from .models import EvidenceBundle
 from .indexing import guard_text, manifest_records
 from .connectivity import DocumentsClient
+from .eligibility import policy_for, BULK_POLICY
 
 SAFETY_WORDS = ("warning", "safe", "safety", "contraindicat", "side effect", "risk", "overview", "teach", "learn", "introduction")
 SAFETY_KINDS = ("warning", "precaution", "contraindicat", "boxed")
@@ -16,7 +17,10 @@ def load_records(active, config):
 def retrieve(question, product_id, active, config, document_id=None, *, client=None):
     namespace = (active or {}).get("namespace", "")
     xml_hash = (active or {}).get("xml_hash", "")
-    empty = EvidenceBundle(question, product_id, namespace, xml_hash, [])
+    empty = EvidenceBundle(question, product_id, namespace, xml_hash, [],
+                           eligibility_policy=policy_for(active or {}),
+                           eligibility_fingerprint=(active or {}).get('eligibility_fingerprint',''),
+                           run_id=(active or {}).get('run_id',''))
     if not active or active.get("status") != "verified":
         empty.warnings.append("No verified corpus is active. Review, load and publish sources first.")
         return empty
@@ -57,12 +61,28 @@ def retrieve(question, product_id, active, config, document_id=None, *, client=N
             empty.warnings.append("Reviewed safety sections are unavailable; this evidence cannot establish the full warning profile.")
         # Direct canonical safety lookup supplements semantic ranking.
         candidates = safety + candidates
+    # A split parent retains adjacent context even when semantic top-k found
+    # just one continuation. Never claim the remainder was included if the
+    # evidence budget cannot contain it.
+    if empty.eligibility_policy == BULK_POLICY:
+        expanded=[]
+        emitted=set()
+        for candidate in candidates:
+            parents=set(candidate.get('continuation_parent_ids',[]))
+            adjacent=([r for r in scoped if parents & set(r.get('continuation_parent_ids',[]))]
+                      if parents else [candidate])
+            for record in sorted(adjacent,key=lambda r:r.get('continuation_index',0)):
+                if record['_id'] not in emitted:
+                    expanded.append(record); emitted.add(record['_id'])
+        candidates=expanded
     budget = config.settings["retrieval"]["evidence_token_budget"]
     used = 0
     seen = set()
     field = config.settings["pinecone"]["text_field"]
     for record in candidates:
-        content_id = (record["document_id"], record.get("source_text", record[field]))
+        content_id = ((record['document_id'], record.get('source_spans',record['_id']))
+                      if empty.eligibility_policy == BULK_POLICY
+                      else (record["document_id"], record.get("source_text", record[field])))
         if content_id in seen:
             continue
         seen.add(content_id)
@@ -74,4 +94,14 @@ def retrieve(question, product_id, active, config, document_id=None, *, client=N
         empty.passages.append({"id": record["_id"], "text": record.get("source_text", record[field]),
                                "metadata": {k: v for k, v in record.items() if k not in {"_id", field}},
                                "namespace": namespace, "xml_hash": xml_hash})
+    if empty.eligibility_policy == BULK_POLICY:
+        included={p['id'] for p in empty.passages}
+        for record in candidates:
+            if record['_id'] not in included and record.get('continuation_parent_ids'):
+                empty.warnings.append('The complete continuation context could not fit in the evidence budget; inspect the full source before explanation.')
+                break
+        for passage in empty.passages:
+            limitations=passage['metadata'].get('extraction_limitations',[])
+            if limitations:
+                empty.warnings.append('Source extraction/layout limitation: '+', '.join(limitations)+'. View the original PDF page.')
     return empty

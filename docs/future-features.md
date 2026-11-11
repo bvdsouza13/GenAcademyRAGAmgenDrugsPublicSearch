@@ -1,31 +1,32 @@
 # Future-feature roadmap
 
-This is a proposed delivery order grounded in the current implementation. These features are not implemented by the regression-hardening release.
+Bulk source verification, whole-library content discovery and controlled chunk experiments are part of the current refactor rather than future proposals. Their actual verification scope belongs in the [release report](implementation/bulk-refactor-release-report.md). This roadmap replaces the earlier plan centered on manually accepting every passage.
 
-## First: extend trustworthy coverage
+## Evidence and source quality
 
-| Priority | Feature | User benefit | Completion criteria |
-|---|---|---|---|
-| 1 | Reviewer workbench for complete medicine lessons | More medicines can answer questions about approved uses, limitations, warnings and mechanism. | Explicit review assignments; source/PDF comparison; separate extraction-fidelity and clinical approval; visible review history; publication only for eligible content. |
-| 2 | Clinician-reviewed evaluation dashboard | Makes retrieval and answer quality measurable before expanding coverage. | Representative questions per medicine/section and difficult refusal cases; expected passages; retrieval coverage and citation accuracy; unsupported-claim and material-qualifier checks; failures block promotion. |
-| 3 | Label version and update management | Learners can see which label version supports an answer. | Official source URLs, retrieval dates and revisions; exact old/new diffs; changed passages require fresh review; explicit handling of supersession and presentation differences. |
-| 4 | Coverage map for each medicine | Explains which questions the library can currently support. | A medicine-by-section grid showing absent, extracted, reviewed and published states; prompt suggestions limited to available evidence. |
+| Next work | Benefit and acceptance boundary |
+|---|---|
+| Clinician-reviewed evaluation | Independent representative cases for safety, variants, qualifiers, abstention and explanation support; retrieval scores alone do not establish medical accuracy. |
+| Label update provenance | Verified acquisition URLs/dates, revisions, exact changes and explicit supersession/applicability decisions; preserve old citation snapshots. |
+| OCR and layout-aware tables | Add readable coverage for scanned pages and trustworthy table structure; retain confidence, units and footnotes, and avoid inferred relationships. |
+| Optional clinical review workflow | Record independent professional judgments separately from automatic extraction verification and historical source-fidelity review. |
+| Richer coverage inspection | Medicine/section coverage and layout limitations with useful source-backed query suggestions. |
 
-## Next: improve ingestion and learning
+## Learning and discovery
 
-| Priority | Feature | User benefit | Completion criteria |
-|---|---|---|---|
-| 5 | OCR and layout-aware table review | Makes scanned pages and difficult tables usable without losing units or row/column relationships. | Confidence and layout flags; page overlays; table structure preserved; uncertain content kept out of automatic publication until reviewed. |
-| 6 | Saved learning paths and stronger quizzes | Gives learners a useful return experience. | Persistent progress and bookmarks; source-backed quizzes beyond the current extractive check; varied answer ordering, hints and explanations; optional plain-language/technical tracks. |
-| 7 | Better search and chunk experiment evaluation | Helps find relevant passages and choose chunk settings using evidence. | Keyword plus semantic retrieval; section filters; evaluated reranking; side-by-side passage coverage, citation correctness, latency and cost for identical questions. |
-| 8 | Accessible presentation and export | Makes lessons easier to read and share. | Keyboard and screen-reader audit; responsive browser checks; glossary definitions linked to sources; exportable lesson notes with label revision and citations. |
+| Next work | Benefit and acceptance boundary |
+|---|---|
+| Persistent learning paths | Bookmarks, accounts and progress across sessions/devices, with version-pinned evidence and privacy controls. |
+| Stronger assessments | More varied source-backed questions, hints and explanations beyond the current extractive reading quiz. |
+| Evaluated search improvements | Study reranking and section filters against held-out expected evidence; retain whole-library coverage and deterministic variant isolation. |
+| Accessibility and export | Keyboard/screen-reader review, responsive layouts and exportable notes retaining source revision/citations. |
 
 ## Before shared hosting
 
-| Priority | Feature | User benefit | Completion criteria |
-|---|---|---|---|
-| Required for sharing | Authentication and roles | Separates learners, reviewers and publishers. | Server-enforced permissions, isolated user state, audit records, authenticated deployment and secret management. |
-| Required for sharing | Durable jobs, backup and recovery | Keeps uploads and reviews reliable across restarts and multiple users. | Persistent shared storage; managed background jobs; concurrency control; tested backup/restore; explicit retention and namespace cleanup. |
-| Required for sharing | Operational dashboard and spending controls | Makes failures and usage visible. | Sanitized error logs; health checks; request latency, token usage and cost; bounded retries; cancellation; quotas and alerts; no raw credentials or unnecessary chat content in logs. |
+| Required work | Acceptance boundary |
+|---|---|
+| Authentication and roles | Server-enforced learner/operator permissions; Admin navigation alone is insufficient. |
+| Durable jobs and recovery | Shared artifact storage, tested backup/restore, concurrency/cancellation and deliberate retention/cleanup. |
+| Operations and spending | Sanitized diagnostics, actual provider usage, quotas, alerts and bounded retries without credential or unnecessary chat logging. |
 
-The recommended next milestone is broader reviewed content plus the evaluation dashboard. These address the current limitation that live learning covers four mechanism passages across three medicines. Hosting should follow the security, recovery and evaluation work rather than serve as a substitute for it.
+Public hosting, inferred clinical fact normalization, new embedding providers and cross-medicine treatment recommendations are outside this refactor. Keep scientific/clinical evaluation distinct from software correctness and extraction provenance.

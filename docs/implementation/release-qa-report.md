@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Release QA — 2026-11-11
 
 The local prototype and guided demo passed the checks below. This report records observed results, not a guarantee that every possible input or future provider response has been tested.

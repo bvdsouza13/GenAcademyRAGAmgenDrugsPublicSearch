@@ -105,9 +105,9 @@ def page_position(offset: int, starts: list[int], texts: list[str]) -> int:
     raise ValueError(f"Offset {offset} does not refer to a source character")
 
 
-def extract(path: Path, root_dir: Path) -> dict:
+def extract(path: Path, root_dir: Path, *, brand_key: str | None = None) -> dict:
     doc_id = "doc-" + path.stem.replace("_", "-")
-    brand_key = path.stem.split("_")[0]
+    brand_key = brand_key or path.stem.split("_")[0]
     # Bind extracted text and provenance to the same immutable source snapshot.
     # build_corpus checks the on-disk hash again before publishing the result.
     source_bytes = path.read_bytes()
@@ -417,7 +417,7 @@ def _atomic_bytes(path: Path, content: bytes):
         Path(temporary).unlink(missing_ok=True)
 
 
-def build_corpus(source_dir: Path, output_path: Path) -> BuildReport:
+def build_corpus(source_dir: Path, output_path: Path, *, identities: dict | None = None) -> BuildReport:
     """Build completely locally, preserving the prior artifact on any failure.
 
     No missing/corrupt input silently disappears. Failed builds raise with an
@@ -435,11 +435,17 @@ def build_corpus(source_dir: Path, output_path: Path) -> BuildReport:
     records = []
     for path in paths:
         try:
-            record = extract(path, root_dir)
+            identity = (identities or {}).get(path.name)
+            record = extract(path, root_dir, brand_key=identity['product_name']) if identity else extract(path, root_dir)
             # XML IDs must remain safe even for filenames with spaces/punctuation.
             safe = re.sub(r"[^A-Za-z0-9_.-]", "-", path.stem.replace("_", "-"))
             record["id"] = "doc-" + safe
             record["productId"] = "product-" + re.sub(r"[^a-z0-9.-]", "-", record["brandKey"].lower())
+            if identity:
+                record['id'] = identity['document_id']
+                record['productId'] = identity['product_id']
+                if record['sha256'] != identity['sha256']:
+                    raise ValueError('Source changed after inventory validation')
             records.append(record)
         except Exception as error:
             report.failed_files.append({"filename": path.name, "error": type(error).__name__})

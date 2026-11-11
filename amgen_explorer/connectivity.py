@@ -71,6 +71,7 @@ class DocumentsClient:
             "filter": filters, "include_fields": ["*"]})
         if response.get("namespace", namespace) != namespace or not isinstance(response.get("matches"), list):
             raise ValueError("Search returned an unexpected namespace or match shape.")
+        self.last_usage = response.get("usage", {}) if isinstance(response.get("usage", {}), dict) else {}
         return response["matches"]
 
 def check_connections(config):

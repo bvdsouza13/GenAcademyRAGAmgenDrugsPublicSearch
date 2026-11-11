@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Guided demo implementation report
 
 Implemented the binding design in `docs/implementation/qa-demo-publish-plan.md`: a five-stop, approximately three-minute read-only Streamlit tour from source PDF through canonical XML, chunk preview, cited lesson and prepared quiz.

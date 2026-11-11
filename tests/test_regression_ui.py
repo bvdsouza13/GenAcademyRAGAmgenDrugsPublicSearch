@@ -31,7 +31,9 @@ def app(monkeypatch, tmp_path):
         }])
     service.answer = answer
     monkeypatch.setitem(sys.modules, 'amgen_explorer.service', SimpleNamespace(ExplorerService=lambda: service))
-    at = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=15).run()
+    at = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=15)
+    at.query_params['legacy']='1'
+    at.run()
     navigate(at, 'Learn with chat')
     at.selectbox(key='document_id').set_value('doc').run()
     return at, service
@@ -123,7 +125,9 @@ def test_new_browser_session_has_no_other_session_learning_state(app):
     click(at, 'Create a source-based quiz')
     quiz_answer(at).set_value(0).run()
     click(at, 'Check answer')
-    second = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=15).run()
+    second = AppTest.from_file(str(ROOT / 'app.py'), default_timeout=15)
+    second.query_params['legacy']='1'
+    second.run()
     navigate(second, 'My learning')
     assert {m.label: m.value for m in second.metric} == {
         'Lessons understood': '0', 'Quizzes checked': '0', 'Questions explored': '0',
@@ -224,7 +228,7 @@ def test_demo_exit_reentry_restart_and_missing_source_keep_state_honest(app, mon
     at.query_params['keep'] = 'retained'
     at.button(key='demo_exit').click().run()
     assert at.sidebar.radio(key='nav').value == 'Explore medicines'
-    assert at.query_params == {'keep': 'retained'}
+    assert at.query_params == {'legacy':'1','keep': 'retained'}
     navigate(at, 'Demo tour')
     assert at.radio(key='demo_answer').value == 0
     assert any('Correct' in item.value for item in at.success)

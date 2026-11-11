@@ -38,7 +38,7 @@ def test_sidebar_demo_and_exit_restore_catalog(monkeypatch):
     at.query_params['demo'] = '1'
     at.button(key='demo_exit').click().run()
     assert not at.exception and len(constructions) == 2
-    assert at.sidebar.radio(key='nav').value == 'Explore medicines'
+    assert at.sidebar.radio(key='nav').value == 'Search & Learn'
     assert 'demo' not in at.query_params
 
 

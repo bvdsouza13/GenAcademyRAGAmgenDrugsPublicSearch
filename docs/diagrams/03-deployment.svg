@@ -1,31 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1120" viewBox="0 0 1680 1120" role="img" aria-labelledby="title desc">
-<title id="title">Local deployment design</title>
-<desc id="desc">One local Python process, durable local evidence, and two server-side HTTPS integrations Implemented local architecture. Source-fidelity pilot is published; broad clinical review remains separate.</desc>
+<title id="title">Local deployment and durable versions</title>
+<desc id="desc">A local browser and Python server; retained source artifacts; two server-side provider integrations Local bulk-library architecture. Release verification and clinical review are separate.</desc>
 <defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M 0 0 L 9 4.5 L 0 9 z" fill="#0063C3"/></marker></defs>
 <style>text { font-family: Helvetica, Arial, sans-serif; } .body { font-size: 19px; } </style>
 <rect width="1680" height="1120" fill="#FFFFFF"/>
 <rect width="1680" height="12" fill="#0063C3"/>
 <text x="60" y="58" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#0063C3" font-weight="700" text-anchor="start">AMGEN MEDICINE EXPLORER  /  03</text>
-<text x="60" y="109" font-family="Helvetica, Arial, sans-serif" font-size="39" fill="#072B50" font-weight="700" text-anchor="start">Local deployment design</text>
-<text x="60" y="146" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#4D667B" font-weight="400" text-anchor="start">One local Python process, durable local evidence, and two server-side HTTPS integrations</text>
+<text x="60" y="109" font-family="Helvetica, Arial, sans-serif" font-size="39" fill="#072B50" font-weight="700" text-anchor="start">Local deployment and durable versions</text>
+<text x="60" y="146" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#4D667B" font-weight="400" text-anchor="start">A local browser and Python server; retained source artifacts; two server-side provider integrations</text>
 <rect x="60" y="190" width="1030" height="735" rx="14" fill="#EEF6FC" stroke="#B8D2E8" stroke-width="1.5"/>
-<text x="85" y="232" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">USER’S COMPUTER  ·  LOCAL RUNTIME PLANNED</text>
+<text x="85" y="232" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">USER COMPUTER / LOCAL RUNTIME</text>
 <rect x="1160" y="190" width="460" height="735" rx="14" fill="#F5F9FC" stroke="#B8D2E8" stroke-width="1.5" stroke-dasharray="8 5"/>
-<text x="1185" y="232" font-family="Helvetica, Arial, sans-serif" font-size="21" fill="#072B50" font-weight="700" text-anchor="start">REMOTE SERVICES  ·  IMPLEMENTED</text>
+<text x="1185" y="232" font-family="Helvetica, Arial, sans-serif" font-size="21" fill="#072B50" font-weight="700" text-anchor="start">REMOTE PROVIDER BOUNDARY</text>
 <rect x="90" y="285" width="400" height="190" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="90" y="305" width="5" height="29" rx="2" fill="#0063C3"/>
-<text x="112" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Browser on this computer</text>
-<text x="112" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Explore / Learn / Manage sources</text>
-<text x="112" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Rendered pages and cited responses</text>
-<text x="112" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Provider API keys never enter browser</text>
+<text x="112" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Local browser</text>
+<text x="112" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Search &amp; Learn / Admin</text>
+<text x="112" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Session learning and prepared demo</text>
+<text x="112" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Keys stay in server-side Python</text>
 <rect x="600" y="285" width="450" height="240" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="600" y="305" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="622" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Python + Streamlit</text>
-<text x="622" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">localhost:8501 • one local process</text>
-<text x="622" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">UI / source review / chunking / indexing</text>
-<text x="622" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Retrieval / generation / citation service</text>
-<text x="622" y="451" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Checkpointed jobs + ingestion lock</text>
-<text x="622" y="480" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Local operator mode for source controls</text>
+<text x="622" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">127.0.0.1:8501 / local process</text>
+<text x="622" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Whole-library build + search + teach</text>
+<text x="622" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Explicit submissions; persisted jobs</text>
+<text x="622" y="451" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Run-pinned chat, quiz and citations</text>
+<text x="622" y="480" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Local operator controls; no hosted auth</text>
 <path d="M 490 374 L 600 374" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="600,374 590.0,379.0 590.0,369.0" fill="#0063C3"/>
 <polygon points="490,374 500.0,369.0 500.0,379.0" fill="#0063C3"/>
@@ -33,54 +33,53 @@
 <text x="514" y="352" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#0063C3" font-weight="400" text-anchor="start">HTTP</text>
 <rect x="90" y="620" width="450" height="245" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="90" y="640" width="5" height="29" rx="2" fill="#0063C3"/>
-<text x="112" y="662" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Local files and durable state</text>
-<text x="112" y="699" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Existing: Documents/*.pdf</text>
-<text x="112" y="728" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Existing: XML/AmgenProducts.xml</text>
-<text x="112" y="757" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Planned: corpus snapshots + manifests</text>
-<text x="112" y="786" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Planned: SQLite review and job ledger</text>
-<text x="112" y="815" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Original PDF pages resolve locally</text>
+<text x="112" y="662" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Durable local evidence</text>
+<text x="112" y="699" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Registered Documents/*.pdf</text>
+<text x="112" y="728" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Canonical XML + immutable snapshots</text>
+<text x="112" y="757" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Source registry + version history</text>
+<text x="112" y="786" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Run records + SQLite lexical artifacts</text>
+<text x="112" y="815" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Review/job SQLite + active manifest</text>
 <rect x="600" y="620" width="450" height="245" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="600" y="640" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="622" y="662" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Server-side configuration</text>
-<text x="622" y="699" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">config/app.toml • non-secret settings</text>
-<text x="622" y="728" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">.streamlit/secrets.toml • provider keys</text>
-<text x="622" y="757" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Environment variables override secrets</text>
-<text x="622" y="786" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Config loader + offline checks exist</text>
-<text x="622" y="815" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Keys are used only by the local server</text>
+<text x="622" y="699" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">config/app.toml: unchanged structure</text>
+<text x="622" y="728" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Ignored secrets TOML / exported keys</text>
+<text x="622" y="757" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Nonblank environment values win</text>
+<text x="622" y="786" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">No .env loader; no automatic indexing</text>
+<text x="622" y="815" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Keep data/ for citations and rollback</text>
 <path d="M 670 525 L 670 560 L 315 560 L 315 620" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="315,620 310.0,610.0 320.0,610.0" fill="#0063C3"/>
 <polygon points="670,525 675.0,535.0 665.0,535.0" fill="#0063C3"/>
-<text x="360" y="549" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#0063C3" font-weight="400" text-anchor="start">Read / write evidence and checkpoints</text>
+<text x="360" y="549" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#0063C3" font-weight="400" text-anchor="start">Evidence / checkpoints / artifact validation</text>
 <path d="M 825 620 L 825 525" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="825,525 830.0,535.0 820.0,535.0" fill="#0063C3"/>
 <text x="845" y="584" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#0063C3" font-weight="400" text-anchor="start">Settings + credentials</text>
 <rect x="1190" y="285" width="400" height="250" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="1190" y="305" width="5" height="29" rx="2" fill="#0063C3"/>
-<text x="1212" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Pinecone</text>
-<text x="1212" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Serverless Documents API</text>
-<text x="1212" y="392" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Integrated llama-text-embed-v2</text>
-<text x="1212" y="420" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">1,024 dimensions • cosine</text>
-<text x="1212" y="448" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Reviewed chunks + flat metadata</text>
-<text x="1212" y="476" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Queries and returned passages</text>
-<text x="1212" y="504" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Staged / active namespaces</text>
+<text x="1212" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Pinecone Documents API</text>
+<text x="1212" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Integrated llama-text-embed-v2</text>
+<text x="1212" y="392" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">1,024 dimensions / cosine</text>
+<text x="1212" y="420" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Chunks + compact flat metadata</text>
+<text x="1212" y="448" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Whole-library version namespaces</text>
+<text x="1212" y="476" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Global / source-scoped queries</text>
+<text x="1212" y="504" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">No full PDF or XML uploads</text>
 <path d="M 1050 374 L 1190 374" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="1190,374 1180.0,379.0 1180.0,369.0" fill="#0063C3"/>
 <polygon points="1050,374 1060.0,369.0 1060.0,379.0" fill="#0063C3"/>
 <text x="1120" y="355" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#0063C3" font-weight="400" text-anchor="middle">HTTPS</text>
 <rect x="1190" y="650" width="400" height="185" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="1190" y="670" width="5" height="29" rx="2" fill="#0063C3"/>
-<text x="1212" y="692" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">OpenAI API</text>
-<text x="1212" y="729" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Question + retrieved evidence</text>
-<text x="1212" y="758" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Returns generated explanations</text>
-<text x="1212" y="787" font-family="Helvetica, Arial, sans-serif" font-size="18.5" fill="#153B5C" font-weight="400" text-anchor="start">Local service validates citations</text>
+<text x="1212" y="692" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">OpenAI Responses API</text>
+<text x="1212" y="729" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Question + selected scoped excerpts</text>
+<text x="1212" y="758" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Checked source-backed explanations</text>
+<text x="1212" y="787" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">store=false / no full PDF uploads</text>
 <path d="M 1050 475 L 1120 475 L 1120 743 L 1190 743" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="1190,743 1180.0,748.0 1180.0,738.0" fill="#0063C3"/>
 <polygon points="1050,475 1060.0,470.0 1060.0,480.0" fill="#0063C3"/>
 <rect x="1091" y="597" width="58" height="28" rx="3" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.5"/>
 <text x="1120" y="618" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#0063C3" font-weight="400" text-anchor="middle">HTTPS</text>
-<text x="1185" y="891" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#4D667B" font-weight="400" text-anchor="start">No full PDFs uploaded by this design</text>
 <rect x="60" y="956" width="1560" height="93" rx="12" fill="#FFF5DF" stroke="#E7C990" stroke-width="1.5"/>
-<text x="82" y="990" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Deployment status: proposed local runtime; no live Streamlit app, connected Pinecone corpus or OpenAI integration is claimed.</text>
-<text x="82" y="1019" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Existing assets are the source PDFs, local extractor and first-pass XML. Hosted deployment is outside the first-version scope.</text>
-<text x="60" y="1094" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = review or current-state constraint</text>
+<text x="82" y="990" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Retained snapshots and manifests keep old conversations resolvable. Semantic and lexical versions activate together.</text>
+<text x="82" y="1019" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Shared hosting is outside scope: it needs server-enforced roles, durable shared storage, learner isolation and operational recovery.</text>
+<text x="60" y="1094" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
 </svg>

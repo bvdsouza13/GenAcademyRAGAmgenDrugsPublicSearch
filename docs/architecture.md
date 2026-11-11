@@ -1,81 +1,61 @@
 # Amgen Medicine Explorer architecture
 
-Date: November 11, 2026. Deployment target: local Streamlit/Python on your Mac, with Pinecone and OpenAI accessed through HTTPS APIs.
+The local Streamlit application separates whole-library administration, global discovery and source-scoped teaching. This document supersedes the original manual-passage pilot architecture. Current release verification belongs in the [bulk-refactor release report](implementation/bulk-refactor-release-report.md); this document does not assert a new live deployment or measured retrieval outcome.
 
-This document describes the implemented local solution. The Streamlit screens, extraction/review/chunking services, Pinecone ingestion and OpenAI cited teaching are running. The initial live corpus is a limited source-fidelity pilot; broad clinical review remains separate.
+## Solution
 
-## 1. Solution architecture
+![Whole-library administration, global search and pinned teaching](diagrams/01-solution-architecture.png)
 
-![Solution architecture: local source preparation and application services connected to Pinecone and OpenAI](diagrams/01-solution-architecture.png)
+[Editable SVG](diagrams/01-solution-architecture.svg)
 
-[Vector version](diagrams/01-solution-architecture.svg)
-
-The application has three clear responsibilities:
-
-| Layer | Responsibility | Where it runs |
-|---|---|---|
-| Streamlit interface | Explore medicines, teach through chat, and manage sources/chunking | Python server on the Mac; rendered in the local browser |
-| Corpus and retrieval services | Extract XML, record reviews, create chunks, load/test indexes, retrieve evidence and resolve citations | Local Python modules |
-| External APIs | Pinecone embeds and searches passages; OpenAI turns retrieved evidence into explanations | Provider-managed cloud services |
-
-The complete PDFs and consolidated XML remain in local storage. Pinecone receives eligible passage text and compact metadata. OpenAI receives the learner's question, the selected evidence, relevant conversation context and teaching instructions. This design does not upload all PDFs to OpenAI or use OpenAI File Search as a second retrieval system.
-
-`XML/AmgenProducts.xml` is the canonical extraction artifact. The original PDFs remain the evidence source. SQLite and manifests record review decisions, ingestion progress and the active corpus; they are application state, not substitutes for the XML.
-
-## 2. Data flows
-
-![Data flow: build and publish a corpus, then answer questions using that pinned corpus](diagrams/02-data-flow.png)
-
-[Vector version](diagrams/02-data-flow.svg)
-
-**Build and index:** An operator selects Build XML. The existing Python extractor reads `Documents/` and writes one `XML/AmgenProducts.xml`. The review screen records hash-bound decisions for eligible source passages. Chunking settings determine the searchable passages without changing the XML. Preview shows exact embedded text, source pages, conservative token bounds and exclusions. An explicit Load action sends batches to a new Pinecone namespace. Only a verified run may become the active corpus.
-
-**Ask and teach:** The app pins the active corpus version at the start of a question, resolves the selected product/scope, and sends a filtered query to Pinecone. Pinecone embeds the query using the same embedding profile as the documents. The backend assembles supported evidence, sends it to OpenAI, checks the returned citations and displays an explanation with source links. Insufficient evidence produces a clear limitation rather than an uncited answer.
-
-**Experiment:** Advanced chunking controls start at a 600-unit conservative token budget with an 80-unit sentence-overlap budget. A saved configuration can build a test namespace. Compare it with the current configuration using the same question set, model and evidence budget. Publish is an explicit action; moving a slider cannot replace the active corpus.
-
-## 3. Deployment
-
-![Deployment diagram: browser and Python server on a Mac, local persistent files, and remote API boundaries](diagrams/03-deployment.png)
-
-[Vector version](diagrams/03-deployment.svg)
-
-The first deployment needs one computer, a Python environment, a Pinecone project and an OpenAI API project. The Streamlit server listens on `127.0.0.1:8501`. API keys are loaded by server-side Python from environment variables or the ignored local secrets file; they are not sent to the browser.
-
-The existing `amgenproduct` Pinecone index in AWS `us-east-1` is configured and verified. OpenAI model access and actual generation have also been tested with the supplied credentials.
-
-For future shared hosting, move the same Python services into a managed application/container host, store source artifacts and manifests durably, use a secret manager, and enforce operator authorization on the server. Add a durable job worker if long imports or concurrent operators require it. Public hosting is outside this configuration task and has not been performed.
-
-## Configuration boundaries
-
-| File | What belongs there |
+| Layer | Responsibility |
 |---|---|
-| `config/app.toml` | Paths, Pinecone index/model settings, chunking parameters, retrieval budgets and OpenAI model settings |
-| `.streamlit/secrets.toml` | Local `PINECONE_API_KEY` and `OPENAI_API_KEY`; excluded from Git |
-| `.streamlit/secrets.toml.example` | Blank credential template suitable for sharing |
-| `.streamlit/config.toml` | Streamlit theme and local server settings |
-| `data/active-corpus.json` | Runtime pointer to the verified index host, concrete namespace, XML hash and configuration fingerprint |
+| Streamlit | Search & Learn; Admin Library and chunk experiments; session learning and prepared demo |
+| Source services | Authoritative inventory, transactional PDF import, consolidated XML, automatic eligibility and exact-span coverage |
+| Index services | Resumable full-library namespace builds, matching immutable lexical artifacts, verification and atomic activation |
+| Discovery | Local FTS5/deterministic lexical search plus whole-namespace semantic search, strict hit validation, rank fusion and grouped results |
+| Teaching | One selected medicine/document/run; bounded evidence, OpenAI explanation checks and retained PDF citations |
 
-There is no `.env` loader in this setup. Exported environment variables can override the local secrets file, but a file named `.env` is not automatically read. Use one explicit secrets mechanism to avoid editing a file the application ignores. Streamlit supports the local TOML secrets convention; the project loader additionally supports CLI use without starting Streamlit. [Streamlit secrets management](https://docs.streamlit.io/develop/concepts/connections/secrets-management)
+Full PDFs and XML stay local. Pinecone receives chunk text plus flat provenance metadata. OpenAI receives selected evidence, a question and relevant conversation context. Neither provider creates the consolidated XML. Provider credentials remain in server-side Python.
 
-The initial runtime uses an application-owned active-corpus manifest rather than requiring a Pinecone namespace alias. The ingestion service updates this local manifest atomically only after complete verification and explicit publication. A later alias adapter is optional. Each answer must retain its initially resolved concrete namespace and XML snapshot even if the active pointer changes.
+## Data flows
 
-## Models and database contract
+![Build, search and experiment flows](diagrams/02-data-flow.png)
 
-- Pinecone: Documents API, `chunk_text` string field with integrated `llama-text-embed-v2`, 1,024 dimensions, cosine distance, stored text, and a local byte-bound guard preventing truncation. The existing immutable index uses END; new indexes may use NONE. The same profile embeds documents and queries. [Pinecone integrated embedding](https://docs.pinecone.io/guides/search/integrated-embedding)
-- OpenAI: configurable `gpt-6.1-sol` through the Responses API, with low reasoning effort. This is a model choice to evaluate against the source-grounded question set, not a claim of validated clinical performance. [OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-6.1-sol)
-- Provenance: each search record has a product ID, document ID/hash, section/block references, PDF page range, review status, XML/corpus hash and chunk configuration hash. Preserve full nested evidence in the XML; Pinecone metadata stays compact and flat.
-- Separation: changing a chunk configuration requires a staged reindex; changing the embedding schema/model requires a compatible index. Neither event silently rewrites the source XML.
+[Editable SVG](diagrams/02-data-flow.svg)
 
-## Existing versus remaining work
+**Build:** Admin explicitly validates every registered source, builds/reuses the single XML, assesses source verification and readable-text coverage, chunks all documents, uploads a separate namespace, builds local search, verifies both and activates one complete manifest. A failed build leaves the previous pointer intact. Uploading PDFs locally is distinct from sending extracted chunks to Pinecone.
 
-| Capability | Status |
+**Discover:** An explicit submission pins a verified run. Its exact records and lexical artifact are validated before any provider call. Search spans body text, section headings, brand and generic names. Semantic hits must equal immutable local records and meet the same scope/policy. Reciprocal-rank fusion, a bounded exact-name boost and document-balanced deduplication produce grouped sources. Provider outage yields labeled local-only degraded results; a changed local artifact fails closed.
+
+**Teach:** Selecting a result carries its product, document and run into the conversation. Retrieval, quiz, re-explanation and source resolution retain that run. Later activation changes fresh searches, not existing conversations. `SearchResults` is a discovery contract; it is distinct from the single-source `EvidenceBundle` sent to teaching.
+
+**Experiment:** Draft chunk settings affect only local preview. Test settings builds an isolated full-library candidate and measures the same saved cases against a compatible active baseline. Use configuration changes the pointer only after verification. Default/current-control resets make no provider calls. Revert restores a retained verified version.
+
+## Deployment and persistence
+
+![Local browser/server, durable artifacts and provider boundaries](diagrams/03-deployment.png)
+
+[Editable SVG](diagrams/03-deployment.svg)
+
+The server listens on `127.0.0.1:8501`. One local Python process uses file/SQLite locks and resumable checkpoints. Admin navigation does not implement hosted authentication.
+
+| Artifact | Role |
 |---|---|
-| Extract all supplied PDF text into one XML with page provenance | Implemented and structurally validated; most passages remain unreviewed |
-| Local configuration parsing and validation | Implemented and tested |
-| Pinecone index dry-run/check/create utility | Existing index checked; no additional index created |
-| Amgen-branded UI | Implemented; mockups retained as design references |
-| Review, adjustable chunking and indexed corpus publication | Implemented and tested; limited reviewed pilot published |
-| OpenAI-backed teaching chat and quizzes | Implemented and tested; limited reviewed pilot published |
+| `Documents/` | Registered source PDFs |
+| `XML/AmgenProducts.xml` | One canonical collection with exact page archives and section spans |
+| `data/source-registry.json`, `data/source-registries/` | Authoritative expected inventory and its version history |
+| `data/corpora/<xml-hash>/` | Immutable XML/PDF snapshots for old citations |
+| `data/manifests/` | Run manifests, immutable chunk records and run/ranking-pinned SQLite search artifacts |
+| `data/active-corpus.json` | One atomic pointer binding semantic namespace and lexical artifact |
+| `data/ingestion.sqlite`, `data/review.sqlite` | Batch checkpoints and preserved historical manual review |
 
-Follow [configuration and Pinecone setup](configuration-and-pinecone-setup.md) to prepare local settings, then use the [implementation plan](superpowers/plans/2026-11-11-amgen-medicine-explorer.md) for design context; see README for runnable commands.
+New runs explicitly use `bulk_source_verified_v1`; legacy manifests without a policy marker use `manual_review_v1`. Automated source verification is not a human/clinical approval. Tables/layout warnings remain discoverable with source limitations. Coverage counts unique physical page character intervals, so overlap cannot inflate completeness. Blank/image-only pages are reported separately; OCR is excluded.
+
+## Provider and configuration boundary
+
+`config/app.toml` holds nonsecret settings. Ignored `.streamlit/secrets.toml` or exported credentials supply keys; nonblank environment values win and no `.env` loader exists. The configuration shape is unchanged.
+
+The Pinecone adapter uses Documents API `2026-07`, integrated `llama-text-embed-v2`, 1,024 dimensions and cosine. The existing index schema is retained. Every prefixed chunk/query passes the conservative UTF-8 byte guard. The local lexical engine uses built-in SQLite FTS5 where available and deterministic token search otherwise. OpenAI Responses requests use `store=false`; citations and material source support are checked locally.
+
+Shared hosting would require server-enforced roles, durable shared storage, isolated learner state and operational recovery. No hosted deployment is claimed. See [setup](configuration-and-pinecone-setup.md), [technical notes](technical-plan-notes.md) and [future work](future-features.md).

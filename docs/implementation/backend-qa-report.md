@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Backend QA report
 
 Completed 2026-11-11. Backend edits are limited to `amgen_explorer/service.py`, `amgen_explorer/extraction.py`, and their regression tests. No public service signature changed. This pass did not change credentials, original PDFs, canonical XML, actual review decisions, local live manifests, or provider data.

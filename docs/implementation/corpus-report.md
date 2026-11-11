@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Corpus implementation report — 2026-11-11
 
 Tasks 1–2 have runnable local extraction, loading, review and chunking implementations. Root owns model/facade/cloud/UI integration; this worker made no cloud calls, recorded no clinical/source approvals, and edited no UI, provider service or configuration files.

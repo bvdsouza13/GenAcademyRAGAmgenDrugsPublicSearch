@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Connectivity, ingestion, retrieval and teaching implementation
 
 Implemented `amgen_explorer/connectivity.py`, `indexing.py`, `retrieval.py`, `teaching.py`, `scripts/check_connections.py`, and four provider-free feature test files.

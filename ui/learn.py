@@ -9,13 +9,13 @@ LESSONS = [
 ]
 
 
-def readiness(service, product, active):
+def readiness(service, product, active, *, bulk=False):
     if not product:
-        return False, 'No XML collection is available. Build and review sources in Manage sources.'
+        return False, 'This conversation’s library version is unavailable. Return to search or build the entire library in Admin.' if bulk else 'No XML collection is available. Build and review sources in Manage sources.'
     if not active:
-        return False, 'No verified library has been published. Review sources, load a staging index, then publish it in Manage sources.'
+        return False, 'No verified library is available. Build the entire library in Admin.' if bulk else 'No verified library has been published. Review sources, load a staging index, then publish it in Manage sources.'
     if product.id not in active.get('product_ids',[]):
-        return False, 'This medicine has no reviewed content in the published library. Review and publish its sources to enable chat.'
+        return False, 'This medicine has no searchable content in the selected library version. Return to search or update the entire library in Admin.' if bulk else 'This medicine has no reviewed content in the published library. Review and publish its sources to enable chat.'
     errors = service.config.validate(require_chat=True,require_secrets=True,require_host=True)
     if errors:
         # Configuration validation is explicitly sanitized by the config contract.
@@ -23,8 +23,9 @@ def readiness(service, product, active):
     return True, ''
 
 
-def scope_key(product_id, document_id):
-    return sha256(f'{product_id}:{document_id}'.encode()).hexdigest()[:12]
+def scope_key(product_id, document_id, run_id=None):
+    identity=f'{product_id}:{document_id}' if run_id is None else f'{run_id}:{product_id}:{document_id}'
+    return sha256(identity.encode()).hexdigest()[:12]
 
 
 def explanation_status(abstained, citations, mode):
@@ -34,17 +35,38 @@ def explanation_status(abstained, citations, mode):
 
 
 def render(service,corpus,active):
+    legacy=st.query_params.get('legacy') == '1'
+    latest=active
+    run_id=None
+    if not legacy:
+        run_id=st.session_state.get('learning_run_id') or (active or {}).get('run_id')
+        if run_id:
+            st.session_state['learning_run_id']=run_id
+            try:
+                active=service.library_version(run_id)
+                corpus=service.library_corpus(run_id)
+            except Exception:
+                active=None
+                corpus=None
+        st.button('Back to search',on_click=back_to_search)
+        if run_id:
+            st.caption(f'Conversation library version: {run_id}')
+        if latest and latest.get('run_id') != run_id:
+            st.info('This conversation uses an earlier library version. Its sources and follow-ups stay pinned.')
+            st.button('Start with latest library',on_click=navigate,args=('Search & Learn',st.session_state.get('product_id'),st.session_state.get('document_id'),latest['run_id']))
+        if st.session_state.get('pending_query'):
+            st.caption(f"From your search: {st.session_state['pending_query']}. Submit a question below when ready.")
     st.html('<div class="eyebrow">GUIDED DISCOVERY</div>')
     left, main, right = st.columns([1.1,2.5,1.1],gap='large')
     with left:
         st.subheader('Your learning path')
         product = product_selector(corpus)
         document = document_selector(corpus,product) if product else None
-        key = scope_key(product.id if product else '',document)
+        key = scope_key(product.id if product else '',document,run_id)
         done = st.session_state.setdefault('lesson_progress',{}).setdefault(key,[])
         lesson = st.radio('Learning steps',[x[0] for x in LESSONS]+['Check your understanding'],key=f'lesson_{key}')
         st.progress(len(done)/3,text=f'{len(done)} of 3 lessons understood')
-    ready, reason = readiness(service,product,active)
+    ready, reason = readiness(service,product,active,bulk=not legacy)
     if ready and 'document_ids' in active and not any(d.id in active['document_ids'] for d in corpus.documents if d.product_id==product.id):
         ready=False
         reason='This medicine has no source documents in the published library. Review and publish its sources in Manage sources.'
@@ -72,7 +94,7 @@ def render(service,corpus,active):
                     history.append({'role':'assistant','content':response.answer,'mode':mode,'citations':response.citations,'abstained':response.abstained,'lesson':previous.get('lesson'),'response':response,'question':previous['question']})
         if not ready:
             st.info(reason)
-            st.button('Open Manage sources',key='chat_setup',on_click=navigate,args=('Manage sources',))
+            st.button('Open Manage sources' if legacy else 'Open Admin',key='chat_setup',on_click=navigate,args=('Manage sources' if legacy else 'Admin',))
         elif active.get('xml_hash') != corpus.xml_hash:
             st.warning('Update available. Answers use the verified published library; your newer local XML has not been published yet.')
         with st.container(border=True):
@@ -84,7 +106,7 @@ def render(service,corpus,active):
                 begin = st.button('Begin the lesson',type='primary',disabled=not ready)
             else:
                 begin = False
-                quiz_panel(service,product,document,key,ready)
+                quiz_panel(service,product,document,key,ready,run_id=run_id)
         prompt = None
         if begin:
             prompt = next(q for n,q in LESSONS if n==lesson)
@@ -102,7 +124,7 @@ def render(service,corpus,active):
             with st.chat_message('user'):
                 st.markdown(prompt)
             with st.chat_message('assistant'):
-                ok,response = action('Create explanation',lambda:service.answer(prompt,product.id,mode=mode,document_id=document,history=prior),spinner='Finding passages and preparing a cited explanation…')
+                ok,response = action('Create explanation',lambda:service.answer(prompt,product.id,mode=mode,document_id=document,history=prior,**({'run_id':run_id} if run_id else {})),spinner='Finding passages and preparing a cited explanation…')
                 if ok:
                     st.write_stream(iter([response.answer]))
                     st.caption(explanation_status(response.abstained,response.citations,mode))
@@ -130,14 +152,14 @@ def render(service,corpus,active):
                     st.caption(f'{doc.page_count} pages · Revision {doc.revision or "not identified"}')
                     if variant := source_variant(doc.filename,doc.variant_hint):
                         st.caption(variant)
-                    source_view(service,doc.id,doc.filename,f'learn_doc_{doc.id}')
+                    source_view(service,doc.id,doc.filename,f'learn_doc_{doc.id}',xml_hash=active.get('xml_hash') if active and run_id else None)
         st.caption('Expand a citation below an explanation to read the exact source passage and view its original PDF page.')
 
 
-def quiz_panel(service,product,document,key,ready):
+def quiz_panel(service,product,document,key,ready,run_id=None):
     quizzes = st.session_state.setdefault('quizzes',{})
     if st.button('Create a source-based quiz',disabled=not ready,key=f'make_quiz_{key}'):
-        ok,quiz = action('Create quiz',lambda:service.quiz(product.id,document_id=document))
+        ok,quiz = action('Create quiz',lambda:service.quiz(product.id,document_id=document,**({'run_id':run_id} if run_id else {})))
         if ok:
             if isinstance(quiz,dict) and 'error' not in quiz and isinstance(quiz.get('choices'),list) and isinstance(quiz.get('correct_index'),int) and 0 <= quiz['correct_index'] < len(quiz['choices']):
                 quizzes[key]={'quiz':quiz,'submitted':False}
@@ -172,6 +194,11 @@ def quiz_panel(service,product,document,key,ready):
         citations(service,quiz.get('citations',[]),f'quiz_{key}')
 
 
+def back_to_search():
+    st.session_state['learning_view']=False
+    st.session_state['nav']='Search & Learn'
+
+
 def progress_view(service,corpus,active):
     hero('Your next discovery starts here.', 'Build understanding one medicine, one lesson, and one question at a time.','MY LEARNING')
     progress=st.session_state.get('lesson_progress',{})
@@ -185,4 +212,4 @@ def progress_view(service,corpus,active):
     st.subheader('Continue your learning')
     st.write('Choose a medicine, explore the three guided lessons, then check your understanding. Mark a lesson understood when you feel ready.')
     st.caption('Progress and chat history are session-local and reset when the session ends.')
-    st.button('Continue learning →',type='primary',on_click=navigate,args=('Learn with chat',))
+    st.button('Continue learning →',type='primary',on_click=navigate,args=('Learn with chat' if st.query_params.get('legacy') == '1' else 'Search & Learn',))

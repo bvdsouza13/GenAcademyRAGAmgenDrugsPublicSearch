@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Streamlit UI implementation
 
 Implemented `app.py`, `ui/common.py`, `ui/explore.py`, `ui/learn.py`, `ui/sources.py`, and `tests/test_app_flows.py` against the shared `ExplorerService` facade. Uses the supplied real Amgen logo, #0063C3 branding, a consistent sidebar, vivid blue hero, cyan medicine cards, native controls, and responsive columns.

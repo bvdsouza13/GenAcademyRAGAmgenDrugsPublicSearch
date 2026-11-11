@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Review package: full local implementation
 
 No git repository or prior application baseline exists. Inspect current files directly; this package identifies owned implementation scope. Reports: corpus-report.md, services-report.md, ui-report.md. Binding user request and contracts.md; plan Tasks1–6 and original design. Root integration additions: service.py, models.py, tests/test_service.py, tests/test_evaluations.py.

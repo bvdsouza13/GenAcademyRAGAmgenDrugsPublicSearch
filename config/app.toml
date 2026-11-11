@@ -40,7 +40,10 @@ truncate = "END"
 max_input_tokens = 2048
 batch_size = 64
 max_batch_bytes = 2000000
-# Publish only a verified staged build. Pin its concrete namespace and XML hash
+# Admin builds the complete library under bulk_source_verified_v1; no passage
+# review is required. Legacy pilot commands retain manual_review_v1.
+# Activate only after full source coverage, Pinecone verification and the matching
+# local content-search artifact pass. Pin the namespace and XML hash
 # in paths.active_corpus_manifest; retain the previous build for rollback.
 namespace_strategy = "local_manifest"
 namespace_prefix = "pi"
@@ -51,7 +54,9 @@ target_tokens = 600
 overlap_tokens = 80
 prefix_template = "Medicine: {product_name}\nSection: {section_title}\n\n"
 # Actual tokenizer/chunker versions and this template must be pinned in each
-# ingestion manifest. Token limits include the rendered prefix.
+# ingestion manifest. Controls are conservative UTF-8 byte budgets + 8 reserve,
+# not exact model tokens. Reset defaults changes drafts only; Test settings builds
+# an isolated full library and Use this configuration switches the active pointer.
 
 [retrieval]
 top_k = 10

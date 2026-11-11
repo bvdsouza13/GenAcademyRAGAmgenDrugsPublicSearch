@@ -4,7 +4,8 @@ from pathlib import Path
 import streamlit as st
 
 ROOT = Path(__file__).resolve().parents[1]
-PAGES = ['Explore medicines', 'Learn with chat', 'My learning', 'Manage sources', 'Demo tour']
+PAGES = ['Search & Learn', 'Admin', 'My learning', 'Demo tour']
+LEGACY_PAGES = ['Explore medicines', 'Learn with chat', 'My learning', 'Manage sources', 'Demo tour']
 
 
 def style():
@@ -45,10 +46,17 @@ def hero(title, subtitle, eyebrow='YOUR MEDICINE LEARNING SPACE'):
     st.html(f'<div class="hero"><div class="eyebrow">{escape(eyebrow)}</div><h1>{escape(title)}</h1><p>{escape(subtitle)}</p></div>')
 
 
-def navigate(page, product=None):
+def navigate(page, product=None, document=None, run_id=None, pending_query=None):
     st.session_state['nav'] = page
+    if page == 'Search & Learn' and run_id is None:
+        st.session_state['learning_view'] = False
     if product is not None:
         st.session_state['product_id'] = product
+    if run_id is not None:
+        st.session_state['learning_run_id'] = run_id
+        st.session_state['document_id'] = document
+        st.session_state['learning_view'] = True
+        st.session_state['pending_query'] = pending_query or ''
 
 
 def sidebar(active, *, demo_mode=False):
@@ -57,26 +65,30 @@ def sidebar(active, *, demo_mode=False):
         st.header('Medicine Explorer')
         st.caption('Discover. Understand. Keep learning.')
         st.divider()
-        st.radio('Your workspace', PAGES, key='nav', label_visibility='collapsed')
+        st.radio('Your workspace', LEGACY_PAGES if st.query_params.get('legacy') == '1' else PAGES, key='nav', label_visibility='collapsed')
         st.divider()
         if demo_mode:
             st.info('Three-minute guided demo')
             st.caption('Prepared examples from included files. No API keys or live connections required.')
         elif active:
-            st.success('Published library')
-            st.caption('Reviewed content is published. Chat also needs configured connections.')
+            st.success('Searchable library')
+            st.caption('A verified library is available. Chat also needs configured connections.')
         else:
             st.info('Library setup in progress')
-            st.caption('Review and publish sources to enable learning.')
+            st.caption('Build the entire library in Admin to enable search and learning.')
         st.caption('LOCAL EDUCATIONAL PROTOTYPE')
         st.caption('Based on your prescribing-information library. Personal treatment decisions belong with your healthcare professional.')
 
 
 def action(label, function, *, spinner=None):
     """Do not print exception payloads: providers may include request secrets."""
+    from amgen_explorer.errors import UserFacingError
     try:
         with st.spinner(spinner or f'{label}…'):
             return True, function()
+    except UserFacingError as error:
+        st.error(str(error))
+        return False, None
     except Exception:
         st.error(f'{label} failed. Check local configuration and service availability, then retry. The last published library remains available.')
         return False, None

@@ -1,3 +1,5 @@
+> Historical pilot report. Current bulk-library behavior and release evidence are in [the bulk refactor release report](bulk-refactor-release-report.md). Original observations below are retained for traceability.
+
 # Independent final implementation review
 
 Reviewed 2026-11-11 against `contracts.md`, the implementation plan, worker reports, and the current files directly. This directory has no Git baseline. Review covered the corpus loader/review/chunker, service orchestration and source snapshots, ingestion/publication/rollback, retrieval and teaching, and Streamlit source/learning state. The latest content-addressed manifest validation and exact-source fallback were present during inspection. Also inspected `scripts/live_smoke.py`, `scripts/test_features.py`, and the evaluation fixture checks.
