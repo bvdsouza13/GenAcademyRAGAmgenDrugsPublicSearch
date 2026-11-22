@@ -20,6 +20,7 @@ else:
     service = None
     active = None
     startup_failed = False
+    startup_error = None
     try:
         service = ExplorerService()
         active = service.active()
@@ -30,12 +31,15 @@ else:
                 raise
             corpus = service.library_corpus(active['run_id'])
             st.warning('The working XML could not be opened. Search and existing conversations continue using the verified library snapshot. Repair or update local sources in Admin.')
-    except Exception:
+    except Exception as error:
         startup_failed = True
+        from amgen_explorer.durable_library import DurableStorageError
+        if isinstance(error, DurableStorageError):
+            startup_error = str(error)
     sidebar(active)
     if startup_failed:
         from ui.recovery import render as render_recovery
-        render_recovery(service)
+        render_recovery(service, startup_error)
         st.stop()
     if page == 'Search & Learn':
         if st.session_state.get('learning_view'):

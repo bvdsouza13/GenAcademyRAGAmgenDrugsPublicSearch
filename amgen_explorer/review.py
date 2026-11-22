@@ -74,3 +74,78 @@ class ReviewStore:
         for status in statuses.values(): result[status] += 1
         result['total'] = len(corpus.blocks)
         return result
+
+
+class ManagedReviewStore:
+    """PostgreSQL-backed review history for Replit-hosted library operation."""
+
+    def record(self, block: SourceBlock, decision: str, reviewer: str, note: str = ''):
+        if decision not in DECISIONS: raise ValueError('Unknown review decision')
+        if not reviewer.strip(): raise ValueError('Reviewer is required')
+        if hashlib.sha256(block.text.encode()).hexdigest() != block.content_hash: raise ValueError('Passage hash does not match text')
+        if not block.spans or block.page_start < 1 or block.page_end < block.page_start: raise ValueError('Valid evidence coordinates are required')
+        scope = block_scope(block)
+        from .durable_library import database_connection
+        try:
+            with database_connection() as db:
+                db.execute(
+                    'INSERT INTO amgen_review_decisions(scope_hash,block_id,decision,reviewer,note,recorded_at,scope_json) '
+                    'VALUES (%s,%s,%s,%s,%s,%s,%s)',
+                    (digest(scope), block.id, decision, reviewer.strip(), note,
+                     datetime.now(timezone.utc).isoformat(), canonical(scope)),
+                )
+        except Exception:
+            raise ValueError('Unable to save the review in managed SQL.') from None
+
+    def _latest(self, block):
+        from .durable_library import database_connection
+        try:
+            with database_connection() as db:
+                return db.execute(
+                    'SELECT decision,reviewer,note,recorded_at,scope_json '
+                    'FROM amgen_review_decisions WHERE scope_hash=%s ORDER BY id DESC LIMIT 1',
+                    (digest(block_scope(block)),),
+                ).fetchone()
+        except Exception:
+            raise ValueError('Managed review history is unavailable.') from None
+
+    def status(self, block):
+        if hashlib.sha256(block.text.encode()).hexdigest() != block.content_hash:
+            return 'needs-review'
+        row = self._latest(block)
+        return row[0] if row else 'needs-review'
+
+    def snapshot(self, corpus: Corpus):
+        """Read one consistent latest-decision set and fingerprint it."""
+        from .durable_library import database_connection
+        try:
+            with database_connection() as db:
+                rows = {
+                    row[0]: row[1:]
+                    for row in db.execute(
+                        'SELECT scope_hash,decision,reviewer,note,recorded_at,scope_json '
+                        'FROM amgen_review_decisions WHERE id IN '
+                        '(SELECT MAX(id) FROM amgen_review_decisions GROUP BY scope_hash)'
+                    ).fetchall()
+                }
+        except Exception:
+            raise ValueError('Managed review history is unavailable.') from None
+        statuses, record = {}, []
+        for block in sorted(corpus.blocks, key=lambda item: item.id):
+            scope = block_scope(block)
+            row = rows.get(digest(scope))
+            valid = hashlib.sha256(block.text.encode()).hexdigest() == block.content_hash
+            statuses[block.id] = row[0] if row and valid else 'needs-review'
+            record.append({'scope': scope, 'review': row})
+        return statuses, digest(record)
+
+    def fingerprint(self, corpus: Corpus):
+        return self.snapshot(corpus)[1]
+
+    def summary(self, corpus: Corpus):
+        statuses, _ = self.snapshot(corpus)
+        result = {decision: 0 for decision in sorted(DECISIONS)}
+        for status in statuses.values():
+            result[status] += 1
+        result['total'] = len(corpus.blocks)
+        return result

@@ -67,6 +67,13 @@ def build_library(service, chunk_config, *, activate=True, on_progress=None):
         report({'stage':'Reading documents'})
         corpus,registry,plan=_prepare(service,chunk_config,recover=True,reextract=True)
         save_registry(service.config,registry)
+        from .durable_library import backend_enabled, sync_paths
+        if backend_enabled():
+            sync_paths(service.config, [
+                service.config.path('xml_output'),
+                service.config.root/'data/source-registry.json',
+                service.config.root/'data/source-registries'/(registry['fingerprint']+'.json'),
+            ])
         report({'stage':'Preparing text','document_count':len(corpus.documents),'record_count':len(plan.chunks),'coverage':plan.coverage})
         service._snapshot(plan)
         def progress(state):
@@ -82,6 +89,11 @@ def build_library(service, chunk_config, *, activate=True, on_progress=None):
                    page_count=sum(d.page_count for d in corpus.documents),coverage=plan.coverage,page_coverage=coverage_summary(corpus))
         validate_search_artifact(run,records,service.config,corpus)
         atomic_json(service.config.path('manifest_dir')/(run['run_id']+'.json'),run)
+        if backend_enabled():
+            sync_paths(service.config, [
+                service.config.path('manifest_dir')/(run['run_id']+'.json'),
+                service.config.root/run['search_artifact']['path'],
+            ])
         if activate:
             # Recheck on-disk sources before changing the single active pointer.
             if inspect_inventory(service.config,corpus)['fingerprint']!=registry['fingerprint']:
@@ -287,6 +299,9 @@ def _recover_working_xml(service):
             atomic_bytes(service.config.root/'data/quarantine'/(hashlib.sha256(damaged).hexdigest()+'.registry.json'), damaged)
         save_registry(service.config,registry)
     _read_corpus.cache_clear()
+    from .durable_library import backend_enabled, sync_paths
+    if backend_enabled():
+        sync_paths(service.config)
     return report
 
 

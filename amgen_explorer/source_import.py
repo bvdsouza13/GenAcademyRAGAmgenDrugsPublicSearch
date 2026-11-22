@@ -206,6 +206,14 @@ def import_documents(config, files, corpus=None):
         try:
             for name,payload in writes.items(): atomic_bytes(directory/name,payload)
             if writes: save_registry(config,_registry(entries))
+            if writes:
+                from .durable_library import backend_enabled, sync_paths
+                if backend_enabled():
+                    paths=[directory/name for name in writes]
+                    registry=_registry(entries)
+                    paths.extend([config.root/'data/source-registry.json',
+                                  config.root/'data/source-registries'/(registry['fingerprint']+'.json')])
+                    sync_paths(config,paths)
         except Exception:
             for name,payload in originals.items():
                 if payload is None: (directory/name).unlink(missing_ok=True)

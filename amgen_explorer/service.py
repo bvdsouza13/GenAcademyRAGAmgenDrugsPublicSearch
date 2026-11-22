@@ -45,9 +45,15 @@ class ExplorerService:
         errors = self.config.validate()
         if errors:
             raise ValueError(" ".join(errors))
+        from .durable_library import restore_at_service_start
+        self.storage_restore = restore_at_service_start(self.config)
 
     @property
     def reviews(self):
+        from .durable_library import backend_enabled
+        if backend_enabled():
+            from amgen_explorer.review import ManagedReviewStore
+            return ManagedReviewStore()
         from amgen_explorer.review import ReviewStore
         return ReviewStore(self.config.path("review_database"))
 
@@ -75,6 +81,9 @@ class ExplorerService:
         from amgen_explorer.extraction import build_corpus
         report = build_corpus(self.config.path("source_dir"), self.config.path("xml_output"))
         _read_corpus.cache_clear()
+        from .durable_library import backend_enabled, sync_paths
+        if backend_enabled():
+            sync_paths(self.config, [self.config.path("xml_output")])
         return report
 
     def connection_status(self):
@@ -239,6 +248,13 @@ class ExplorerService:
         for doc_id in {c.metadata["document_id"] for c in plan.chunks}:
             doc, _, payload = self._verified_document_bytes(doc_id, corpus)
             self._immutable_bytes(folder / (doc.sha256 + ".pdf"), payload)
+        from .durable_library import backend_enabled, sync_paths
+        if backend_enabled():
+            sync_paths(self.config, [folder / "AmgenProducts.xml", *[
+                folder / (document.sha256 + ".pdf")
+                for document in corpus.documents
+                if document.id in {c.metadata["document_id"] for c in plan.chunks}
+            ]])
 
     @staticmethod
     def _immutable_bytes(path, payload):

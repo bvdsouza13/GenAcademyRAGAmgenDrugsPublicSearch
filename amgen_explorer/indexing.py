@@ -15,6 +15,39 @@ from .connectivity import DocumentsClient, ProviderError
 from .eligibility import BULK_POLICY, SCHEMA_VERSION, policy_for, validate_record_policy, validate_record_sources
 
 
+class _ManagedIngestionConnection:
+    """Small compatibility adapter for the existing ingestion SQL statements."""
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def execute(self, statement, params=()):
+        normalized = statement.strip()
+        lowered = normalized.casefold()
+        if lowered.startswith("insert or ignore into batches"):
+            normalized = re.sub(
+                r"(?i)^insert\s+or\s+ignore\s+into\s+batches",
+                "INSERT INTO amgen_ingestion_batches", normalized,
+            ) + " ON CONFLICT (run,batch) DO NOTHING"
+        elif lowered.startswith("insert or replace into job_lock"):
+            normalized = re.sub(
+                r"(?i)^insert\s+or\s+replace\s+into\s+job_lock",
+                "INSERT INTO amgen_ingestion_job_lock", normalized,
+            ) + " ON CONFLICT (target) DO UPDATE SET pid=EXCLUDED.pid, started=EXCLUDED.started"
+        else:
+            normalized = re.sub(r"(?i)\b(batches|job_lock)\b", lambda match: {
+                "batches": "amgen_ingestion_batches",
+                "job_lock": "amgen_ingestion_job_lock",
+            }[match.group(0).casefold()], normalized)
+        normalized = re.sub(r"(?i)\bdone\s*=\s*0\b", "done=FALSE", normalized)
+        normalized = re.sub(r"(?i)\bdone\s*=\s*1\b", "done=TRUE", normalized)
+        normalized = normalized.replace("?", "%s")
+        return self.connection.execute(normalized, params)
+
+    def commit(self):
+        self.connection.commit()
+
+
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, allow_nan=False).encode()).hexdigest()
 
@@ -228,6 +261,11 @@ class IndexService:
 
     @contextmanager
     def _lock(self):
+        from .durable_library import backend_enabled
+        if backend_enabled():
+            with self._managed_lock() as db:
+                yield db
+            return
         database = self.config.path("ingestion_database")
         database.parent.mkdir(parents=True, exist_ok=True)
         # Kernel lock releases on crash; SQLite retains job and batch checkpoints.
@@ -248,6 +286,38 @@ class IndexService:
                 db.commit()
                 db.close()
                 fcntl.flock(lock, fcntl.LOCK_UN)
+
+    @contextmanager
+    def _managed_lock(self):
+        from .durable_library import database_connection
+        connection = database_connection()
+        lock_key = int.from_bytes(bytes.fromhex(digest(self._profile()))[:8], "big", signed=True)
+        try:
+            acquired = connection.execute(
+                "SELECT pg_try_advisory_lock(%s)", (lock_key,)
+            ).fetchone()[0]
+            connection.commit()
+        except Exception:
+            connection.close()
+            raise ValueError("Managed ingestion storage is unavailable.") from None
+        if not acquired:
+            connection.close()
+            raise ValueError("Another indexing or publication job is running. Retry after it finishes.")
+        db = _ManagedIngestionConnection(connection)
+        target = digest(self._profile())
+        try:
+            db.execute("INSERT OR REPLACE INTO job_lock VALUES (?,?,?)",
+                       (target, os.getpid(), time.time()))
+            db.commit()
+            yield db
+        finally:
+            try:
+                db.execute("DELETE FROM job_lock WHERE pid=?", (os.getpid(),))
+                db.commit()
+                connection.execute("SELECT pg_advisory_unlock(%s)", (lock_key,))
+                connection.commit()
+            finally:
+                connection.close()
 
     def _observe(self, manifest, records):
         """Fetch only expected IDs; a successful observation is distinct from outage."""
@@ -345,6 +415,11 @@ class IndexService:
         records = self._records(plan)
         report = on_progress or (lambda value: None)
         with self._lock() as db:
+            def save_checkpoint(*paths):
+                from .durable_library import backend_enabled, sync_paths
+                if backend_enabled():
+                    sync_paths(self.config, paths)
+
             old = read_json(self._run_path(manifest["run_id"]))
             if old is not None and (not isinstance(old, dict) or old.get("run_id") != manifest["run_id"]):
                 raise ValueError("Saved run manifest does not match its requested identity.")
@@ -371,6 +446,7 @@ class IndexService:
             manifest["records_path"] = str(record_path.relative_to(self.config.root))
             atomic_json(record_path, records)
             atomic_json(self._run_path(manifest["run_id"]), manifest)
+            save_checkpoint(record_path, self._run_path(manifest["run_id"]))
             try:
                 for batch in self._batches(records):
                     batch_id = digest(batch)
@@ -384,9 +460,11 @@ class IndexService:
                         self._upload_batch(manifest, pending, db)
                     manifest["succeeded"] += len(batch)
                     atomic_json(self._run_path(manifest["run_id"]), manifest)
+                    save_checkpoint(self._run_path(manifest["run_id"]))
                     report(dict(manifest))
                 manifest["status"] = "verifying"
                 atomic_json(self._run_path(manifest["run_id"]), manifest)
+                save_checkpoint(self._run_path(manifest["run_id"]))
                 report(dict(manifest))
                 self._verify(manifest, records)
                 manifest.update(status="verified", verified_at=time.time())
@@ -394,17 +472,25 @@ class IndexService:
                 manifest.update(status="failed", failed_ids=[r["_id"] for r in records][manifest["succeeded"]:],
                                 error="Load or verification failed. Check configuration/connectivity and retry this unchanged plan.")
                 atomic_json(self._run_path(manifest["run_id"]), manifest)
+                save_checkpoint(self._run_path(manifest["run_id"]))
                 report(dict(manifest))
                 raise
             atomic_json(self._run_path(manifest["run_id"]), manifest)
+            save_checkpoint(self._run_path(manifest["run_id"]))
             report(dict(manifest))
             return manifest
 
     def active(self):
-        path = self.config.path('active_corpus_manifest')
-        active = read_json(path)
-        if active is None and not path.exists():
-            return None
+        from .durable_library import active_pointer, backend_enabled
+        if backend_enabled():
+            active = active_pointer(self.config)
+            if active is None:
+                return None
+        else:
+            path = self.config.path('active_corpus_manifest')
+            active = read_json(path)
+            if active is None and not path.exists():
+                return None
         if (not isinstance(active, dict) or active.get('status') != 'verified'
                 or not isinstance(active.get('run_id'), str)
                 or not re.fullmatch(r'[a-f0-9]{64}', active['run_id'])):
@@ -477,6 +563,9 @@ class IndexService:
             same = previous and previous.get('run_id') == run_id
             active = {**manifest, 'published_at': previous.get('published_at', time.time()) if same else time.time(),
                       'previous_run_id': previous.get('previous_run_id') if same else (previous or {}).get('run_id')}
+            from .durable_library import backend_enabled, persist_active_library
+            if backend_enabled():
+                persist_active_library(self.config, active)
             atomic_json(self.config.path("active_corpus_manifest"), active)
             return active
 

@@ -3,8 +3,11 @@ import streamlit as st
 from ui.common import action
 
 
-def render(service=None):
-    st.error('The local library could not be opened. Your saved source versions have not been changed.')
+def render(service=None, startup_error=None):
+    if startup_error:
+        st.error('The persistent library could not be restored: ' + startup_error)
+    else:
+        st.error('The local library could not be opened. Your saved source versions have not been changed.')
     st.subheader('Library recovery')
     if service is None:
         st.info('Check config/app.toml and .streamlit/secrets.toml locally, then reload. Keep credentials out of shared reports.')
