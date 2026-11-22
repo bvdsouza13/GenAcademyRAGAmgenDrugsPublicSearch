@@ -4,6 +4,7 @@ altair==6.3.0
     # via streamlit
 anyio==4.16.0
     # via
+    #   httpx
     #   httpx2
     #   starlette
     #   streamlit
@@ -11,8 +12,13 @@ attrs==26.1.0
     # via
     #   jsonschema
     #   referencing
+authlib==1.9.10
+    # via streamlit
 certifi==2026.10.23
-    # via requests
+    # via
+    #   httpcore
+    #   httpx
+    #   requests
 cffi==2.1.1
     # via cryptography
 charset-normalizer==3.5.2
@@ -23,7 +29,10 @@ click==8.5.1
     #   streamlit
     #   uvicorn
 cryptography==50.0.2
-    # via google-auth
+    # via
+    #   authlib
+    #   google-auth
+    #   joserfc
 filelock==4.2.10
     # via huggingface-hub
 fsspec==2026.9.0
@@ -51,12 +60,17 @@ googleapis-common-protos==1.76.0
     # via google-api-core
 h11==0.16.0
     # via
+    #   httpcore
     #   httpcore2
     #   uvicorn
 hf-xet==1.8.0
     # via huggingface-hub
+httpcore==1.0.9
+    # via httpx
 httpcore2==2.16.0
     # via httpx2
+httpx==0.28.1
+    # via streamlit
 httpx2==2.16.0
     # via huggingface-hub
 huggingface-hub==2.4.0
@@ -64,6 +78,7 @@ huggingface-hub==2.4.0
 idna==3.20
     # via
     #   anyio
+    #   httpx
     #   httpx2
     #   requests
 iniconfig==2.3.1
@@ -74,6 +89,8 @@ jinja2==3.1.6
     # via
     #   altair
     #   pydeck
+joserfc==1.8.0
+    # via authlib
 jsonschema==4.26.0
     # via altair
 jsonschema-specifications==2025.9.1
