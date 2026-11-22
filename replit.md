@@ -16,6 +16,23 @@ The checked-in configuration keeps the app in local mode so the offline demo and
 
 Hosted learner pages require OIDC sign-in. Admin, source-management, and recovery pages check the verified email allowlist in server-side Python, and library-changing service operations repeat that role check; hiding a navigation item is not the authorization control. The prepared offline demo remains available without sign-in or provider credentials.
 
+### Google sign-in for the pilot
+
+The pilot uses Google accounts. Publishing runs `python scripts/start_streamlit.py`, which starts the Streamlit HTTP server and, when Google credentials exist, creates a private temporary OIDC settings file outside the repository. It never prints credentials or rewrites a manually maintained secrets file.
+
+Configure these through Replit Secrets:
+
+- `GOOGLE_CLIENT_ID`: Google Auth Platform OAuth client ID, using application type **Web application**.
+- `GOOGLE_CLIENT_SECRET`: that client's secret.
+- `ADMIN_EMAILS`: comma-separated verified Google email addresses allowed to administer the library.
+- `SESSION_SECRET`: a stable signing secret of at least 32 characters; already configured for this project.
+
+The production environment sets `AMGEN_APP_MODE=hosted` and `AUTH_REDIRECT_URI` to the published URL plus `/oauth2callback`. Register that exact URI in the Google client's authorized redirect URIs. While Google’s consent screen is in Testing, add the intended pilot accounts as test users. Do not publish Google credentials in code or chat.
+
+`AMGEN_APP_MODE=hosted` requires sign-in even though the checked-in configuration stays local. This lets the local preview and offline tools remain usable while production fails closed when authentication is missing. Partial Google settings stop the production launcher with a sanitized error; missing OIDC settings never grant access to protected pages.
+
+Before retrying the initial publish, select **Set up your production database with your current development data** in Publishing's database settings. The development database holds the verified library inventory and active pointer; publishing code and schema alone does not populate an already-empty inventory. Never reset an existing production database to perform this step.
+
 ## Current limitations
 
 The app remains in local mode by default. Hosted use requires configured OIDC and an administrator allowlist. Do not use real learner or administrator data until the hosted Admin safeguards are complete and the configured App Storage bucket has passed an upload/restore round trip. The local Admin workflow can perform cloud operations when configured, so use it only in a trusted development workspace.

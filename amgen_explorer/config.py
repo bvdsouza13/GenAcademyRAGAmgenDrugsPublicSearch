@@ -221,6 +221,12 @@ def load_config(config_path: str | Path | None = None,
     errors = _structure_errors(settings)
     if errors:
         raise ValueError(" ".join(errors))
+    mode = os.environ.get("AMGEN_APP_MODE")
+    if mode is not None:
+        if mode not in {"local", "hosted"}:
+            raise ValueError("AMGEN_APP_MODE must be local or hosted.")
+        settings["app"]["mode"] = mode
+        settings["app"]["auth_enabled"] = mode == "hosted"
     names = ("PINECONE_API_KEY", "OPENAI_API_KEY")
     values = {name: os.environ.get(name, "").strip() for name in names}
     if not all(values.values()):

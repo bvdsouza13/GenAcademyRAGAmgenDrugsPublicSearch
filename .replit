@@ -35,9 +35,22 @@ outputType = "webview"
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 6000
+externalPort = 6000
+
 [deployment]
 deploymentTarget = "autoscale"
-run = ["python", "-m", "streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "5000", "--server.headless", "true"]
+run = ["python", "scripts/start_streamlit.py"]
 
 [objectStorage]
 defaultBucketID = "replit-objstore-ed1b5add-8303-4ce8-bc57-0885b20efe94"
+
+[userenv]
+
+[userenv.shared]
+AMGEN_STORAGE_BACKEND = "app_storage"
+
+[userenv.production]
+AMGEN_APP_MODE = "hosted"
+AUTH_REDIRECT_URI = "https://gen-academy-rag-amgen-drugs-public-search.replit.app/oauth2callback"
