@@ -1,0 +1,64 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Amgen Medicine Explorer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { width: 1800px; background: #f4f7fb; font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #0b2545; }
+  header { background: linear-gradient(120deg, #062a5c 0%, #0a4fb3 70%, #1677d6 100%); color: #fff; padding: 56px 72px 48px; position: relative; overflow: hidden; }
+  header::after { content: ""; position: absolute; right: -160px; top: -160px; width: 560px; height: 560px; border-radius: 50%; border: 70px solid rgba(255,255,255,.07); }
+  .eyebrow { font-size: 15px; letter-spacing: .22em; font-weight: 700; opacity: .8; text-transform: uppercase; }
+  h1 { font-size: 64px; font-weight: 800; letter-spacing: -.02em; margin: 10px 0 12px; }
+  .lede { font-size: 23px; max-width: 1180px; line-height: 1.45; opacity: .93; }
+  .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 34px; }
+  .stat { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 16px 18px; }
+  .stat b { display: block; font-size: 32px; font-weight: 800; }
+  .stat span { font-size: 14.5px; opacity: .85; line-height: 1.35; display: block; margin-top: 4px; }
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin: 36px 72px 8px; }
+  .step { flex: 1; background: #fff; border: 1px solid #d5e1f0; border-radius: 12px; padding: 14px 16px; }
+  .step h4 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: #0a5bd3; margin-bottom: 6px; }
+  .step p { font-size: 15.5px; line-height: 1.38; color: #2b3f5c; }
+  .arrow { width: 30px; display: flex; align-items: center; justify-content: center; color: #0a5bd3; font-size: 22px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 28px 72px 24px; }
+  figure { background: #fff; border-radius: 16px; border: 1px solid #d5e1f0; overflow: hidden; box-shadow: 0 6px 24px rgba(11,37,69,.08); }
+  figure img { display: block; width: 100%; border-bottom: 1px solid #e3ebf5; }
+  figcaption { padding: 16px 20px 18px; }
+  figcaption b { font-size: 19px; display: block; margin-bottom: 4px; }
+  figcaption span { font-size: 15.5px; color: #42566f; line-height: 1.42; }
+  footer { padding: 6px 72px 36px; font-size: 14px; color: #5b6e86; display: flex; justify-content: space-between; }
+</style></head>
+<body>
+<header>
+  <div class="eyebrow">Week 2 · Retrieval-Augmented Generation project</div>
+  <h1>Amgen Medicine Explorer</h1>
+  <p class="lede">A local RAG app that turns 37 Amgen prescribing-information PDFs into a searchable, citable learning library. It runs hybrid semantic and keyword search across every medicine, shows the exact PDF page behind each passage, and answers questions only with cited evidence from one pinned source.</p>
+  <div class="stats">
+    <div class="stat"><b>37 / 36</b><span>source PDFs / medicines</span></div>
+    <div class="stat"><b>1,439</b><span>PDF pages, every readable character covered</span></div>
+    <div class="stat"><b>9,110</b><span>verified chunks in Pinecone at 600/80</span></div>
+    <div class="stat"><b>96.8%</b><span>expected-document recall · MRR 0.988</span></div>
+    <div class="stat"><b>100%</b><span>citation resolution · 0% scope leakage</span></div>
+    <div class="stat"><b>349</b><span>tests + 21 subtests, run offline with network blocked</span></div>
+  </div>
+</header>
+
+<div class="pipeline">
+  <div class="step"><h4>1 · Extract</h4><p>PyMuPDF reads each PDF; text is verified page by page</p></div><div class="arrow">→</div>
+  <div class="step"><h4>2 · Structure</h4><p>One canonical XML with exact character spans per section</p></div><div class="arrow">→</div>
+  <div class="step"><h4>3 · Chunk</h4><p>Section-aware chunks with medicine and section prefixes</p></div><div class="arrow">→</div>
+  <div class="step"><h4>4 · Index</h4><p>Pinecone (llama-text-embed-v2) and SQLite FTS5, built and activated together</p></div><div class="arrow">→</div>
+  <div class="step"><h4>5 · Retrieve</h4><p>Reciprocal-rank fusion, grouped by medicine and document</p></div><div class="arrow">→</div>
+  <div class="step"><h4>6 · Teach</h4><p>OpenAI Responses API explains; each claim is checked against a cited quote</p></div>
+</div>
+
+<div class="grid">
+  <figure><img src="screenshots/02-search-results.png">
+    <figcaption><b>Global search with exact citations</b><span>A search for “storage temperature” returns passages from different medicines, each with its section, physical PDF page, “View PDF page” and “Ask about this source”.</span></figcaption></figure>
+  <figure><img src="screenshots/03-cited-lesson.png">
+    <figcaption><b>Cited, source-scoped learning</b><span>Each answer carries a [1] citation and the exact supporting quote. PDF and XML hashes and page spans are checked before the answer is shown. Shown here in the built-in offline demo tour.</span></figcaption></figure>
+  <figure><img src="screenshots/04-admin-library.png">
+    <figcaption><b>One-click full-library build</b><span>Admins import PDFs and build or update the whole library. A new version goes live only after every chunk is verified in Pinecone; the previous version is kept for rollback.</span></figcaption></figure>
+  <figure><img src="screenshots/05-chunk-experiments.png">
+    <figcaption><b>Chunk-size experiments</b><span>Admins can test a chunk size and overlap against 42 retrieval questions, compare it with the current library, switch to it, or revert. Example: 600/80 vs 900/80.</span></figcaption></figure>
+</div>
+
+<footer><span>Python 3.12 · Streamlit · PyMuPDF · lxml · Pinecone Documents API · SQLite FTS5 · OpenAI Responses API</span><span>Screenshots captured from the running app, Nov 2026 · Educational prototype, not clinical advice</span></footer>
+</body></html>
