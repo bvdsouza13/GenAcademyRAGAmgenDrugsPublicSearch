@@ -10,7 +10,7 @@
 
 **Spec:** [Reliability remediation design](../specs/2026-11-22-reliability-remediation-design.md).
 
-**Status:** Approved by the user on 2026-11-22 ("Fix all the 8"); implementation complete; final clean-checkout and local release integration in progress. OpenAI authentication and one verified three-citation answer have already recovered following the user's credential update; software readiness improvements remain in scope.
+**Status:** Approved by the user on 2026-11-22 ("Fix all the 8"); implemented and verified; see the [release report](../../implementation/reliability-remediation-release.md). OpenAI authentication and one verified three-citation answer have already recovered following the user's credential update; software readiness improvements remain in scope.
 
 ## Global constraints
 
@@ -178,12 +178,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Files:** Refresh `README.md`, `docs/configuration-and-pinecone-setup.md`, `docs/architecture.md`, diagrams where flows changed, `docs/demo.md`, `docs/future-features.md`, `evals/README.md`, script help and CI/test grouping. Add a remediation release report under `docs/implementation/`.
 
-- [ ] Confirm all 23 diagnostic failure instances are ordinary passing tests with xfail markers removed. Preserve equivalent coverage if a test is replaced for determinism; do not weaken assertions to make the suite green.
-- [ ] Run `python scripts/test_offline.py --shuffle-seed 20261123` and a clean-checkout run. Require zero unexplained failures, zero unexpected network attempts and no xfails for the repaired gaps. Run `git diff --check` and verify secrets/runtime outputs remain excluded from Git.
-- [ ] Run explicit live provider readiness plus verified generation, expected source fallback and safe redirects. Run held-out global search and all 37 document retrieval probes, with citations/scopes verified and category-level regressions reviewed.
-- [ ] Fetch/compare every expected remote record and test every document scope for a new candidate; verify activation/revert and an existing conversation pinned to the previous run. Real active records are never deleted for tests.
-- [ ] Refresh documentation and demo to show global search, honest readiness, one whole-library repair flow, source limitations and chunk comparison. Record the resolved credential incident separately from software remediation; report remaining capability boundaries accurately.
-- [ ] Independently review the integrated diff, launch the verified app locally, and provide the release report and commit summary. Remote publication follows the user's approved delivery scope.
+- [x] Confirm all 23 diagnostic failure instances are ordinary passing tests with xfail markers removed. Preserve equivalent coverage if a test is replaced for determinism; do not weaken assertions to make the suite green.
+- [x] Run `python scripts/test_offline.py --shuffle-seed 20261123` and a clean-checkout run. Require zero unexplained failures, zero unexpected network attempts and no xfails for the repaired gaps. Run `git diff --check` and verify secrets/runtime outputs remain excluded from Git.
+- [x] Run explicit live provider readiness plus verified generation, expected source fallback and safe redirects. Run held-out global search and all 37 document retrieval probes, with citations/scopes verified and category-level regressions reviewed.
+- [x] Fetch/compare every expected remote record and test every document scope for a new candidate; verify activation/revert and an existing conversation pinned to the previous run. Real active records are never deleted for tests.
+- [x] Refresh documentation and demo to show global search, honest readiness, one whole-library repair flow, source limitations and chunk comparison. Record the resolved credential incident separately from software remediation; report remaining capability boundaries accurately.
+- [x] Independently review the integrated diff, launch the verified app locally, and provide the release report and commit summary. Remote publication follows the user's approved delivery scope.
 
 ## Traceability: every demonstrated failing instance
 

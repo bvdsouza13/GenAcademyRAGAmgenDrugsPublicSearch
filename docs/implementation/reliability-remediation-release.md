@@ -26,15 +26,15 @@ The new consolidated XML uses `text-layer-layout-v3` and `native-geometric-bound
 - Candidate activation, rollback to the previous run and reactivation passed. Retrieval against the previous run still resolved its original XML hash and source PDFs after activation.
 - The frozen live learner evaluation completed without degraded search: all 14 behavioral cases passed and every returned citation resolved. Development precision@5 was 0.8487; holdout precision@5 was 0.7167. These are fixture-based relevance measurements, not clinical accuracy scores. The pre-ranking local baseline was 0.20 and 0.15 respectively; extraction changed for the final candidate, so that comparison includes both changes.
 - All 37 source-scoped mechanism probes retained valid provenance: 29 were eligible for generation and eight correctly remained source-only because of relevant layout restrictions. Those eight scopes were Enbrel, Kyprolis, Lumakras, Parsabiv, Ravicti, Tavneos, Tepezza and Tezspire. Eligibility is not a promise that every stochastic generation attempt passes verification.
-- Live ACTIMMUNE and Repatha examples produced verified explanations; Tezspire preserved its expected source fallback. The final strengthened live smoke check passed all four search checks and all three teaching contracts. Personal treatment examples redirected before provider use. A subsequent ACTIMMUNE readiness attempt fell back despite successful authentication and semantic search; the application reported readiness incomplete. Successful access alone never establishes answer readiness.
+- Live ACTIMMUNE and Repatha examples produced verified explanations; Tezspire preserved its expected source fallback. The final strengthened live smoke check passed all four search checks and all three teaching contracts. Personal treatment examples redirected before provider use. One intermediate ACTIMMUNE readiness attempt fell back despite successful authentication and semantic search; the application correctly reported readiness incomplete. The final readiness check passed with three verified citations. Successful access alone never establishes answer readiness.
 
 The original OpenAI credential incident was resolved before these code changes. Both configured credentials and the existing Pinecone index were accessible during release testing. No secrets were added to source control and no real active records were deleted for fault simulation.
 
 ## Regression and release evidence
 
-The final working-tree regression passed **612 tests and 21 subtests**, with zero network attempts and no xfails, using `scripts/test_offline.py --shuffle-seed 20261123` (81.60 seconds). Five warnings originate in upstream PyMuPDF/SWIG bindings. The final review found and then approved fixes for readiness presentation, smoke-test fallback enforcement and repair accounting. Clean-checkout verification and local release integration follow this commit.
+The final working-tree regression passed **612 tests and 21 subtests**, with zero network attempts and no xfails, using `scripts/test_offline.py --shuffle-seed 20261123` (81.60 seconds). Five warnings originate in upstream PyMuPDF/SWIG bindings. The final review found and then approved fixes for readiness presentation, smoke-test fallback enforcement and repair accounting. A clean archive of implementation commit `4c436db` also passed **612 tests and 21 subtests**, with zero network attempts, in 79.12 seconds. It contained no local secrets or runtime data and reused the existing Python dependency environment; this was not a fresh dependency installation. After integration into the original workspace, 47 targeted app/demo/status/management tests passed.
 
-Independent package reviews covered search/retention, recovery, teaching/operations and extraction. The whole-branch review preserved immutable sources and verified that the 37 legacy provenance-fixture updates changed only XML hashes/block IDs, not questions, quotes or PDF hashes. The frozen learner suite was not relabeled after observing holdout results.
+[Independent package and final reviews](reliability-remediation-review.md) covered search/retention, recovery, teaching/operations and extraction. The whole-branch review preserved immutable sources and verified that the 37 legacy provenance-fixture updates changed only XML hashes/block IDs, not questions, quotes or PDF hashes. The frozen learner suite was not relabeled after observing holdout results.
 
 Local reports are retained under ignored `output/remediation/`: `candidate-run.json`, `live-candidate-discovery.json`, `live-candidate-probes.json`, `live-candidate-teaching.json`, `activation-rollback-check.json`, test logs and capacity reports. These contain machine-specific runtime evidence and are not required by a fresh checkout.
 
@@ -48,6 +48,12 @@ Reproduce the principal checks:
 ```
 
 Live commands consume provider requests. Use `--help` for command options; no provider checks run simply by opening or rerendering a page.
+
+## Local delivery
+
+The release was integrated into the original workspace and launched at **http://127.0.0.1:8501**. HTTP health returned 200; the local runtime check found the expected active run, 10,641 records, 37 searchable documents, no status warnings and a successful historical readiness check. The prior runtime and original planning files were retained under ignored `output/remediation/pre-integration/`. Browser checks verified corrected ACTIMMUNE search, run-pinned results, original PDF page rendering, and Admin counts/coverage.
+
+The implementation is on branch `reliability-remediation`; the local `submission-materials` branch was advanced without rewriting history. Runtime data, reports and credentials remain outside Git.
 
 ## Confidence and remaining boundaries
 
