@@ -26,6 +26,9 @@ import xml.etree.ElementTree as ET
 
 import pymupdf
 
+PARSER_VERSION = "text-layer-layout-v3"
+LAYOUT_POLICY_VERSION = "native-geometric-boundaries-v1"
+
 NS = "urn:local:pi-corpus:1"
 EXT = "urn:local:pi-corpus:extraction:1"
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
@@ -105,6 +108,76 @@ def page_position(offset: int, starts: list[int], texts: list[str]) -> int:
     raise ValueError(f"Offset {offset} does not refer to a source character")
 
 
+def _caption_kinds(text):
+    """Recognize caption candidates, excluding explicit prose references."""
+    result = []
+    for match in re.finditer(r"(?im)^[ \t]*(Table|Figure)[ \t]+[0-9]+(?:[A-Za-z])?\b([^\n]*)", text):
+        tail = match.group(2).strip()
+        if re.match(r"(?i)^(?:shows?|summarizes?|describes?|lists?|presents?|provides?|compares?|illustrates?)\b", tail):
+            continue
+        result.append('unresolved_' + match.group(1).lower())
+    return sorted(set(result))
+
+
+def _native_layout(page, text):
+    """Partition source-order native blocks only after exact sequential proof.
+
+    Geometric detection establishes separation, never table semantics. Failure
+    to locate a caption's region, uncertain columns or a text mismatch keeps the
+    whole page restricted. Repeated text is mapped by cumulative lengths, not a
+    substring lookup which could bind a later occurrence to an earlier one.
+    """
+    native = [b for b in page.get_text('blocks', sort=False) if b[6] == 0]
+    captions = _caption_kinds(text)
+    if ''.join(b[4] for b in native) != text:
+        return [(0, len(text), sorted(set(captions + ['unresolved_native_layout'])))]
+    try:
+        tables = [pymupdf.Rect(t.bbox) for t in page.find_tables().tables]
+        images = [pymupdf.Rect(i['bbox']) for i in page.get_image_info()]
+    except Exception:
+        return [(0, len(text), sorted(set(captions + ['unresolved_native_layout'])))]
+    regions = [('unresolved_table', rect) for rect in tables] + [('unresolved_figure', rect) for rect in images]
+    # A caption with no detected region cannot establish its own end boundary.
+    for block in native:
+        caption_rect = pymupdf.Rect(block[:4])
+        for caption in _caption_kinds(block[4]):
+            associated = [rect for reason, rect in regions if reason == caption
+                          and min(rect.x1, caption_rect.x1) > max(rect.x0, caption_rect.x0)
+                          and max(rect.y0-caption_rect.y1, caption_rect.y0-rect.y1, 0) <= 60]
+            if len(associated) != 1:
+                return [(0, len(text), captions)]
+    lines = [pymupdf.Rect(line['bbox']) for block in page.get_text('dict', sort=False)['blocks']
+             if block['type'] == 0 for line in block['lines']]
+    prose = [line for line in lines if not any(line.intersects(rect) for _,rect in regions)]
+    for i, left in enumerate(prose):
+        for right in prose[i+1:]:
+            overlap = min(left.y1, right.y1) - max(left.y0, right.y0)
+            gap = max(left.x0, right.x0) - min(left.x1, right.x1)
+            if overlap > 3 and gap > 20 and min(left.width, right.width) > 60:
+                return [(0, len(text), sorted(set(captions + ['unresolved_multicolumn'])))]
+    result = []; cursor = 0
+    for block in native:
+        end = cursor + len(block[4]); rect = pymupdf.Rect(block[:4])
+        risks = _caption_kinds(block[4])
+        # Prose-like labels can still be captions when adjacent geometry proves
+        # a table/figure is present; do not promote that caption to narrative.
+        for mention in re.finditer(r'(?im)^[ \t]*(Table|Figure)[ \t]+[0-9]+', block[4]):
+            reason = 'unresolved_' + mention.group(1).lower()
+            if any(reason == kind and min(region.x1,rect.x1) > max(region.x0,rect.x0)
+                   and max(region.y0-rect.y1,rect.y0-region.y1,0) <= 60
+                   for kind,region in regions):
+                risks.append(reason)
+        risks += [reason for reason, region in regions
+                  if rect.intersects(pymupdf.Rect(region.x0, region.y0, region.x1, region.y1+30))]
+        risks = sorted(set(risks))
+        if result and result[-1][1] == cursor and result[-1][2] == risks:
+            result[-1] = (result[-1][0], end, risks)
+        else:
+            result.append((cursor, end, risks))
+        cursor = end
+    return result or [(0, len(text), [])]
+
+
 def extract(path: Path, root_dir: Path, *, brand_key: str | None = None) -> dict:
     doc_id = "doc-" + path.stem.replace("_", "-")
     brand_key = brand_key or path.stem.split("_")[0]
@@ -113,6 +186,23 @@ def extract(path: Path, root_dir: Path, *, brand_key: str | None = None) -> dict
     source_bytes = path.read_bytes()
     with pymupdf.open(stream=source_bytes, filetype="pdf") as pdf:
         texts = [page.get_text("text", sort=False) for page in pdf]
+        layouts = []
+        continuing_table = False
+        for index, page in enumerate(pdf):
+            text = texts[index]
+            layout = _native_layout(page, text)
+            unbounded_table = (len(layout) == 1 and 'unresolved_table' in layout[0][2]
+                               and 'unresolved_table' in _caption_kinds(text))
+            if continuing_table:
+                # A new numbered section is an explicit end boundary. Otherwise
+                # an unresolved continuation cannot become safe on a new page.
+                boundary = re.search(r"(?m)^[ \t]*(?:[0-9]+\.[0-9]+[ \t]*(?:\n[ \t]*)?[A-Z][a-z]|[0-9]+[ \t]*(?:\n[ \t]*)?(?:INDICATIONS|DOSAGE|WARNINGS|CLINICAL|ADVERSE|DESCRIPTION|REFERENCES|PATIENT|NONCLINICAL|HOW SUPPLIED|USE IN|DRUG|OVERDOSAGE|CONTRAINDICATIONS))", text)
+                limit = boundary.start() if boundary else len(text)
+                layout = [(a,min(b,limit),sorted(set(risks+['unresolved_table']))) for a,b,risks in layout if a < limit] + [(max(a,limit),b,risks) for a,b,risks in layout if b > limit]
+                continuing_table = boundary is None
+            if unbounded_table or re.search(r"(?im)^[ \t]*Table[ \t]+[0-9]+[^\n]*(?:continued|continuing)", text):
+                continuing_table = True
+            layouts.append(layout)
         page_metadata = [
             {"number": index + 1, "widthPoints": page.rect.width,
              "heightPoints": page.rect.height, "embeddedImageCount": len(page.get_images()),
@@ -173,7 +263,7 @@ def extract(path: Path, root_dir: Path, *, brand_key: str | None = None) -> dict
         "id": doc_id, "productId": f"product-{brand_key}", "brandKey": brand_key,
         "path": path.relative_to(root_dir).as_posix(), "bytes": len(source_bytes),
         "sha256": digest(source_bytes), "texts": texts, "starts": starts,
-        "joined": joined, "pageMetadata": page_metadata, "marker": marker,
+        "joined": joined, "pageMetadata": page_metadata, "layouts": layouts, "marker": marker,
         "identity": identity_matches[0] if identity_matches else None, "identities": identity_matches,
         "approval": approval, "revision": revision, "candidates": candidates,
         "appendixOffset": appendix, "lowTextPages": low,
@@ -190,23 +280,25 @@ def add_fragment_section(raw: ET.Element, record: dict, key: str, kind: str,
     h.set(XML_SPACE, "preserve")
     if number is not None:
         h.set("number", str(number))
+    heading_only = " ".join(record["joined"][begin:end].split()) == " ".join(heading.split())
     for i, (start, text) in enumerate(zip(record["starts"], record["texts"]), 1):
         lo, hi = max(begin, start) - start, min(end, start + len(text)) - start
         if hi <= lo:
             continue
-        paragraph_id = f"{section_id}-p{i:04d}"
-        fragment = text[lo:hi]
-        paragraph = child(sec, "paragraph", fragment, id=paragraph_id)
-        paragraph.set(XML_SPACE, "preserve")
-        risks = []
-        if re.search(r"(?im)^[ \t]*Table[ \t]+[0-9]", fragment): risks.append("unresolved_table")
-        if re.search(r"(?im)^[ \t]*Figure[ \t]+[0-9]", fragment): risks.append("unresolved_figure")
-        if risks: paragraph.set(x("warnings"), " ".join(risks))
-        paragraph.set(x("sha256"), digest(fragment.encode("utf-8")))
-        ev = evidence(sec, record["id"], i, block=f"{record['id']}-page-{i:04d}-text")
-        ev.set(x("fragmentRef"), paragraph_id)
-        ev.set(x("characterStart"), str(lo))
-        ev.set(x("characterEndExclusive"), str(hi))
+        parts = [(max(lo, a), min(hi, b), risks) for a,b,risks in record['layouts'][i-1]
+                 if max(lo,a) < min(hi,b)]
+        for part, (a,b,risks) in enumerate(parts):
+            paragraph_id = f"{section_id}-p{i:04d}" + (f"-r{part+1:03d}" if len(parts)>1 else "")
+            fragment = text[a:b]
+            paragraph = child(sec, "paragraph", fragment, id=paragraph_id)
+            paragraph.set(XML_SPACE, "preserve")
+            risks = sorted(set(risks + (["unresolved_heading_only"] if heading_only else [])))
+            if risks: paragraph.set(x("warnings"), " ".join(risks))
+            paragraph.set(x("sha256"), digest(fragment.encode("utf-8")))
+            ev = evidence(sec, record["id"], i, block=f"{record['id']}-page-{i:04d}-text")
+            ev.set(x("fragmentRef"), paragraph_id)
+            ev.set(x("characterStart"), str(a))
+            ev.set(x("characterEndExclusive"), str(b))
     return sec
 
 
@@ -217,7 +309,8 @@ def _assemble(root_dir: Path, template_path: Path, output_path: Path, report_pat
     root = copy.deepcopy(template)
     root.set("contentStatus", "machineExtractedUnreviewed")
     root.set(x("schemaValidation"), "localStructuralSchema")
-    root.set(x("parserVersion"), "text-layer-sections-v2")
+    root.set(x("parserVersion"), PARSER_VERSION)
+    root.set(x("layoutPolicyVersion"), LAYOUT_POLICY_VERSION)
     root.set(x("templateSha256"), digest(template_path.read_bytes()))
     root.find(q("sourceIndex")).set(x("verificationStatus"), "templateReferenceNotVerified")
     products, documents = root.find(q("products")), root.find(q("documents"))
@@ -308,8 +401,13 @@ def _assemble(root_dir: Path, template_path: Path, output_path: Path, report_pat
             paragraph.set(XML_SPACE, "preserve")
             paragraph.set(x("sha256"), digest(text.encode("utf-8")))
             paragraph.set(x("characterCount"), str(len(text)))
+            risks = sorted({risk for _,_,risks in record["layouts"][i-1] for risk in risks})
+            if risks: paragraph.set(x("warnings"), " ".join(risks))
             evidence(sec, doc_id, i, block=f"{page_id}-text")
         candidates = record["candidates"]
+        if not (record["marker"] and candidates) and any(risks for layout in record["layouts"] for _,_,risks in layout):
+            add_fragment_section(raw, record, "native-layout", "nativeTextLayout", 0, len(record["joined"]),
+                                 "Native text layer (source order; unreviewed)")
         if record["marker"] and candidates:
             add_fragment_section(raw, record, "full-preamble", "fullPrescribingInformationPreamble",
                                  record["marker"].start(), candidates[0][0], "FULL PRESCRIBING INFORMATION: preamble (may include boxed warning)")

@@ -1,9 +1,4 @@
-"""Offline failure probes, including strict expected failures for known gaps.
-
-The xfails are desired-behavior tests, not assertions that the current defect is
-correct. Synthetic source text and fake provider outputs are used throughout;
-these tests do not establish clinical correctness or live model behavior.
-"""
+"""Teaching failure regressions using synthetic evidence and fake providers."""
 from copy import deepcopy
 from urllib.error import URLError
 
@@ -107,7 +102,6 @@ def test_chat_retrieval_rejects_empty_and_oversize_query_before_provider(config,
     assert not calls
 
 
-@pytest.mark.xfail(strict=True, reason='FT-01: model followups are outside entailment verification and only regex filtered')
 def test_followups_must_not_publish_unverified_treatment_instructions(config, evidence):
     fake = FakeAI(evidence)
     unsafe = 'Use two injections tomorrow.'
@@ -122,15 +116,19 @@ def test_followups_must_not_publish_unverified_treatment_instructions(config, ev
     'Is it okay for me to use this while breastfeeding?',
     'Would you recommend this medication for a 70-year-old?',
 ])
-@pytest.mark.xfail(strict=True, reason='FT-02: deterministic treatment gate misses pronouns, synonyms and indirect requests; model safeguards still apply')
 def test_personal_treatment_paraphrases_receive_deterministic_redirect(question):
     assert safety_reason(question) is not None
 
 
-@pytest.mark.xfail(strict=True, reason='FT-03: quiz always puts the correct option at index zero')
 def test_repeated_quizzes_do_not_reveal_answer_by_fixed_position(config, evidence):
-    quizzes = [make_quiz(evidence, config) for _ in range(20)]
-    assert len({quiz['correct_index'] for quiz in quizzes}) > 1
+    class ControlledRNG:
+        def __init__(self, rotate): self.rotate = rotate
+        def shuffle(self, items): items[:] = items[self.rotate:] + items[:self.rotate]
+    quizzes = [make_quiz(evidence, config, rng=ControlledRNG(i)) for i in (0, 1, 2)]
+    assert [quiz['correct_index'] for quiz in quizzes] == [0, 2, 1]
+    for quiz in quizzes:
+        assert quiz['choices'][quiz['correct_index']] == evidence.passages[0]['text']
+        assert 'first choice' not in quiz['rationale'].lower()
 
 
 def bulk_evidence(tmp_path, *, long=False, warnings=None):
@@ -145,7 +143,6 @@ def bulk_evidence(tmp_path, *, long=False, warnings=None):
 
 
 @pytest.mark.parametrize('problem', ['layout', 'continuation'])
-@pytest.mark.xfail(strict=True, reason='FT-04: quiz skips the teaching path layout/continuation completeness gate')
 def test_quiz_does_not_grade_uncertain_layout_or_incomplete_context(tmp_path, config, problem):
     bundle = bulk_evidence(tmp_path, long=problem == 'continuation',
                            warnings=['unresolved_table'] if problem == 'layout' else None)
@@ -158,7 +155,6 @@ def test_quiz_does_not_grade_uncertain_layout_or_incomplete_context(tmp_path, co
     assert 'error' in quiz or quiz.get('limited_source') is True
 
 
-@pytest.mark.xfail(strict=True, reason='FT-05: chat/quiz retrieval propagates Pinecone errors and has no local evidence fallback')
 def test_chat_can_read_scoped_local_evidence_during_pinecone_outage(config, plan):
     fake = FakeDocuments()
     run = service(config, fake).ingest(plan)
@@ -170,7 +166,6 @@ def test_chat_can_read_scoped_local_evidence_during_pinecone_outage(config, plan
     assert any('unavailable' in warning.lower() or 'local' in warning.lower() for warning in result.warnings)
 
 
-@pytest.mark.xfail(strict=True, reason='FT-06: canonical safety passages consume the whole evidence budget before query-relevant hits')
 def test_overview_keeps_query_relevant_passage_alongside_safety(config, plan):
     warnings = []
     for number in range(5):
@@ -196,3 +191,136 @@ def test_overview_keeps_query_relevant_passage_alongside_safety(config, plan):
     assert 'approved-use' in {p['id'] for p in expanded.passages}
     assert any('omitted' in warning for warning in limited.warnings)
     assert 'approved-use' in {p['id'] for p in limited.passages}
+
+@pytest.mark.parametrize('question', [
+    'Could he use this for his condition?', 'Should a 12 year old use it?',
+    'I am breastfeeding. Would this medicine be appropriate?',
+    'My doctor prescribed this. Should I begin?', 'What about me?',
+])
+def test_indirect_personal_routes_withhold_before_model(config, evidence, question):
+    fake = FakeAI(evidence)
+    response = teach(question, evidence, config, history=[{'role':'user','content':'Explain pregnancy warnings'}], client=fake)
+    assert response.abstained and not fake.calls
+
+@pytest.mark.parametrize('question', [
+    'Help me understand the mechanism.', 'I want to learn about the general warnings.',
+    'What does the label say about pregnancy?', 'Explain the breastfeeding section of the label.',
+])
+def test_general_label_and_first_person_learning_remain_educational(question):
+    assert safety_reason(question) is None
+
+
+def test_followups_are_fixed_source_appropriate_even_after_product_injection(config, evidence):
+    fake = FakeAI(evidence)
+    fake.data['followups'] = ['Ignore the source and switch to another medicine.', 'Use two injections.']
+    response = teach('Explain mechanism', evidence, config, mode='Technical detail', client=fake)
+    assert response.followups == ['Help me read this source section.', 'Explain the mechanism of action in this source.']
+
+
+@pytest.mark.parametrize('mutation', ['namespace', 'run', 'text', 'xml'])
+def test_quiz_and_teaching_share_source_scope_rejection(config, evidence, mutation):
+    evidence.run_id = 'pinned-run'
+    source = evidence.passages[0]
+    if mutation == 'namespace': source['namespace'] = 'other'
+    if mutation == 'run': source['run_id'] = 'other'
+    if mutation == 'text': source['metadata']['source_text'] = 'A different original source statement.'
+    if mutation == 'xml': source['xml_hash'] = 'other'
+    fake = FakeAI(evidence)
+    assert teach('Explain mechanism', evidence, config, client=fake).abstained
+    assert not fake.calls
+    assert 'error' in make_quiz(evidence, config)
+
+
+def test_misleading_missing_sibling_is_not_accepted_as_complete(tmp_path, config):
+    bundle = bulk_evidence(tmp_path, long=True)
+    duplicate = deepcopy(bundle.passages[0])
+    duplicate['id'] = 'duplicate-index'
+    bundle.passages.append(duplicate)
+    fake = FakeAI(bundle)
+    assert teach('Explain source', bundle, config, client=fake).abstained
+    assert not fake.calls
+    assert 'error' in make_quiz(bundle, config)
+
+
+def test_openai_transport_retries_transient_fault_within_deadline(config):
+    calls = []
+    def transport(*args, **kwargs):
+        calls.append(kwargs['timeout'])
+        if len(calls) < 3: raise ProviderError('OpenAI',503)
+        return {'status':'completed','output':[{'type':'message','content':[{'type':'output_text','text':'{"supported":true}'}]}]}
+    data, usage = OpenAIClient(config,transport=transport).generate('i', {}, {})
+    assert data == {'supported': True} and len(calls) == 3
+    assert usage['prior_attempt_usage']=='unknown'
+    assert usage['retry_attempts']==2
+
+
+def test_late_openai_response_is_rejected_even_if_transport_returns_completed(config):
+    from amgen_explorer.reliability import deadline_scope
+    now = [0.0]
+    def transport(*args, **kwargs):
+        assert kwargs['timeout'] == 2
+        now[0] = 3
+        return {'status':'completed','output':[{'type':'message','content':[{'type':'output_text','text':'{"supported":true}'}]}]}
+    with deadline_scope(2, clock=lambda:now[0]):
+        with pytest.raises(ProviderError):
+            OpenAIClient(config,transport=transport).generate('i', {}, {})
+
+@pytest.mark.parametrize('question', [
+    'I want to learn about approved uses.', 'Help me understand the label dosage section.',
+    'Explain to me the source dose information.',
+])
+def test_educational_first_person_does_not_become_an_individual_decision(question):
+    assert safety_reason(question) is None
+
+@pytest.mark.parametrize('question', [
+    'Help me understand if I should take it.', 'Explain to me what dose I should use.',
+])
+def test_learning_preamble_does_not_bypass_personal_gate(question):
+    assert safety_reason(question) is not None
+
+@pytest.mark.parametrize('question', ['Should the patient take this medicine?', 'What dose should this patient take?'])
+def test_singular_patient_decisions_redirect_before_generation(config, evidence, question):
+    fake = FakeAI(evidence)
+    assert teach(question,evidence,config,client=fake).abstained
+    assert not fake.calls
+
+
+@pytest.mark.parametrize('question', ['What patient populations does the label describe?', 'Explain the general patient population and dosage sections of the label.'])
+def test_general_patient_population_questions_remain_educational(question):
+    assert safety_reason(question) is None
+
+
+@pytest.mark.parametrize('phase', ['generation','verification'])
+@pytest.mark.parametrize('failure', ['incomplete','refusal','malformed'])
+@pytest.mark.parametrize('reported', [True,False])
+def test_invalid_generation_preserves_only_sanitized_reported_usage(config,evidence,phase,failure,reported):
+    import json
+    valid = FakeAI(evidence).data
+    safe_usage = {'input_tokens':17,'output_tokens':5,'total_tokens':22,
+                  'input_tokens_details':{'cached_tokens':2},'output_tokens_details':{'reasoning_tokens':3}}
+    unsafe_usage = {**safe_usage,'provider_debug':'private-provider-body',
+                    'input_tokens_details':{'cached_tokens':2,'secret':'private-provider-body'},
+                    'output_tokens_details':{'reasoning_tokens':3,'secret':'private-provider-body'}}
+    bad = {'status':'completed','output':[{'type':'message','content':[{'type':'output_text','text':'{invalid'}]}]}
+    if failure == 'incomplete': bad = {'status':'incomplete','output':[]}
+    if failure == 'refusal': bad = {'status':'completed','output':[{'type':'message','content':[{'type':'refusal','refusal':'private-provider-body'}]}]}
+    if reported: bad['usage'] = unsafe_usage
+    def transport(url,payload,**kwargs):
+        if phase == 'verification' and payload['text']['format']['name'] == 'medicine_teaching':
+            return {'status':'completed','usage':{'input_tokens':11},'output':[{'type':'message','content':[{'type':'output_text','text':json.dumps(valid)}]}]}
+        return bad
+    response = teach('Explain mechanism',evidence,config,client=OpenAIClient(config,transport=transport))
+    assert response.abstained and response.usage['explanation_verified'] is False
+    assert response.usage[phase] == (safe_usage if reported else {'reported_usage':'unknown'})
+    if phase == 'verification': assert response.usage['generation'] == {'input_tokens':11}
+    assert 'private-provider-body' not in repr(response.usage)
+    assert 'private-provider-body' not in response.answer
+
+
+def test_patient_redirect_occurs_before_service_retrieval():
+    from amgen_explorer.service import ExplorerService
+    service = object.__new__(ExplorerService)
+    def forbidden(*args,**kwargs): raise AssertionError('Personal decision must not retrieve or contact a provider')
+    service._evidence = forbidden
+    response = service.answer('Should the patient take this medicine?','medicine')
+    assert response.abstained and not response.citations

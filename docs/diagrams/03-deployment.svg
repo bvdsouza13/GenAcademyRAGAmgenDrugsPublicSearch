@@ -42,7 +42,7 @@
 <rect x="600" y="620" width="450" height="245" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="600" y="640" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="622" y="662" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Server-side configuration</text>
-<text x="622" y="699" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">config/app.toml: unchanged structure</text>
+<text x="622" y="699" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Optional search / reliability settings</text>
 <text x="622" y="728" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Ignored secrets TOML / exported keys</text>
 <text x="622" y="757" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Nonblank environment values win</text>
 <text x="622" y="786" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">No .env loader; no automatic indexing</text>
@@ -81,5 +81,5 @@
 <rect x="60" y="956" width="1560" height="93" rx="12" fill="#FFF5DF" stroke="#E7C990" stroke-width="1.5"/>
 <text x="82" y="990" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Retained snapshots and manifests keep old conversations resolvable. Semantic and lexical versions activate together.</text>
 <text x="82" y="1019" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Shared hosting is outside scope: it needs server-enforced roles, durable shared storage, learner isolation and operational recovery.</text>
-<text x="60" y="1094" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
+<text x="60" y="1094" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  22 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
 </svg>

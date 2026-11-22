@@ -35,3 +35,11 @@ def test_contamination_requires_explicit_scope_global_other_docs_not_contaminati
     assert score_case(case,[hit('other',0,2,'ab')],evidence_budget=100)['contamination_rate']==0
     case['document_id']='d'
     assert score_case(case,[hit('other',0,2,'ab')],evidence_budget=100)['contamination_rate']==1
+
+
+def test_teaching_budget_counts_indexed_prefix_bytes():
+    case={'expected_document_ids':['d']}
+    record=hit('d',0,2,'ab')
+    record['metadata']['indexed_text_bytes']=99
+    score=score_case(case,[record],evidence_budget=100)
+    assert score['hits']==[] and score['evidence_bytes_with_reserve']==0

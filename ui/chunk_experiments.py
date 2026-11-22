@@ -52,7 +52,7 @@ def render(service,corpus,active):
         st.info('Build an active full library before comparing chunk settings. Every test uses the entire inventory and the same saved questions.')
     if st.button('Test settings',type='primary',disabled=not baseline_ready):
         with st.status('Building the full-library candidate, then evaluating saved questions…',expanded=True) as progress:
-            ok,report=action('Test settings',lambda:service.test_chunk_configuration(config,suite_id='global-search',on_progress=lambda p:st.caption(str(p.get('stage') or p.get('phase') or p.get('status','Testing')))))
+            ok,report=action('Test settings',lambda:service.test_chunk_configuration(config,suite_id='learner-search',on_progress=lambda p:st.caption(str(p.get('stage') or p.get('phase') or p.get('status','Testing')))))
             if ok:
                 st.session_state['chunk_experiment']={'signature':signature,'report':report}
                 progress.update(label='Experiment complete',state='complete',expanded=False)

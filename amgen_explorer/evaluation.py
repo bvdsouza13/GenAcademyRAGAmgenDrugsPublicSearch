@@ -12,7 +12,7 @@ from pathlib import Path
 from .review import digest
 from .source_import import inspect_inventory
 from .library import BULK_POLICY
-from .search import RANKING_VERSION
+from .search import RANKING_VERSION, ARTIFACT_VERSION
 from .service import atomic_json
 
 
@@ -32,7 +32,7 @@ def _union(intervals):
 def score_case(case,hits,*,evidence_budget):
     kept=[];used=0
     for hit in hits:
-        cost=len(hit['text'].encode('utf-8'))+8
+        cost=hit.get('metadata',{}).get('indexed_text_bytes',len(hit['text'].encode('utf-8')))+8
         if used+cost>evidence_budget:continue
         used+=cost;kept.append(hit)
     expected=set(case.get('expected_document_ids',[]))
@@ -57,6 +57,65 @@ def score_case(case,hits,*,evidence_budget):
             'evidence_bytes_with_reserve':used,'expected_characters':total,'covered_expected_characters':covered,'hits':kept}
 
 
+def _grade(case, hit):
+    meta=hit.get('metadata',{})
+    did=meta.get('document_id',hit.get('document_id'))
+    matches=[]
+    for judgment in case.get('relevance_judgments',[]):
+        if judgment.get('document_id')!=did:continue
+        if judgment.get('document_sha256')!=meta.get('document_sha256'):continue
+        for span in _spans(hit):
+            if (span.get('page')==judgment.get('page') and
+                    max(span.get('start',0),judgment['start'])<min(span.get('end',0),judgment['end'])):
+                matches.append(judgment['grade'])
+    if matches:return max(matches)
+    for judgment in case.get('document_judgments',[]):
+        if judgment['document_id']==did:return judgment['grade']
+    # A default is an explicit judgment, never inferred from missing labels.
+    return case.get('other_documents_grade')
+
+
+def score_discovery(case: dict, hits: list[dict], *, k: int) -> dict:
+    """Score visible discovery before teaching clipping; unknown is not zero.
+
+    Precision uses the number of displayed hits (up to the cutoff). If any hit
+    lacks a judgment the complete precision is unavailable; judged precision
+    and judgment coverage remain visible. Graded relevance is mean grade / 3.
+    """
+    if type(k) is not int or k<1:raise ValueError('Discovery cutoff must be positive.')
+    def at(cutoff):
+        grades=[_grade(case,h) for h in hits[:cutoff]]
+        judged=[g for g in grades if g is not None]
+        precision=sum(g>0 for g in judged)/len(judged) if judged else 0
+        return (precision if len(judged)==len(grades) else None),precision
+    grades=[_grade(case,h) for h in hits[:k]];judged=[g for g in grades if g is not None]
+    p5,j5=at(5);p10,j10=at(10)
+    mean=sum(judged)/len(judged) if judged else 0
+    return {'precision_at_5':p5,'precision_at_10':p10,
+            'judged_precision_at_5':j5,'judged_precision_at_10':j10,
+            'graded_relevance':mean/3 if len(judged)==len(grades) else None,
+            'mean_relevance_grade':mean,'judgment_coverage':len(judged)/len(grades) if grades else 1,
+            'judged_hits':len(judged),'unjudged_hits':len(grades)-len(judged),'visible_hits':len(grades)}
+
+
+def score_behavior(case, result):
+    """Execute retrieval assertions; generation-only fixtures remain unmeasured."""
+    get=lambda key,default=None:result.get(key,default) if isinstance(result,dict) else getattr(result,key,default)
+    expected=case.get('expected_outcome')
+    if expected is None:
+        return {'behavior_correct':None,'no_answer_correct':None,'suggestion_correct':None,
+                'status':'not_measured','reason':'Generation/source-context assertion requires a dedicated answer evaluation.'}
+    actual=get('outcome','results' if get('hits',[]) else 'no_results')
+    outcome_correct=actual==expected
+    suggestions={s.casefold() for s in get('suggestions',[])}
+    expected_suggestions={s.casefold() for s in case.get('expected_suggestions',[])}
+    suggestion_correct=expected_suggestions<=suggestions if expected_suggestions else None
+    no_answer_correct=(not get('hits',[])) if expected=='no_results' else None
+    return {'behavior_correct':outcome_correct and suggestion_correct is not False and no_answer_correct is not False,
+            'outcome_correct':outcome_correct,'no_answer_correct':no_answer_correct,
+            'suggestion_correct':suggestion_correct,'expected_outcome':expected,'actual_outcome':actual,'status':'measured'}
+
+
 def _suite(service,suite_id,corpus):
     """Materialize a deterministic suite for this source version without dropping expectations."""
     import hashlib
@@ -76,7 +135,11 @@ def _suite(service,suite_id,corpus):
             raise UserFacingError('The evaluation suite has an invalid XML source version.')
         source_changed=row['xml_hash']!=corpus.xml_hash
         row['suite_source_xml_hash']=row['xml_hash'];row['xml_hash']=corpus.xml_hash
-        if row.get('expected_behavior') and not row.get('expected_document_ids'):
+        for judgment in row.get('relevance_judgments',[]):
+            document=documents.get(judgment.get('document_id'))
+            if document is None or document.sha256!=judgment.get('document_sha256'):
+                raise UserFacingError('Discovery judgments refer to changed source PDFs. Create a separately versioned, relabeled suite before comparison.')
+        if row.get('expected_outcome') or (row.get('expected_behavior') and not row.get('expected_document_ids')):
             behavior.append(row);continue
         if not row.get('question') or not row.get('expected_document_ids') or not row.get('expected_spans'):
             raise UserFacingError('The evaluation suite needs questions, expected documents and exact source spans.')
@@ -121,7 +184,7 @@ def _suite(service,suite_id,corpus):
         if not block:continue
         source=block.spans[0];archive=archives[(doc.id,source['page'])]
         lo=source['start'];hi=min(source['end'],lo+180)
-        measured.append({'id':'generated-'+doc.id,'kind':'source_lookup','question':products[doc.product_id].name+' '+block.section_title,
+        measured.append({'id':'generated-'+doc.id,'kind':'source_lookup','question':products[doc.product_id].name+(' '+block.section_title if 'mechanism' in block.section_title.lower() else ''),
             'product_id':doc.product_id,'document_id':doc.id,'expected_document_ids':[doc.id],'xml_hash':corpus.xml_hash,
             'expected_spans':[{'document_id':doc.id,'document_sha256':doc.sha256,'page':source['page'],'start':lo,'end':hi,'quote':archive.text[lo:hi]}],
             'fixture_origin':'Automatically source-bound coverage case, not a clinical evaluation'})
@@ -139,11 +202,13 @@ def _compatible(service,a,b,suite_hash):
     for key in ('xml_hash','source_registry_fingerprint','eligibility_policy','eligibility_fingerprint','profile','document_ids','product_ids'):
         if a.get(key)!=b.get(key):raise UserFacingError('Update the full library first: sources, policy and embedding profile must match for comparison.')
     for run in (a,b):
-        if run.get('search_artifact',{}).get('ranking_version')!=RANKING_VERSION:
-            raise UserFacingError('Rebuild both configurations with the same search ranking version.')
+        if run.get('search_artifact',{}).get('ranking_version')!=ARTIFACT_VERSION:
+            raise UserFacingError('Both configurations require compatible pinned search artifacts.')
     controls={'xml_hash':a['xml_hash'],'source_registry':a['source_registry_fingerprint'],
               'eligibility':a['eligibility_fingerprint'],'profile':a['profile'],
               'suite_hash':suite_hash,'ranking_version':RANKING_VERSION,
+              'search':{'result_limit':service.config.settings.get('search',{}).get('result_limit',20),
+                        'semantic_candidates':service.config.settings.get('search',{}).get('semantic_candidates',60)},
               'retrieval':service.config.settings['retrieval'],'generation':service.config.settings['openai']}
     return digest(controls),controls
 
@@ -172,6 +237,7 @@ def evaluate_versions(service,baseline_run_id,candidate_run_id,suite_id='global-
     cases,behavior,suite_hash=_suite(service,suite_id,corpus)
     fingerprint,controls=_compatible(service,a,b,suite_hash)
     rows=[];warnings=[f"Unavailable expected source evidence retained with zero quote coverage: {case['id']} ({', '.join(case['unavailable_expected_sources'])})" for case in cases if case.get('unavailable_expected_sources')];usage={'baseline':{},'candidate':{}};modes={'baseline':set(),'candidate':set()};observations=[]
+    visible_limit=service.config.settings.get('search',{}).get('result_limit',20)
     for number,case in enumerate(cases):
         row={'id':case['id'],'question':case['question'],'expected_document_ids':case['expected_document_ids']}
         # Alternate order to reduce systematic first-request latency bias.
@@ -180,10 +246,11 @@ def evaluate_versions(service,baseline_run_id,candidate_run_id,suite_id='global-
         for label,run in sequence:
             started=time.monotonic()
             result=service.search_library(case['question'],run_id=run['run_id'],
-                product_ids=[case['product_id']] if case.get('product_id') else None,
-                document_ids=[case['document_id']] if case.get('document_id') else None,
-                limit=service.config.settings['retrieval']['top_k'])
-            score=score_case(case,result.hits,evidence_budget=service.config.settings['retrieval']['evidence_token_budget'])
+                product_ids=case.get('requested_filters',{}).get('product_ids'),
+                document_ids=case.get('requested_filters',{}).get('document_ids'),
+                limit=visible_limit)
+            score=score_case(case,result.hits[:service.config.settings['retrieval']['top_k']],evidence_budget=service.config.settings['retrieval']['evidence_token_budget'])
+            score.update(score_discovery(case,result.hits,k=visible_limit))
             score.update(latency_ms=round((time.monotonic()-started)*1000,3),degraded=result.degraded,
                          citation_resolution=_citation_rate(service,run,score['hits']))
             row[label]=score;modes[label].add(result.degraded)
@@ -195,6 +262,23 @@ def evaluate_versions(service,baseline_run_id,candidate_run_id,suite_id='global-
                 observations.append({'case_id':case['id'],'version':label,'abstained':answer.abstained,
                                      'citation_count':len(answer.citations),'usage':answer.usage})
         rows.append(row)
+    behavioral_results=[]
+    for case in behavior:
+        row={'id':case['id'],'question':case['question']}
+        for label,run in (('baseline',a),('candidate',b)):
+            if not case.get('expected_outcome'):
+                row[label]=score_behavior(case,{})
+                continue
+            result=service.search_library(case['question'],run_id=run['run_id'],
+                product_ids=case.get('requested_filters',{}).get('product_ids'),
+                document_ids=case.get('requested_filters',{}).get('document_ids'),
+                limit=visible_limit)
+            row[label]=score_behavior(case,result)
+            row[label]['discovery']=score_discovery(case,result.hits,k=visible_limit)
+            warnings.extend(result.warnings);modes[label].add(result.degraded)
+            for key,value in result.usage.items():
+                if isinstance(value,(int,float)):usage[label][key]=usage[label].get(key,0)+value
+        behavioral_results.append(row)
     metrics={}
     for label in ('baseline','candidate'):
         metrics[label]={name:round(statistics.mean(r[label][key] for r in rows),6) for name,key in
@@ -202,15 +286,23 @@ def evaluate_versions(service,baseline_run_id,candidate_run_id,suite_id='global-
              ('quote_coverage','quote_coverage'),('citation_resolution','citation_resolution'),
              ('contamination_rate','contamination_rate'),('mean_latency_ms','latency_ms')]}
         metrics[label]['question_count']=len(rows)
+        for name in ('precision_at_5','precision_at_10','graded_relevance','judgment_coverage'):
+            observed=[r[label][name] for r in rows if r[label][name] is not None]
+            metrics[label][name]=round(statistics.mean(observed),6) if observed else None
+            metrics[label][name+'_measured_cases']=len(observed)
+        for name in ('behavior_correct','no_answer_correct','suggestion_correct'):
+            observed=[r[label][name] for r in behavioral_results if r[label][name] is not None]
+            metrics[label][name]=round(statistics.mean(observed),6) if observed else None
+            metrics[label][name+'_measured_cases']=len(observed)
     compatible=modes['baseline']==modes['candidate'] and len(modes['baseline'])==1
     if not compatible:warnings.append('Search availability differed during this comparison. Rerun before choosing a configuration.')
     report={'baseline_run_id':a['run_id'],'candidate_run_id':b['run_id'],'candidate':b,'suite_id':suite_id,
             'suite_hash':suite_hash,'compatibility_fingerprint':fingerprint,'controls':controls,'compatible':compatible,
             'metrics':metrics,'rows':rows,'warnings':list(dict.fromkeys(warnings)),'usage':usage,
-            'behavioral_cases_retained':len(behavior),'generated_answer_observations':observations,
+            'behavioral_cases_retained':len(behavior),'behavioral_results':behavioral_results,'generated_answer_observations':observations,
             'searchable_coverage':{'baseline':a['coverage'],'candidate':b['coverage']},
             'latency_conditions':'Sequential calls with alternating baseline/candidate order; includes local integrity checks. Provider caches are uncontrolled.',
-            'note':'Expected-document and exact-span retrieval measurements under the same evidence budget. Behavioral fixtures remain separate regression cases. These are not clinical accuracy scores.',
+            'note':'Expected-document and exact-span retrieval measurements under the same evidence budget. Visible discovery quality is independent of teaching budget; retrieval behaviors are executed, generation-only assertions are explicitly unmeasured. These are not clinical accuracy scores.',
             'created_at':time.time()}
     path=service.config.root/'data/experiments'/(digest({'a':a['run_id'],'b':b['run_id'],'controls':fingerprint})+'.json')
     atomic_json(path,report)

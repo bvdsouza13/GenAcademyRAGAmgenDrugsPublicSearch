@@ -39,9 +39,14 @@ def render(service, corpus, active):
     from ui.search_results import render as render_results
     hero('Search all medicine information', 'Find words, questions and cited passages across the searchable library.')
     if hasattr(service, 'library_status'):
-        status = service.library_status()
+        ok, status = action('Read library status', lambda:service.library_status(include_history=False))
+        if not ok:
+            st.button('Open Admin recovery', on_click=navigate, args=('Admin',))
+            return
     else:
         status = {'searchable_documents': len((active or {}).get('document_ids', [])), 'searchable_products': len((active or {}).get('product_ids', [])), 'source_documents': len(service.inventory())}
+    for warning in status.get('warnings', []):
+        st.warning(warning)
     global_ready=bool(active and status.get('is_full_library',active.get('full_library',False)))
     a, b = st.columns(2)
     a.metric('Searchable documents', status.get('searchable_documents', 0))
@@ -62,11 +67,12 @@ def render(service, corpus, active):
         ok, results = action('Search library', lambda:service.search_library(query.strip(), product_ids=product_ids or None, document_ids=document_ids or None))
         if ok:
             st.session_state['library_results'] = results
+            st.session_state['library_result_filters'] = [products[x] for x in product_ids]+[documents[x] for x in document_ids]
     elif submitted:
         st.info('Enter a word or question to search the source text.')
     results = st.session_state.get('library_results')
     if results:
-        render_results(service, results, active)
+        render_results(service, results, active,st.session_state.get('library_result_filters'))
     if corpus and corpus.products:
         with st.expander('Browse medicines'):
             products = sorted(corpus.products, key=lambda p:p.name)

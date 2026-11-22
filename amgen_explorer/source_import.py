@@ -52,34 +52,57 @@ def _registry(documents):
     return {'schema_version':1,'documents':documents,'fingerprint':digest(documents)}
 
 
+def validate_registry(data):
+    """Validate inventory identity without inferring an inventory from damaged data."""
+    try:
+        if (not isinstance(data, dict) or data.get('schema_version') != 1
+                or not isinstance(data.get('documents'), list)
+                or data.get('fingerprint') != digest(data['documents'])):
+            raise ValueError()
+        ids = []; names = []; hashes = []
+        for document in data['documents']:
+            if not isinstance(document, dict): raise ValueError()
+            for field in ('document_id', 'product_id', 'product_name', 'filename', 'sha256'):
+                if not isinstance(document.get(field), str) or not document[field]: raise ValueError()
+            name = document['filename']
+            if (Path(name).name != name or '/' in name or '\\' in name
+                    or name in {'.', '..'} or not name.lower().endswith('.pdf')
+                    or not re.fullmatch(r'[a-f0-9]{64}', document['sha256'])):
+                raise ValueError()
+            if not all(re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.-]*', document[field])
+                       for field in ('document_id', 'product_id')): raise ValueError()
+            ids.append(document['document_id']); names.append(name.casefold()); hashes.append(document['sha256'])
+        if len(ids) != len(set(ids)) or len(names) != len(set(names)) or len(hashes) != len(set(hashes)):
+            raise ValueError()
+        return data
+    except (ValueError, TypeError, KeyError):
+        raise UserFacingError('The source registry failed validation. Restore its saved version before building.') from None
+
+
 def read_registry(config, corpus=None):
-    path=config.root/'data/source-registry.json'
+    path = config.root/'data/source-registry.json'
     if path.exists():
         try:
-            data=json.loads(path.read_text())
-            if data['schema_version']!=1 or data['fingerprint']!=digest(data['documents']):
-                raise UserFacingError()
-            ids=[d['document_id'] for d in data['documents']]
-            names=[d['filename'].casefold() for d in data['documents']]
-            if len(ids)!=len(set(ids)) or len(names)!=len(set(names)):
-                raise UserFacingError()
-            for d in data['documents']:
-                if Path(d['filename']).name!=d['filename'] or not re.fullmatch(r'[a-f0-9]{64}',d['sha256']):
-                    raise UserFacingError()
-            return data
-        except (OSError,ValueError,KeyError,TypeError):
+            return validate_registry(json.loads(path.read_text()))
+        except (OSError, ValueError, TypeError):
             raise UserFacingError('The source registry failed validation. Restore its saved version before building.') from None
-    names={p.id:p.name for p in corpus.products} if corpus else {}
-    return _registry([{'document_id':d.id,'product_id':d.product_id,'product_name':names[d.product_id],
-                      'filename':Path(d.filename).name,'sha256':d.sha256} for d in corpus.documents] if corpus else [])
+    names = {p.id:p.name for p in corpus.products} if corpus else {}
+    return validate_registry(_registry([{'document_id':d.id,'product_id':d.product_id,'product_name':names[d.product_id],
+                      'filename':Path(d.filename).name,'sha256':d.sha256} for d in corpus.documents] if corpus else []))
 
 
 def save_registry(config, registry):
     data=(json.dumps(registry,ensure_ascii=False,indent=2)+'\n').encode()
     snapshot=config.root/'data/source-registries'/(registry['fingerprint']+'.json')
-    if snapshot.exists() and snapshot.read_bytes()!=data:
-        raise UserFacingError('A source registry snapshot failed integrity validation.')
-    if not snapshot.exists(): atomic_bytes(snapshot,data)
+    if snapshot.exists():
+        saved = snapshot.read_bytes()
+        try:
+            if validate_registry(json.loads(saved)) != registry: raise ValueError()
+        except (ValueError, TypeError):
+            raise UserFacingError('A source registry snapshot failed integrity validation.') from None
+        data = saved  # Preserve the original immutable snapshot serialization.
+    else:
+        atomic_bytes(snapshot,data)
     atomic_bytes(config.root/'data/source-registry.json',data)
 
 
@@ -132,9 +155,18 @@ def import_documents(config, files, corpus=None):
             if sha in by_hash:
                 registered=by_hash[sha]['filename']
                 target=directory/registered
-                if not target.exists() and registered not in writes:
+                if not target.resolve().is_relative_to(directory.resolve()):
+                    raise UserFacingError('A source PDF points outside the configured Documents folder.')
+                existing = writes.get(registered)
+                if existing is None and target.exists(): existing = target.read_bytes()
+                if existing is None:
                     writes[registered]=upload.payload
                     imported.append(registered)
+                elif hashlib.sha256(existing).hexdigest() != sha:
+                    if not upload.replace_existing:
+                        raise UserFacingError('Replace matching filenames must be selected to restore a changed source PDF.')
+                    writes[registered]=upload.payload
+                    replaced.append(registered)
                 else:
                     duplicates.append(upload.filename)
                 continue
@@ -164,6 +196,10 @@ def import_documents(config, files, corpus=None):
                 entry={'document_id':doc_id,'product_id':product_id,'product_name':brand,'filename':name,'sha256':sha}
                 entries.append(entry);by_name[name.casefold()]=entry;imported.append(name)
             by_hash[sha]=entry;writes[name]=upload.payload
+        # Reject traversal through registered destinations before reading rollback
+        # bytes or replacing any path, including explicit source repairs.
+        if any(not (directory/name).resolve().is_relative_to(directory.resolve()) for name in writes):
+            raise UserFacingError('A source PDF points outside the configured Documents folder.')
         # Retain originals for rollback of local I/O failure (including registry write).
         originals={name:(directory/name).read_bytes() if (directory/name).exists() else None for name in writes}
         previous=(config.root/'data/source-registry.json').read_bytes() if (config.root/'data/source-registry.json').exists() else None

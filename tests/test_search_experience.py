@@ -17,7 +17,8 @@ class LibraryService(FakeService):
         self.versions={'first':dict(self.active_value)}
         self.pdf_calls=[]
         self.fail_test=False
-    def library_status(self):
+    def library_status(self, *, include_history=True):
+        self.last_status_included_history=include_history
         return {'active':self.active_value,'source_documents':3,'source_products':2,'searchable_documents':3 if self.active_value else 0,'searchable_products':2 if self.active_value else 0,'record_count':3 if self.active_value else 0,'is_full_library':bool(self.active_value),'versions':list(self.versions.values())}
     def library_version(self,run_id): return self.versions[run_id]
     def library_corpus(self,run_id): return self.data
@@ -134,7 +135,7 @@ def test_active_search_survives_unreadable_working_xml(library_app):
 def test_legacy_pilot_does_not_advertise_ready_global_search(library_app):
     at,s=library_app
     s.active_value={**s.active_value,'is_full_library':False}
-    s.library_status=lambda:{'active':s.active_value,'is_full_library':False,'source_documents':3,'searchable_documents':1,'searchable_products':1,'record_count':2}
+    s.library_status=lambda **kwargs:{'active':s.active_value,'is_full_library':False,'source_documents':3,'searchable_documents':1,'searchable_products':1,'record_count':2}
     at.run()
     assert next(b for b in at.button if b.label=='Search').disabled
     assert any('full library' in m.value.lower() for m in at.info)
@@ -154,3 +155,28 @@ def test_each_passage_in_group_can_open_its_own_page(library_app):
     assert not at.exception
     assert any(b.label=='View original page 3' for b in at.button)
     assert ('act','xml-sha') in s.pdf_calls
+
+
+def test_typo_suggestion_requires_an_explicit_new_search(library_app):
+    from amgen_explorer.search import SearchResults
+    at,s=library_app
+    def suggest(query,**kwargs):
+        s.calls.append(('search_typo',query))
+        return SearchResults(query,'first','ns','xml-sha',outcome='clarification',suggestions=['ACTIMMUNE'])
+    s.search_library=suggest
+    at.run();at.text_input(key='library_query').set_value('ACTIMUNE');click(at,'Search')
+    assert any('Choose a suggested medicine' in m.value for m in at.info)
+    click(at,'Use ACTIMMUNE')
+    assert at.text_input(key='library_query').value=='ACTIMMUNE'
+    assert s.calls==[('search_typo','ACTIMUNE')]
+    click(at,'Search')
+    assert s.calls[-1]==('search_typo','ACTIMMUNE')
+
+
+def test_learner_render_requests_active_status_without_retained_history(library_app):
+    at,s=library_app;at.run()
+    assert not at.exception
+    assert s.last_status_included_history is False
+    at.sidebar.radio(key='nav').set_value('Admin').run()
+    assert not at.exception
+    assert s.last_status_included_history is True

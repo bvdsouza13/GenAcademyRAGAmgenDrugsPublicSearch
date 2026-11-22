@@ -34,11 +34,16 @@ _SCHEMA = {
                "max_output_tokens": int, "request_timeout_seconds": int,
                "store_responses": bool},
 }
+_OPTIONAL_SCHEMA = {
+    'reliability': {key: int for key in ('response_deadline_seconds', 'max_attempts',
+        'retry_budget_seconds', 'backoff_base_seconds', 'backoff_cap_seconds')},
+    'search': {'result_limit': int, 'semantic_candidates': int},
+}
 
 
 def _structure_errors(settings: dict[str, Any]) -> list[str]:
     errors = []
-    if set(settings) - set(_SCHEMA):
+    if set(settings) - set(_SCHEMA) - set(_OPTIONAL_SCHEMA):
         errors.append("Unknown configuration table; remove unsupported settings.")
     for table, fields in _SCHEMA.items():
         values = settings.get(table)
@@ -52,6 +57,18 @@ def _structure_errors(settings: dict[str, Any]) -> list[str]:
                 errors.append(f"Missing setting: {table}.{name}.")
             elif type(values[name]) is not expected_type:
                 errors.append(f"{table}.{name} must be {expected_type.__name__}.")
+    for table, fields in _OPTIONAL_SCHEMA.items():
+        if table not in settings:
+            continue
+        values = settings[table]
+        if not isinstance(values, dict):
+            errors.append(f'[{table}] must contain a TOML table.')
+            continue
+        if set(values) - set(fields):
+            errors.append(f'[{table}] contains unsupported fields.')
+        for key, value in values.items():
+            if key in fields and type(value) is not fields[key]:
+                errors.append(f'{table}.{key} must be {fields[key].__name__}.')
     return errors
 
 
@@ -101,6 +118,18 @@ class AppConfig:
         errors = _structure_errors(self.settings)
         if errors:
             return errors
+        from .reliability import settings_for
+        reliability = settings_for(self.settings)
+        for key in ('response_deadline_seconds', 'retry_budget_seconds'):
+            if not 1 <= reliability[key] <= 300:
+                errors.append(f'reliability.{key} must be between 1 and 300.')
+        if not 1 <= reliability['max_attempts'] <= 6:
+            errors.append('reliability.max_attempts must be between 1 and 6.')
+        if not 1 <= reliability['backoff_base_seconds'] <= reliability['backoff_cap_seconds'] <= 60:
+            errors.append('reliability backoff must satisfy 1 <= base <= cap <= 60 seconds.')
+        for key, value in self.settings.get('search', {}).items():
+            if not 1 <= value <= 100:
+                errors.append(f'search.{key} must be between 1 and 100.')
         app, pc = self.settings["app"], self.settings["pinecone"]
         chunk, retrieval, ai = (self.settings[k] for k in ("chunking", "retrieval", "openai"))
         if app["mode"] != "local" or app["auth_enabled"]:

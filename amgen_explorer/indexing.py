@@ -116,7 +116,7 @@ def validate_manifest_records(manifest, records, config):
 
 def _validate_bulk_inventory(value, records):
     coverage = value.get('coverage',{})
-    if (value.get('schema_version') != SCHEMA_VERSION
+    if (not isinstance(coverage,dict) or value.get('schema_version') != SCHEMA_VERSION
             or not re.fullmatch('[a-f0-9]{64}',value.get('eligibility_fingerprint',''))
             or coverage.get('complete') is not True or coverage.get('missing_intervals') != []
             or not coverage.get('expected_characters')
@@ -128,6 +128,8 @@ def _validate_bulk_inventory(value, records):
 
 
 def manifest_records(manifest, config):
+    if not isinstance(manifest, dict):
+        raise ValueError('Invalid run manifest.')
     run_id = manifest.get("run_id", "")
     if not isinstance(run_id, str) or not re.fullmatch(r"[a-f0-9]{64}", run_id):
         raise ValueError("Invalid run identifier in records manifest.")
@@ -154,7 +156,7 @@ class IndexService:
         return index_profile(self.config)
 
     def _run_path(self, run_id):
-        if not re.fullmatch(r"[a-f0-9]{64}", run_id):
+        if not isinstance(run_id, str) or not re.fullmatch(r"[a-f0-9]{64}", run_id):
             raise ValueError("Invalid run identifier.")
         return self.config.path("manifest_dir") / (run_id + ".json")
 
@@ -247,33 +249,94 @@ class IndexService:
                 db.close()
                 fcntl.flock(lock, fcntl.LOCK_UN)
 
-    def _verify(self, manifest, records):
-        ns = manifest["namespace"]
-        field = self.config.settings["pinecone"]["text_field"]
+    def _observe(self, manifest, records):
+        """Fetch only expected IDs; a successful observation is distinct from outage."""
+        ns = manifest['namespace']
+        matched = []; missing = []; mismatched = []
+        for start in range(0, len(records), 96):
+            expected = records[start:start + 96]
+            actual = self.client.fetch(ns, [r['_id'] for r in expected])
+            if not isinstance(actual, dict):
+                raise ValueError('Provider returned an invalid fetch result.')
+            for record in expected:
+                received = actual.get(record['_id'])
+                if received is None:
+                    missing.append(record)
+                elif not isinstance(received, dict):
+                    raise ValueError('Provider returned an invalid record.')
+                elif any(received.get(k) != v for k, v in record.items()):
+                    mismatched.append(record)
+                else:
+                    matched.append(record)
+        visibility = {}
+        field = self.config.settings['pinecone']['text_field']
+        for document_id in manifest['document_ids']:
+            record = next(r for r in records if r['document_id'] == document_id)
+            filters = {'$and': [{'document_id': {'$eq': document_id}},
+                               {'product_id': {'$eq': record['product_id']}},
+                               {'xml_hash': {'$eq': manifest['xml_hash']}}]}
+            hits = self.client.search(ns, record[field][:200], filters, 5)
+            if not isinstance(hits, list) or not all(isinstance(h, dict) for h in hits):
+                raise ValueError('Provider returned an invalid search result.')
+            expected_ids = {r['_id'] for r in records if r['document_id'] == document_id}
+            visibility[document_id] = any(h.get('_id') in expected_ids for h in hits)
+        return {'expected_count': len(records), 'matched_count': len(matched),
+                'missing_count': len(missing), 'mismatched_count': len(mismatched),
+                'document_visibility': visibility, 'missing': missing, 'mismatched': mismatched}
+
+    def _verify(self, manifest, records, *, require_verified=True):
         for attempt in range(self.verification_attempts):
-            complete = True
-            for start in range(0, len(records), 96):
-                expected = records[start:start + 96]
-                actual = self.client.fetch(ns, [r["_id"] for r in expected])
-                for record in expected:
-                    received = actual.get(record["_id"], {})
-                    if any(received.get(k) != v for k, v in record.items()):
-                        complete = False
-            if complete:
-                # Check search visibility independently for every document scope.
-                for document_id in manifest["document_ids"]:
-                    record = next(r for r in records if r["document_id"] == document_id)
-                    filters = {"$and": [{"document_id": {"$eq": document_id}}, {"product_id": {"$eq": record["product_id"]}}, {"xml_hash": {"$eq": manifest["xml_hash"]}}]}
-                    hits = self.client.search(ns, record[field][:200], filters, 5)
-                    expected_ids = {r["_id"] for r in records if r["document_id"] == document_id}
-                    if not any(h.get("_id") in expected_ids for h in hits):
-                        complete = False
-                        break
-            if complete:
-                return
+            observation = self._observe(manifest, records)
+            if (not observation['missing_count'] and not observation['mismatched_count']
+                    and all(observation['document_visibility'].values())):
+                return observation
             if attempt + 1 < self.verification_attempts:
                 self.sleep(min(2 ** attempt, 8))
+        if not require_verified:
+            return observation
         raise ValueError("Staged records are not fully fetchable and searchable yet. Retry Load; the active corpus was preserved.")
+
+    def _upload_batch(self, manifest, batch, db, *, on_usage=None):
+        """Persist acknowledgements, but never treat them as current remote truth."""
+        batch_id = digest(batch)
+        db.execute('INSERT OR IGNORE INTO batches(run,batch) VALUES (?,?)', (manifest['run_id'], batch_id))
+        db.execute('UPDATE batches SET done=0 WHERE run=? AND batch=?', (manifest['run_id'], batch_id))
+        db.commit()
+        def upload():
+            db.execute('UPDATE batches SET attempts=attempts+1 WHERE run=? AND batch=?', (manifest['run_id'], batch_id))
+            db.commit()
+            if on_usage:
+                on_usage(manifest, True)
+            try:
+                response = self.client.upsert(manifest['namespace'], batch)
+                usage = response.get('usage')
+                tokens = usage.get('embed_total_tokens') if isinstance(usage, dict) else None
+                if type(tokens) in (int, float) and math.isfinite(tokens) and tokens >= 0:
+                    manifest.setdefault('usage', {'embed_total_tokens': 0})['embed_total_tokens'] += tokens
+                else:
+                    manifest['usage_may_include_unreported_retries'] = True
+                if response.get('upserted_count') != len(batch):
+                    raise ValueError('Provider did not confirm the complete batch.')
+            except BaseException:
+                # Record uncertainty even when the process is interrupted; re-raise.
+                manifest['usage_may_include_unreported_retries'] = True
+                raise
+            finally:
+                if on_usage:
+                    on_usage(manifest, False)
+        from .reliability import retry_call
+        retry_call(upload, settings=self.config.settings.get('reliability'), sleep=self.sleep)
+        db.execute('UPDATE batches SET done=1 WHERE run=? AND batch=?', (manifest['run_id'], batch_id))
+        db.commit()
+
+    def _repair(self, manifest, records, db, on_progress=None, *, require_verified=True, on_usage=None):
+        observation = self._observe(manifest, records)
+        pending_ids = {r['_id'] for r in observation['missing'] + observation['mismatched']}
+        for batch in self._batches([r for r in records if r['_id'] in pending_ids]):
+            self._upload_batch(manifest, batch, db, on_usage=on_usage)
+            if on_progress:
+                on_progress({'run_id': manifest['run_id'], 'status': 'repairing', 'repaired_count': len(batch)})
+        return self._verify(manifest, records, require_verified=require_verified)
 
     def ingest(self, plan, on_progress=None):
         manifest = self.preview(plan)
@@ -282,13 +345,25 @@ class IndexService:
         records = self._records(plan)
         report = on_progress or (lambda value: None)
         with self._lock() as db:
-            self.client.check()  # schema/model/host validation always precedes writes
             old = read_json(self._run_path(manifest["run_id"]))
             if old is not None and (not isinstance(old, dict) or old.get("run_id") != manifest["run_id"]):
                 raise ValueError("Saved run manifest does not match its requested identity.")
             if old and old.get("status") == "verified":
-                manifest_records(old, self.config)
+                saved_records = manifest_records(old, self.config)
+                if old.get('full_library'):
+                    from .library_health import validate_local_run
+                    validate_local_run(self.config, old)
+                self.client.check()  # schema/model/host validation precedes writes
+                from .repair_accounting import repair_accounting
+                with repair_accounting(self.config, old) as (working, usage, checkpoint):
+                    observation = self._repair(working, saved_records, db, on_progress=report, on_usage=checkpoint)
+                # Verification and repair accounting do not rewrite immutable identity.
+                from .library_health import save_report, observation_report
+                health = observation_report(old, observation)
+                health['repair_usage'] = usage
+                save_report(self.config, health)
                 return old
+            self.client.check()  # schema/model/host validation precedes writes
             manifest.update(status="indexing", created_at=(old or {}).get("created_at", time.time()), succeeded=0, failed_ids=[],
                             usage=(old or {}).get("usage", {"embed_total_tokens": 0}),
                             usage_may_include_unreported_retries=(old or {}).get("usage_may_include_unreported_retries", False))
@@ -300,25 +375,13 @@ class IndexService:
                 for batch in self._batches(records):
                     batch_id = digest(batch)
                     state = db.execute("SELECT done FROM batches WHERE run=? AND batch=?", (manifest["run_id"], batch_id)).fetchone()
-                    if not state or not state[0]:
-                        db.execute("INSERT OR IGNORE INTO batches(run,batch) VALUES (?,?)", (manifest["run_id"], batch_id))
-                        db.commit()
-                        for attempt in range(4):
-                            db.execute("UPDATE batches SET attempts=attempts+1 WHERE run=? AND batch=?", (manifest["run_id"], batch_id))
-                            db.commit()
-                            try:
-                                response = self.client.upsert(manifest["namespace"], batch)
-                                if response.get("upserted_count") != len(batch):
-                                    raise ValueError("Provider did not confirm the complete batch.")
-                                manifest["usage"]["embed_total_tokens"] += response.get("usage", {}).get("embed_total_tokens", 0)
-                                break
-                            except ProviderError as exc:
-                                manifest["usage_may_include_unreported_retries"] = True
-                                if not exc.retryable or attempt == 3:
-                                    raise
-                                self.sleep(min(.25 * 2 ** attempt, 2))
-                        db.execute("UPDATE batches SET done=1 WHERE run=? AND batch=?", (manifest["run_id"], batch_id))
-                        db.commit()
+                    if state and state[0]:
+                        actual = self.client.fetch(manifest['namespace'], [r['_id'] for r in batch])
+                        pending = [r for r in batch if any(actual.get(r['_id'], {}).get(k) != v for k, v in r.items())]
+                    else:
+                        pending = batch
+                    if pending:
+                        self._upload_batch(manifest, pending, db)
                     manifest["succeeded"] += len(batch)
                     atomic_json(self._run_path(manifest["run_id"]), manifest)
                     report(dict(manifest))
@@ -338,14 +401,34 @@ class IndexService:
             return manifest
 
     def active(self):
-        return read_json(self.config.path("active_corpus_manifest"))
+        path = self.config.path('active_corpus_manifest')
+        active = read_json(path)
+        if active is None and not path.exists():
+            return None
+        if (not isinstance(active, dict) or active.get('status') != 'verified'
+                or not isinstance(active.get('run_id'), str)
+                or not re.fullmatch(r'[a-f0-9]{64}', active['run_id'])):
+            raise ValueError('The active library pointer failed validation. Restore a validated retained version.')
+        manifest_records(active, self.config)
+        if active.get('full_library'):
+            from .library_health import validate_local_run
+            validate_local_run(self.config, active)
+        return active
 
     def runs(self):
-        folder = self.config.path("manifest_dir")
-        if not folder.exists():
-            return []
-        return sorted([read_json(p) for p in folder.glob("*.json") if re.fullmatch(r"[a-f0-9]{64}\.json", p.name)],
-                      key=lambda r: r.get("created_at", 0), reverse=True)
+        folder = self.config.path('manifest_dir')
+        result = []
+        if folder.exists():
+            for path in folder.glob('*.json'):
+                if not re.fullmatch(r'[a-f0-9]{64}\.json', path.name): continue
+                try:
+                    run = read_json(path)
+                    if not isinstance(run, dict) or run.get('run_id') != path.stem: continue
+                    if not isinstance(run.get('created_at', 0), (int, float)): continue
+                    result.append(run)
+                except (OSError, ValueError, TypeError):
+                    continue
+        return sorted(result, key=lambda r: r.get('created_at', 0), reverse=True)
 
     def activate(self, run_id, current_plan=None):
         if current_plan is None:
@@ -354,7 +437,7 @@ class IndexService:
             raise ValueError("Sources, review, chunk settings or index profile changed. Preview and load again.")
         return self._publish(run_id)
 
-    def _publish(self, run_id):
+    def _publish(self, run_id, *, allow_damaged_active=False):
         with self._lock():
             manifest = read_json(self._run_path(run_id))
             if manifest is not None and (not isinstance(manifest, dict) or manifest.get("run_id") != run_id):
@@ -365,6 +448,9 @@ class IndexService:
             if policy_for(manifest) == BULK_POLICY:
                 if not manifest.get('search_artifact'):
                     raise ValueError('Bulk publication requires a matching local search artifact.')
+                if manifest.get('full_library'):
+                    from .library_health import validate_local_run
+                    validate_local_run(self.config, manifest)
                 from .search import validate_search_artifact
                 from .xml_store import load_corpus
                 xml_hash = manifest.get('xml_hash', '')
@@ -383,8 +469,14 @@ class IndexService:
                 validate_search_artifact(manifest, records, self.config, corpus)
             self.client.check()
             self._verify(manifest, records)
-            previous = self.active()
-            active = {**manifest, "published_at": time.time(), "previous_run_id": (previous or {}).get("run_id")}
+            try:
+                previous = self.active()
+            except (OSError, ValueError, TypeError):
+                if not allow_damaged_active: raise
+                previous = None
+            same = previous and previous.get('run_id') == run_id
+            active = {**manifest, 'published_at': previous.get('published_at', time.time()) if same else time.time(),
+                      'previous_run_id': previous.get('previous_run_id') if same else (previous or {}).get('run_id')}
             atomic_json(self.config.path("active_corpus_manifest"), active)
             return active
 

@@ -131,3 +131,32 @@ def test_reexplain_rejects_altered_bulk_evidence(library_service,monkeypatch,fie
     if field=='extraction_limitations':evidence.passages[0]['metadata'][field]='["forged"]'
     with pytest.raises(ValueError,match='immutable'):
         service.reexplain('Storage temperature',previous,'Technical detail','product-alpha','doc-alpha-label')
+
+
+def test_parser_upgrade_requires_explicit_build_and_preserves_old_pins(library_service,monkeypatch):
+    from amgen_explorer import extraction
+    service,fake=library_service
+    first=service.build_library(service.chunk_config())
+    original=service.config.path('xml_output').read_bytes()
+    monkeypatch.setattr(extraction,'PARSER_VERSION','test-next-parser')
+    service.preview_library(service.chunk_config())
+    assert service.config.path('xml_output').read_bytes()==original
+    candidate=service.build_library(service.chunk_config(),activate=False)
+    assert candidate['run_id']!=first['run_id']
+    assert service.active()['run_id']==first['run_id']
+    assert (service.config.path('corpus_dir')/first['xml_hash']/'AmgenProducts.xml').read_bytes()==original
+    assert candidate['page_coverage']['total_pages']==2
+
+
+def test_layout_policy_upgrade_requires_explicit_candidate(library_service,monkeypatch):
+    from amgen_explorer import extraction
+    service,_=library_service
+    first=service.build_library(service.chunk_config())
+    original=service.config.path('xml_output').read_bytes()
+    monkeypatch.setattr(extraction,'LAYOUT_POLICY_VERSION','test-next-layout')
+    service.preview_library(service.chunk_config())
+    assert service.config.path('xml_output').read_bytes()==original
+    candidate=service.build_library(service.chunk_config(),activate=False)
+    assert candidate['run_id']!=first['run_id']
+    assert service.active()['run_id']==first['run_id']
+    assert (service.config.path('corpus_dir')/first['xml_hash']/'AmgenProducts.xml').read_bytes()==original

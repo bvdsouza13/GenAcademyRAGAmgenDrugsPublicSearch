@@ -132,14 +132,15 @@ def test_bulk_retrieval_pins_policy_and_continuation_context_does_not_silently_d
     # Bound evidence so the full parent cannot fit; this must constrain teaching.
     config.settings['retrieval']['evidence_token_budget'] = 700
     bundle = retrieve('Explain source text', 'one', run, config, 'doc-one', client=fake)
-    assert bundle.passages and bundle.eligibility_policy == BULK
+    assert not bundle.passages and bundle.eligibility_policy == BULK
     assert bundle.eligibility_fingerprint == plan.eligibility_fingerprint
     assert bundle.run_id == run['run_id']
     assert any('continuation context' in warning.lower() for warning in bundle.warnings)
     class NoProvider:
         def generate(self,*args,**kwargs): raise AssertionError('Incomplete parent must not be explained')
     response = teach('Explain source text', bundle, config, client=NoProvider())
-    assert response.abstained and response.usage['source_fallback']
+    assert response.abstained and not response.citations
+    assert 'continuation context' in response.answer
     # With adequate budget all exact intervals, including repeated text at
     # different offsets, must survive deduplication.
     config.settings['retrieval']['evidence_token_budget'] = 25000
@@ -250,6 +251,8 @@ def test_direct_bulk_evidence_cannot_explain_incomplete_continuation_without_war
     run=index.ingest(plan)
     config.settings['retrieval']['evidence_token_budget']=700
     bundle=retrieve('Explain source text','one',run,config,'doc-one',client=fake)
+    bundle.passages=[{'id':plan.chunks[0].id,'text':plan.chunks[0].metadata['source_text'],
+                      'metadata':plan.chunks[0].metadata,'namespace':run['namespace']}]
     bundle.warnings=[]  # Direct callers must not bypass context checks by omitting warnings.
     class NoProvider:
         def generate(self,*args,**kwargs):raise AssertionError('Incomplete context reached generation')

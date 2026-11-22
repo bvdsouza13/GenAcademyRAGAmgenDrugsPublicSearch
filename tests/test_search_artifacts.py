@@ -92,3 +92,17 @@ def test_rebuild_cannot_refresh_checksum_of_previously_pinned_artifact(config, l
         db.execute('PRAGMA user_version=7')
     with pytest.raises(ValueError, match='artifact'):
         build_search_artifact(run, records, corpus, config)
+
+
+def test_runtime_ranking_upgrade_retains_v1_artifact_identity_and_never_upserts(config, library):
+    from amgen_explorer.search import RANKING_VERSION, search_library
+    run, _, corpus, fake=make_searchable(config,library)
+    descriptor=copy.deepcopy(run['search_artifact'])
+    path=config.root/descriptor['path'];payload=path.read_bytes();stamp=path.stat().st_mtime_ns
+    writes=copy.deepcopy(fake.writes)
+    fake.search=lambda *args: []
+    result=search_library('What is ACTIMMUNE?',run,config,corpus,client=fake)
+    assert descriptor['ranking_version']=='global-rrf-v1'
+    assert result.ranking_version==RANKING_VERSION!='global-rrf-v1'
+    assert path.read_bytes()==payload and path.stat().st_mtime_ns==stamp
+    assert run['search_artifact']==descriptor and fake.writes==writes

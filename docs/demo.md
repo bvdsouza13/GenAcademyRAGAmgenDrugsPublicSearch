@@ -35,3 +35,13 @@ The loader checks XML/PDF hashes, source identity, exact page text and block/arc
 ```
 
 The tests verify source integrity, reject altered/missing evidence and exercise navigation/quiz state under offline constraints. Actual release results are recorded in the [bulk-refactor release report](implementation/bulk-refactor-release-report.md), separately from this walkthrough. Historical demo descriptions based on PDF → XML → chunk alone are superseded by these five stops.
+
+## Live remediation walkthrough
+
+1. Search **What is Prolia?**, then **ACTIMUNE**. Inspect relevant passages and use the suggested spelling with a separate Search click. Search unrelated text to see no-results behavior.
+2. Open a source, ask how it works, inspect citations, and request a knowledge check. Navigate away and back; choices and grading remain stable. Source limitations may require reading the original PDF.
+3. Open Admin. Compare **Records at last build** with the timestamp from **Verify stored library**. No repair is offered for a healthy library. Fault simulations belong in tests, not the live index.
+4. Run **Check search and generated answers** to distinguish key/model access from verified generation. View page coverage and retained storage under Details.
+5. Preview chunk changes locally; **Test settings** runs the unfiltered learner suite. Reset changes draft controls only. Keep the verified baseline until a measured candidate is selected.
+
+These steps use live providers only on the labeled actions. The five-stop prepared tour above remains offline and does not claim live readiness or measured search improvements.

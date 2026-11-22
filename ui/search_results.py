@@ -4,10 +4,17 @@ import streamlit as st
 from ui.common import navigate, source_text, source_view, source_variant
 
 
-def render(service, results, active=None):
+def render(service, results, active=None, filters=None):
     run_id = results.run_id
     st.subheader('Matching source passages')
     st.caption(f'Library version: {run_id} · Results for “{results.query}”')
+    st.caption('Scope: '+(', '.join(filters) if filters else 'All medicines and source documents'))
+    if getattr(results,'outcome',None)=='clarification':
+        st.info('Choose a suggested medicine or add a medicine name to make the question clearer. The search has not silently changed your question.')
+    for suggestion in getattr(results,'suggestions',[]):
+        def use_suggestion(value=suggestion):
+            st.session_state['library_query']=value
+        st.button('Use '+suggestion,key='suggest_'+run_id+'_'+suggestion,on_click=use_suggestion)
     if active and active.get('run_id') != run_id:
         st.info('These results belong to an earlier library version. Search again to use the latest library; source actions keep this version.')
     if results.degraded:

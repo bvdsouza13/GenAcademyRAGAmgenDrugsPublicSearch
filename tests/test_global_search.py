@@ -183,3 +183,104 @@ def test_repeated_text_at_distinct_source_offsets_keeps_both_citations(config, l
     act_hits = [h for h in result.hits if h['metadata']['document_id']=='act-label']
     assert len(act_hits)==2
     assert {h['metadata']['source_spans'][0]['start'] for h in act_hits} == {0,100}
+
+
+def test_search_local_is_provider_free_with_identical_pins(config, library, monkeypatch):
+    from amgen_explorer import search
+    run, _, corpus, _ = make_searchable(config, library)
+    def forbidden(*args, **kwargs):
+        raise AssertionError('Local discovery constructed a provider')
+    monkeypatch.setattr(search, 'DocumentsClient', forbidden)
+    local=getattr(search,'search_local',None)
+    assert callable(local), 'Explicit local search must exist'
+    result=local('latex',run,config,corpus)
+    assert {h['document_id'] for h in result.hits}=={'act-label','repatha-syringe'}
+    assert result.outcome=='results' and all(h['run_id']==run['run_id'] for h in result.hits)
+
+
+def test_local_suggestions_do_not_silently_substitute_medicine(config, library):
+    from amgen_explorer import search
+    run, _, corpus, _ = make_searchable(config, library)
+    local=getattr(search,'search_local',None)
+    assert callable(local)
+    result=local('What is ACTIMUNE?',run,config,corpus)
+    assert result.hits==[] and result.outcome=='clarification'
+    assert 'ACTIMMUNE' in result.suggestions
+
+
+def test_query_interpretation_keeps_negation_units_and_token_boundaries(config, library):
+    from amgen_explorer import search
+    run, _, corpus, _ = make_searchable(config, library)
+    intent=getattr(search,'analyze_query',None)
+    assert callable(intent)
+    query=intent('Could you tell me about Repatha not 140 mg?',corpus)
+    assert query.product_candidates==['repatha']
+    assert {'not','140','mg'}<=set(query.meaningful_terms)
+    assert not intent('ACTIMMUNEX',corpus).product_candidates
+
+
+def test_multiple_named_products_remain_relevant_without_hard_scope(config, library):
+    from amgen_explorer import search
+    run, _, corpus, fake = make_searchable(config, library)
+    fake.search=lambda *args: []
+    result=search.search_library('Tell me about ACTIMMUNE and Repatha',run,config,corpus,client=fake)
+    assert {h['product_id'] for h in result.hits}=={'act','repatha'}
+
+
+def test_generic_ambiguity_returns_catalog_choices_and_preserves_both_sources(config, library):
+    from amgen_explorer.query_intent import analyze_query
+    from amgen_explorer.models import Product, Corpus
+    corpus=Corpus(Path('generic.xml'),'a'*64,[Product('prolia','Prolia','denosumab',[]),Product('xgeva','Xgeva','denosumab',[])],[],[])
+    intent=analyze_query('Can you explain denosumab?',corpus)
+    assert intent.ambiguity and set(intent.product_candidates)=={'prolia','xgeva'}
+    assert set(intent.suggestions)=={'Prolia','Xgeva'}
+
+
+def test_named_medicine_is_relevance_signal_not_a_hidden_scope(config, library):
+    from amgen_explorer.search import search_library
+    run,_,corpus,fake=make_searchable(config,library)
+    fake.search=lambda *args: []
+    result=search_library('ACTIMMUNE latex',run,config,corpus,client=fake)
+    assert result.hits[0]['product_id']=='act'
+    assert {h['product_id'] for h in result.hits}=={'act','repatha'}
+
+
+def test_no_literal_overlap_semantic_paraphrase_uses_source_features(config, library):
+    from amgen_explorer.search import search_library
+    run,records,corpus,fake=make_searchable(config,library)
+    original=[]
+    def cloud(namespace,query,*args):
+        original.append(query)
+        return [{**records[1],'_score':.000001}]
+    fake.search=cloud
+    result=search_library('keep chilled',run,config,corpus,client=fake)
+    assert original==['keep chilled']
+    assert [h['id'] for h in result.hits]==['chunk-1']
+    assert not set('keep chilled'.split()) & set(result.hits[0]['text'].casefold().split())
+
+
+def test_conversational_pronouns_cannot_anchor_an_unrelated_query(config, library):
+    from amgen_explorer.search import analyze_query
+    _,_,corpus,_=library
+    intent=analyze_query('Who won the football championship?',corpus)
+    assert intent.meaningful_terms==['won','football','championship']
+
+
+def test_named_section_question_does_not_admit_other_products_generic_headings(config, library):
+    from amgen_explorer.search import search_library
+    run,_,corpus,fake=make_searchable(config,library)
+    fake.search=lambda *args: []
+    result=search_library('Repatha storage',run,config,corpus,client=fake)
+    assert result.hits and {h['product_id'] for h in result.hits}=={'repatha'}
+
+
+@pytest.mark.parametrize('query',['ACTIMMUNE','ACTIMMUNE warnings'])
+def test_genuine_other_product_body_reference_remains_discoverable(library,query):
+    from amgen_explorer.query_intent import analyze_query
+    from amgen_explorer.search import _relevance
+    _,_,corpus,_=library
+    intent=analyze_query(query,corpus)
+    record={'product_id':'other','source_text':'Warnings about concomitant ACTIMMUNE use.','section_title':'Warnings'}
+    assert _relevance(record,intent,None,semantic=True)[0]
+    record['source_text']='Warnings about concomitant ACTIMMUNEX use.'
+    assert not _relevance(record,intent,None,semantic=True)[0]

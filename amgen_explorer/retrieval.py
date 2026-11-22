@@ -1,9 +1,12 @@
 """Scope-pinned retrieval; cloud matches must resolve to immutable local records."""
 from __future__ import annotations
-from pathlib import Path
+import json
 from .models import EvidenceBundle
 from .indexing import guard_text, manifest_records
-from .connectivity import DocumentsClient
+from .connectivity import DocumentsClient, ProviderError
+from scripts.setup_pinecone import SetupError
+from .evidence_selection import select_evidence
+from .learning_policy import learning_intent
 from .eligibility import policy_for, BULK_POLICY
 
 SAFETY_WORDS = ("warning", "safe", "safety", "contraindicat", "side effect", "risk", "overview", "teach", "learn", "introduction")
@@ -14,7 +17,7 @@ def load_records(active, config):
     return manifest_records(active, config)
 
 
-def retrieve(question, product_id, active, config, document_id=None, *, client=None):
+def retrieve(question, product_id, active, config, document_id=None, *, client=None, corpus=None):
     namespace = (active or {}).get("namespace", "")
     xml_hash = (active or {}).get("xml_hash", "")
     empty = EvidenceBundle(question, product_id, namespace, xml_hash, [],
@@ -41,9 +44,49 @@ def retrieve(question, product_id, active, config, document_id=None, *, client=N
     filters = {"$and": [{"product_id": {"$eq": product_id}}, {"xml_hash": {"$eq": xml_hash}},
                         {"document_id": {"$eq": next(iter(docs))}}]}
     client = client or DocumentsClient(config)
-    if not getattr(client, "host", True):
-        client.check()
-    hits = client.search(namespace, question, filters, config.settings["retrieval"]["top_k"])
+    try:
+        if not getattr(client, "host", True):
+            client.check()
+        hits = client.search(namespace, question, filters, config.settings["retrieval"]["top_k"])
+    except (ProviderError, SetupError, OSError):
+        # Never re-enter global/semantic search after its provider failed.
+        from .search import search_local
+        if corpus is None and (active.get('search_artifact') or empty.eligibility_policy == BULK_POLICY):
+            import hashlib
+            from .xml_store import load_corpus
+            snapshot = config.path('corpus_dir') / xml_hash / 'AmgenProducts.xml'
+            if not snapshot.is_file() or hashlib.sha256(snapshot.read_bytes()).hexdigest() != xml_hash:
+                raise ValueError('The pinned XML snapshot is unavailable or changed.')
+            corpus = load_corpus(snapshot)
+        local = search_local(question, active, config, corpus,
+                             product_ids=[product_id], document_ids=sorted(docs),
+                             limit=min(100, max(20, config.settings['retrieval']['top_k'])))
+        expected_local = {r['_id']:r for r in scoped}
+        field = config.settings['pinecone']['text_field']
+        hits = []
+        for hit in local.hits:
+            record = expected_local.get(hit.get('id')) if isinstance(hit,dict) else None
+            valid = record is not None
+            if valid:
+                metadata = hit.get('metadata', {})
+                if not isinstance(metadata,dict):
+                    empty.warnings.append('A malformed local search hit was excluded.')
+                    continue
+                valid = (hit.get('run_id') == empty.run_id and hit.get('namespace') == namespace
+                         and hit.get('xml_hash') == xml_hash
+                         and hit.get('text') == record.get('source_text',record[field])
+                         and isinstance(metadata,dict))
+                for key,value in record.items():
+                    if key in {'_id',field}: continue
+                    if key == 'source_spans':
+                        value = json.loads(value) if isinstance(value,str) else value
+                    if metadata.get(key) != value: valid = False
+            if valid:
+                hits.append(record)
+            else:
+                empty.warnings.append('A local hit failed pinned source/scope verification and was excluded.')
+        empty.warnings.append('Semantic search is unavailable. Showing verified scoped local evidence only (degraded mode).')
+        empty.warnings.extend(local.warnings)
     expected = {r["_id"]: r for r in scoped}
     candidates = []
     for hit in hits:
@@ -55,53 +98,23 @@ def retrieve(question, product_id, active, config, document_id=None, *, client=N
             empty.warnings.append("A search hit failed active source/scope verification and was excluded.")
             continue
         candidates.append(record)
-    if any(word in question.lower() for word in SAFETY_WORDS):
-        safety = [r for r in scoped if any(word in (str(r.get("section_kind", "")) + " " + str(r.get("section_title", ""))).lower() for word in SAFETY_KINDS)]
-        if not safety:
-            empty.warnings.append("Reviewed safety sections are unavailable; this evidence cannot establish the full warning profile.")
-        # Direct canonical safety lookup supplements semantic ranking.
-        candidates = safety + candidates
-    # A split parent retains adjacent context even when semantic top-k found
-    # just one continuation. Never claim the remainder was included if the
-    # evidence budget cannot contain it.
-    if empty.eligibility_policy == BULK_POLICY:
-        expanded=[]
-        emitted=set()
-        for candidate in candidates:
-            parents=set(candidate.get('continuation_parent_ids',[]))
-            adjacent=([r for r in scoped if parents & set(r.get('continuation_parent_ids',[]))]
-                      if parents else [candidate])
-            for record in sorted(adjacent,key=lambda r:r.get('continuation_index',0)):
-                if record['_id'] not in emitted:
-                    expanded.append(record); emitted.add(record['_id'])
-        candidates=expanded
-    budget = config.settings["retrieval"]["evidence_token_budget"]
-    used = 0
-    seen = set()
-    field = config.settings["pinecone"]["text_field"]
-    for record in candidates:
-        content_id = ((record['document_id'], record.get('source_spans',record['_id']))
-                      if empty.eligibility_policy == BULK_POLICY
-                      else (record["document_id"], record.get("source_text", record[field])))
-        if content_id in seen:
-            continue
-        seen.add(content_id)
-        cost = len(record[field].encode("utf-8")) + 8
-        if used + cost > budget:
-            empty.warnings.append("A complete passage was omitted to respect the evidence budget; it was not truncated.")
-            continue
-        used += cost
-        empty.passages.append({"id": record["_id"], "text": record.get("source_text", record[field]),
-                               "metadata": {k: v for k, v in record.items() if k not in {"_id", field}},
-                               "namespace": namespace, "xml_hash": xml_hash})
-    if empty.eligibility_policy == BULK_POLICY:
-        included={p['id'] for p in empty.passages}
-        for record in candidates:
-            if record['_id'] not in included and record.get('continuation_parent_ids'):
-                empty.warnings.append('The complete continuation context could not fit in the evidence budget; inspect the full source before explanation.')
-                break
-        for passage in empty.passages:
-            limitations=passage['metadata'].get('extraction_limitations',[])
-            if limitations:
-                empty.warnings.append('Source extraction/layout limitation: '+', '.join(limitations)+'. View the original PDF page.')
+    intent = learning_intent(question)
+    if intent in ('overview', 'safety') and not any(
+            any(word in (str(r.get('section_kind',''))+' '+str(r.get('section_title',''))).lower()
+                for word in SAFETY_KINDS) for r in scoped):
+        empty.warnings.append('Reviewed safety sections are unavailable; this evidence cannot establish the full warning profile.')
+    if not candidates and intent not in ('overview', 'safety'):
+        return empty
+    field = config.settings['pinecone']['text_field']
+    selection = select_evidence(question, [{**r, '_evidence_text': r[field]} for r in scoped],
+                                [r['_id'] for r in candidates],
+                                budget_bytes=config.settings['retrieval']['evidence_token_budget'], intent=intent)
+    empty.warnings.extend(selection.reasons)
+    for record in selection.records:
+        empty.passages.append({'id': record['_id'], 'text': record.get('source_text', record[field]),
+                               'metadata': {k:v for k,v in record.items() if k not in {'_id', field, '_evidence_text'}},
+                               'namespace': namespace, 'xml_hash': xml_hash, 'run_id': empty.run_id})
+        limitations = record.get('extraction_limitations', [])
+        if limitations:
+            empty.warnings.append('Source extraction/layout limitation: '+', '.join(limitations)+'. View the original PDF page.')
     return empty

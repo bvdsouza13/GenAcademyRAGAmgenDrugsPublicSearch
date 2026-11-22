@@ -36,6 +36,24 @@ Individual passage acceptance is not required for new bulk builds. `bulk_source_
 
 The supplied inventory has **37 PDFs and 36 medicine identities**. These are input counts, separate from searchable counts shown for an actual verified run. Missing registered files, corrupt PDFs, source mismatches and incomplete coverage block a complete release. Both Repatha documents remain distinct. Discovery retains text carrying table/figure limitations and links its original page; teaching cannot infer unverified row/column relationships. Blank/image-only pages are reported separately; OCR is outside this version.
 
+## Verify, repair and recover
+
+In **Admin → Library**, **Records at last build** is historical. Select **Verify stored library** to fetch and compare every expected record and check every document scope. A difference exposes **Repair missing or changed records**, which restores the original IDs and exact content from intact pinned snapshots and then rechecks. An outage is reported as unavailable; it is never treated as proof that records are missing. Verification does not enumerate extra remote records.
+
+Open **Connection and answer readiness → Check search and generated answers** to test model access, semantic search and an actual cited answer. Each result shows its check time. A valid key or model listing alone does not prove that generation works. Calls are explicit, and rerenders do not repeat them.
+
+**Details → Open library recovery** lists validated retained versions and can regenerate damaged working XML from the complete registered PDFs. Startup also keeps Recovery reachable when the active pointer fails. Original registered bytes can be restored using **Replace matching filenames** on import. Parser upgrades occur on an explicit Build as a new candidate; old pinned conversations remain intact.
+
+```bash
+.venv-corpus/bin/python scripts/manage_corpus.py verify-library
+.venv-corpus/bin/python scripts/manage_corpus.py repair-library
+.venv-corpus/bin/python scripts/manage_corpus.py readiness
+.venv-corpus/bin/python scripts/manage_corpus.py recoverable-versions
+.venv-corpus/bin/python scripts/manage_corpus.py recover-xml
+```
+
+Search recognizes conversational names, presents typo/ambiguous-name suggestions for explicit selection, and can return no matching passages. Teaching falls back to verified local evidence during a semantic outage. Complete continuation groups are kept together; missing qualifiers or unresolved layout prevent generation and scored quizzes. Follow-up buttons use vetted educational prompts, and quiz choices shuffle once then keep their grading state.
+
 ## Admin: chunk experiments
 
 Start with **Chunk size 600 / Overlap 80**. Units are conservative UTF-8 byte budgets plus a reserve, not exact model tokens; the values are starting points to test.
@@ -45,7 +63,7 @@ Start with **Chunk size 600 / Overlap 80**. Units are conservative UTF-8 byte bu
 - **Reset to defaults** changes draft controls to 600/80 only. **Restore current settings** discards draft edits. Neither action uploads, deletes data or changes live search.
 - **Revert to previous version** restores the retained verified library. Legacy pilot recovery remains separately labeled.
 
-Comparisons pin sources, inventory, policy, question suite, embedding profile, search version, retrieval settings and evidence budget. Results report expected-document recall/rank, source-span coverage, citation/scope checks, observed latency and available provider-reported usage. Incompatible runs cannot be presented as a controlled chunk comparison. These retrieval measurements do not establish clinical accuracy.
+Comparisons pin sources, inventory, policy, question suite, embedding profile, search version, retrieval settings and evidence budget. Results use the 51-case learner-search suite with unfiltered source questions and executed behavior checks. They report visible-result precision, graded relevance, judgment coverage, no-answer/suggestion correctness, expected-document recall/rank, source-span coverage, citation/scope checks, observed latency and available provider-reported usage. Incompatible runs cannot be presented as a controlled chunk comparison. These retrieval measurements do not establish clinical accuracy.
 
 ## Configure providers
 
@@ -56,7 +74,7 @@ OPENAI_API_KEY = "your-openai-key"
 PINECONE_API_KEY = "your-pinecone-key"
 ```
 
-Nonblank exported environment credentials override that file. **There is no `.env` loader.** Keep nonsecret paths, index host/name and models in [config/app.toml](config/app.toml). The configuration shape is unchanged by the bulk/search refactor.
+Nonblank exported environment credentials override that file. **There is no `.env` loader.** Keep nonsecret paths, index host/name and models in [config/app.toml](config/app.toml). Optional `[search]` and `[reliability]` tables configure search limits, deadlines and retries; existing configuration files retain compatibility defaults.
 
 ```bash
 .venv-corpus/bin/python scripts/check_config.py --require-secrets --require-chat
@@ -81,7 +99,7 @@ Offline tests use fake providers and temporary storage. `test_offline.py` additi
 .venv-corpus/bin/python scripts/manage_corpus.py preview-library --target 600 --overlap 80
 .venv-corpus/bin/python scripts/manage_corpus.py build-library --target 600 --overlap 80
 .venv-corpus/bin/python scripts/manage_corpus.py search --query "storage temperature"
-.venv-corpus/bin/python scripts/manage_corpus.py test-settings --target 900 --overlap 80 --suite global-search
+.venv-corpus/bin/python scripts/manage_corpus.py test-settings --target 900 --overlap 80 --suite learner-search
 .venv-corpus/bin/python scripts/manage_corpus.py use-configuration --run-id VERIFIED_RUN_ID
 .venv-corpus/bin/python scripts/manage_corpus.py revert-library
 .venv-corpus/bin/python scripts/manage_corpus.py status
@@ -95,7 +113,7 @@ Retain `Documents/`, `XML/` and `data/` together. `data/source-registry.json` is
 
 The earlier six-chunk/four-mechanism-passage pilot and its live smoke results are historical. They do not describe the searchable coverage of a new bulk run. Source-fidelity review is separate from clinical review, and supplied documents are not asserted to be the latest labels. This custom XML is not FDA SPL.
 
-The [bulk-refactor release report](docs/implementation/bulk-refactor-release-report.md) records the current verified coverage, regression results, live searches, chunk comparison and operating limits. Earlier [release QA](docs/implementation/release-qa-report.md), [regression assessment](docs/implementation/additional-regression-assessment.md) and [pilot evidence](evals/pilot-report.md) describe their original scope and are superseded for current workflow/status claims. Their recorded measurements must not be read as a new full-library cloud evaluation.
+The [reliability remediation report](docs/implementation/reliability-remediation-release.md) records the latest changes and checks. The historical [bulk-refactor release report](docs/implementation/bulk-refactor-release-report.md) records its verified coverage, regression results, live searches, chunk comparison and operating limits. Earlier [release QA](docs/implementation/release-qa-report.md), [regression assessment](docs/implementation/additional-regression-assessment.md) and [pilot evidence](evals/pilot-report.md) describe their original scope and are superseded for current workflow/status claims. Their recorded measurements must not be read as a new full-library cloud evaluation.
 
 - [Architecture and editable diagrams](docs/architecture.md)
 - [Current product design](docs/amgen-medicine-explorer-design.md), [approved bulk/search design](docs/superpowers/specs/2026-11-11-bulk-library-global-search-design.md), [refactor implementation plan](docs/superpowers/plans/2026-11-11-bulk-library-global-search-refactor.md)

@@ -81,7 +81,7 @@ class Diagram:
     def footer(self, y, lines):
         self.rect(60, y, 1560, 93, AMBER, "#E7C990", 12)
         self.lines(82, y + 34, lines, 19, INK, 29)
-        self.text(60, self.height - 26, "LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint", 15, MUTED)
+        self.text(60, self.height - 26, "LOCAL IMPLEMENTATION  •  22 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint", 15, MUTED)
 
     def save(self):
         svg = "\n".join(self.parts + ["</svg>"])
@@ -98,7 +98,7 @@ def architecture():
     d = Diagram("01-solution-architecture", "01", "Whole-library solution architecture", "One registered library, global content discovery and version-pinned source teaching")
     d.rect(60, 185, 1560, 142, NAVY, NAVY)
     d.text(85, 222, "LOCAL STREAMLIT EXPERIENCE", 18, WHITE, 700)
-    for x, title, detail in [(85, "Search & Learn", "Body text, names, source excerpts"), (600, "Admin: Library", "Build / update entire collection"), (1115, "Chunk experiments", "Test, Use, Default, Restore, Revert")]:
+    for x, title, detail in [(85, "Search & Learn", "Body text, names, source excerpts"), (600, "Admin: Library", "Build, verify, repair and recover"), (1115, "Chunk experiments", "Test, Use, Default, Restore, Revert")]:
         d.text(x, 264, title, 24, WHITE, 700)
         d.text(x, 298, detail, 18, "#C7E7FF")
     d.rect(60, 395, 1130, 490, ICE, LINE)
@@ -107,15 +107,15 @@ def architecture():
     d.text(375, 352, "Explicit submissions; rerenders do not call providers", 18, MUTED)
     d.card(85, 458, 340, 221, "Complete source preparation", [
         "Authoritative source registry", "PDF identity + exact XML spans", "Versioned automatic eligibility",
-        "All readable page intervals", "Source-scoped chunks: 600 / 80",
+        "Native page coverage + layout flags", "Source-scoped chunks: 600 / 80",
     ], body=17.5)
     d.card(455, 458, 340, 221, "Build, search and activation", [
         "New namespace + checkpoints", "Matching SQLite lexical artifact", "FTS5 / deterministic fallback",
-        "Verify both; activate together", "Retain previous full library",
+        "Verify / exact repair; activate together", "Retain previous full library",
     ], body=17.5)
     d.card(825, 458, 340, 221, "Discovery and teaching", [
-        "Global lexical + semantic fusion", "Group medicine / document hits", "Ask one selected source",
-        "Pin run through chat and quiz", "Check support; cite snapshot PDF",
+        "Query intent + relevance ranking", "Group medicine / document hits", "Ask one selected source",
+        "Pin run through chat and quiz", "Shared evidence gate + safe fallback",
     ], body=17.5)
     d.arrow([(425, 568), (455, 568)])
     d.arrow([(795, 568), (825, 568)])
@@ -165,7 +165,7 @@ def data_flow():
         ("10  Ready", ["Actual searchable counts", "One full library version", "Previous version retained"], WHITE, BLUE),
         ("9  Atomic activation", ["Select semantic + lexical", "One active manifest", "Failure keeps old library"], WHITE, BLUE),
         ("8  Check search", ["Exact records + every doc", "Full inventory + coverage", "Local artifact validation"], AMBER, AMBER_LINE),
-        ("7  Local lexical", ["SQLite FTS5 if available", "Deterministic fallback", "Run + ranking identity"], WHITE, LINE),
+        ("7  Local lexical", ["SQLite FTS5 if available", "Deterministic fallback", "Pinned format; runtime ranking"], WHITE, LINE),
         ("6  Upload chunks", ["New Pinecone namespace", "Resumable batch writes", "Text + flat metadata"], "#DCEEFE", BLUE),
     ]
     for x, (title, lines, fill, stroke) in zip(cols, lower):
@@ -179,9 +179,9 @@ def data_flow():
     query = [
         ("Submit content query", ["Body / heading / brand", "Generic names included", "Medicine choice optional"], WHITE, LINE),
         ("Pin verified run", ["Check immutable records", "Check lexical artifact", "Use pinned XML catalog"], WHITE, LINE),
-        ("Fuse verified ranks", ["Local + semantic search", "Bounded name boost", "Labeled degraded fallback"], "#DCEEFE", BLUE),
+        ("Rank relevant evidence", ["Local + semantic search", "Names / typos / no-results gate", "Labeled degraded fallback"], "#DCEEFE", BLUE),
         ("Grouped sources", ["Deduplicate overlap", "Keep source variants apart", "View / Ask about source"], WHITE, LINE),
-        ("Scoped teaching", ["Pinned product + doc + run", "Checked OpenAI explanation", "Snapshot PDF citations"], "#DCEEFE", BLUE),
+        ("Scoped teaching", ["Pinned product + doc + run", "60s budget; checked explanation", "Snapshot PDF citations"], "#DCEEFE", BLUE),
     ]
     for x, (title, lines, fill, stroke) in zip(cols, query):
         d.card(x, 804, width, 158, title, lines, fill, stroke, 20, 17, 27)
@@ -193,7 +193,7 @@ def data_flow():
     controls = [
         ("Draft 600 / 80", ["Conservative byte budgets", "Preview runs locally", "Not exact model tokens"]),
         ("Test settings", ["Explicit full-library build", "Isolated candidate", "Same sources and policy"]),
-        ("Equal evaluation", ["Same suite / search profile", "Equal evidence budget", "Recall / spans / latency"]),
+        ("Equal evaluation", ["Same suite / search profile", "Equal evidence budget", "Precision / behavior / latency"]),
         ("Use configuration", ["Verified candidate only", "Atomic pointer change", "All medicines remain"]),
         ("Reset / Revert", ["Defaults: draft controls only", "Restore: current controls", "Revert: prior full library"]),
     ]
@@ -228,7 +228,7 @@ def deployment():
         "Run records + SQLite lexical artifacts", "Review/job SQLite + active manifest",
     ],body=18)
     d.card(600,620,450,245,"Server-side configuration",[
-        "config/app.toml: unchanged structure", "Ignored secrets TOML / exported keys", "Nonblank environment values win",
+        "Optional search / reliability settings", "Ignored secrets TOML / exported keys", "Nonblank environment values win",
         "No .env loader; no automatic indexing", "Keep data/ for citations and rollback",
     ],body=18)
     d.arrow([(670,525),(670,560),(315,560),(315,620)],both=True)

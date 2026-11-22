@@ -13,7 +13,7 @@
 <text x="85" y="264" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#FFFFFF" font-weight="700" text-anchor="start">Search &amp; Learn</text>
 <text x="85" y="298" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#C7E7FF" font-weight="400" text-anchor="start">Body text, names, source excerpts</text>
 <text x="600" y="264" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#FFFFFF" font-weight="700" text-anchor="start">Admin: Library</text>
-<text x="600" y="298" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#C7E7FF" font-weight="400" text-anchor="start">Build / update entire collection</text>
+<text x="600" y="298" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#C7E7FF" font-weight="400" text-anchor="start">Build, verify, repair and recover</text>
 <text x="1115" y="264" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#FFFFFF" font-weight="700" text-anchor="start">Chunk experiments</text>
 <text x="1115" y="298" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#C7E7FF" font-weight="400" text-anchor="start">Test, Use, Default, Restore, Revert</text>
 <rect x="60" y="395" width="1130" height="490" rx="14" fill="#EEF6FC" stroke="#B8D2E8" stroke-width="1.5"/>
@@ -27,7 +27,7 @@
 <text x="107" y="537" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Authoritative source registry</text>
 <text x="107" y="566" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">PDF identity + exact XML spans</text>
 <text x="107" y="595" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Versioned automatic eligibility</text>
-<text x="107" y="624" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">All readable page intervals</text>
+<text x="107" y="624" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Native page coverage + layout flags</text>
 <text x="107" y="653" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Source-scoped chunks: 600 / 80</text>
 <rect x="455" y="458" width="340" height="221" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="455" y="478" width="5" height="29" rx="2" fill="#0063C3"/>
@@ -35,16 +35,16 @@
 <text x="477" y="537" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">New namespace + checkpoints</text>
 <text x="477" y="566" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Matching SQLite lexical artifact</text>
 <text x="477" y="595" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">FTS5 / deterministic fallback</text>
-<text x="477" y="624" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Verify both; activate together</text>
+<text x="477" y="624" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Verify / exact repair; activate together</text>
 <text x="477" y="653" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Retain previous full library</text>
 <rect x="825" y="458" width="340" height="221" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="825" y="478" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="847" y="500" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Discovery and teaching</text>
-<text x="847" y="537" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Global lexical + semantic fusion</text>
+<text x="847" y="537" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Query intent + relevance ranking</text>
 <text x="847" y="566" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Group medicine / document hits</text>
 <text x="847" y="595" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Ask one selected source</text>
 <text x="847" y="624" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Pin run through chat and quiz</text>
-<text x="847" y="653" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Check support; cite snapshot PDF</text>
+<text x="847" y="653" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Shared evidence gate + safe fallback</text>
 <path d="M 425 568 L 455 568" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="455,568 445.0,573.0 445.0,563.0" fill="#0063C3"/>
 <path d="M 795 568 L 825 568" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
@@ -90,5 +90,5 @@
 <rect x="60" y="956" width="1560" height="93" rx="12" fill="#FFF5DF" stroke="#E7C990" stroke-width="1.5"/>
 <text x="82" y="990" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Supplied inventory: 37 PDFs / 36 medicines. Actual searchable counts come from a verified complete run.</text>
 <text x="82" y="1019" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Source verification establishes extraction provenance, not clinical approval. Admin is a local workflow, not hosted authorization.</text>
-<text x="60" y="1094" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
+<text x="60" y="1094" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  22 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
 </svg>

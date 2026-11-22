@@ -4,13 +4,13 @@
 
 **Evidence:** [Failure assessment](../../implementation/failure-assessment-2026-11-22.md). The assessment produced 23 failing test instances across search, recovery, teaching and operational readiness, alongside 397 passing tests and 21 passing subtests.
 
-**Current correction:** The OpenAI credential issue has since been resolved. Authentication passed, and a real ACTIMMUNE explanation produced three citations and passed the application's entailment check in 9.23 seconds. Readiness detection still needs fixing; replacing the key did not fix the application defects. All 9,110 expected Pinecone records and all 37 document scopes passed the earlier live verification.
+**Pre-implementation correction:** The OpenAI credential issue has since been resolved. Authentication passed, and a real ACTIMMUNE explanation produced three citations and passed the application's entailment check in 9.23 seconds. Readiness detection still needs fixing; replacing the key did not fix the application defects. All 9,110 expected Pinecone records and all 37 document scopes passed the earlier live verification.
 
 ## Intent and recommended approach
 
 Improve the existing local Streamlit learning application so general learners get relevant discovery, useful source-backed explanations and honest availability states, while an administrator manages the entire library without reviewing medicines individually.
 
-The recommended approach is staged remediation of the current Python/Streamlit/XML/Pinecone/OpenAI stack. Existing source snapshots, exact citations and atomic publication provide a useful foundation. A replacement service architecture would add deployment and migration work without directly resolving the demonstrated defects. Configuration tuning alone cannot correct ranking, recovery or validation logic. This recommendation awaits approval; it has not been selected by the user yet.
+The recommended approach is staged remediation of the current Python/Streamlit/XML/Pinecone/OpenAI stack. Existing source snapshots, exact citations and atomic publication provide a useful foundation. A replacement service architecture would add deployment and migration work without directly resolving the demonstrated defects. Configuration tuning alone cannot correct ranking, recovery or validation logic. The user approved this approach on 2026-11-22. Implementation and release evidence are recorded in the remediation release report.
 
 Deliver independently testable work packages, with independent review of search, recovery and teaching boundaries. Keep query improvements separate from extraction migrations and storage repair.
 

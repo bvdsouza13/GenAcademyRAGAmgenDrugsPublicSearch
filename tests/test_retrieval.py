@@ -3,6 +3,7 @@ import pytest
 from amgen_explorer.retrieval import retrieve
 from amgen_explorer.indexing import IndexService
 from test_indexing import config,plan,FakeDocuments,service
+from test_global_search import library
 
 
 def test_scoped_search_is_pinned_and_provenance_verified(config,plan):
@@ -73,3 +74,38 @@ def test_manifest_integrity_rejected_before_search(config,plan,mutation):
     fake.search=lambda *args:calls.append(args)
     with pytest.raises(ValueError):retrieve('mechanism','medicine',run,config,client=fake)
     assert calls==[]
+
+
+def test_scoped_fallback_accepts_only_verified_local_result_envelopes(config, plan, monkeypatch):
+    from types import SimpleNamespace
+    from amgen_explorer.connectivity import ProviderError
+    from amgen_explorer.indexing import manifest_records
+    import amgen_explorer.search as search
+    fake = FakeDocuments(); run = service(config, fake).ingest(plan)
+    expected = manifest_records(run, config)[0]
+    hit = {'id':expected['_id'],'text':expected['chunk_text'],
+           'metadata':{k:v for k,v in expected.items() if k not in {'_id','chunk_text'}},
+           'run_id':run['run_id'],'namespace':run['namespace'],'xml_hash':run['xml_hash']}
+    def unavailable(*args): raise ProviderError('Pinecone',503)
+    fake.search = unavailable
+    monkeypatch.setattr(search,'search_local',lambda *a,**kw:SimpleNamespace(hits=[hit],warnings=[]),raising=False)
+    assert retrieve('Explain mechanism','medicine',run,config,client=fake).passages
+    hit['run_id'] = 'other-run'
+    assert not retrieve('Explain mechanism','medicine',run,config,client=fake).passages
+
+
+def test_outage_fallback_rejects_corrupted_artifact_without_second_provider_call(config, library):
+    from amgen_explorer.connectivity import ProviderError
+    from test_global_search import make_searchable
+    run, _, corpus, fake = make_searchable(config, library)
+    path = config.root / run['search_artifact']['path']
+    path.write_bytes(b'corrupted local artifact')
+    calls = []
+    def unavailable(*args):
+        calls.append(args)
+        raise ProviderError('Pinecone',503)
+    fake.search = unavailable
+    with pytest.raises(ValueError, match='artifact'):
+        retrieve('latex','act',run,config,'act-label',client=fake,corpus=corpus)
+    assert len(calls) == 1
+    assert path.read_bytes() == b'corrupted local artifact'

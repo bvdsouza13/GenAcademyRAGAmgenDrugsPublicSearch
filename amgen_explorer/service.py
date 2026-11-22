@@ -81,6 +81,14 @@ class ExplorerService:
         from amgen_explorer.connectivity import check_connections
         return check_connections(self.config)
 
+    def check_readiness(self, *, require_generation=False):
+        from .readiness import check_readiness
+        return check_readiness(self, require_generation=require_generation)
+
+    def latest_readiness(self):
+        from .readiness import latest_readiness
+        return latest_readiness(self.config)
+
     def chunk_config(self, target_tokens=600, overlap_tokens=80):
         from amgen_explorer.chunking import ChunkConfig
         return ChunkConfig(target_tokens=target_tokens, overlap_tokens=overlap_tokens,
@@ -100,11 +108,19 @@ class ExplorerService:
 
     def source_registry(self):
         from .source_import import read_registry
-        return read_registry(self.config, self.corpus())
+        return read_registry(self.config, self._import_corpus())
+
+    def _import_corpus(self):
+        try:
+            return self.corpus()
+        except (ValueError, OSError):
+            if (self.config.root / 'data/source-registry.json').is_file():
+                return None  # The importer still validates the authoritative registry.
+            raise
 
     def import_documents(self, files):
         from .source_import import import_documents
-        return import_documents(self.config, files, self.corpus())
+        return import_documents(self.config, files, self._import_corpus())
 
     def preview_library(self, chunk_config):
         from .library import preview_library
@@ -114,9 +130,25 @@ class ExplorerService:
         from .library import build_library
         return build_library(self, chunk_config, activate=activate, on_progress=on_progress)
 
-    def library_status(self):
+    def library_status(self, *, include_history=True):
         from .library import status
-        return status(self)
+        return status(self, include_history=include_history)
+
+    def verify_library(self, run_id=None, *, repair=False, on_progress=None):
+        from .library_health import verify_library
+        return verify_library(self, run_id, repair=repair, on_progress=on_progress)
+
+    def recover_working_xml(self):
+        from .library import recover_working_xml
+        return recover_working_xml(self)
+
+    def list_recoverable_versions(self):
+        from .library import list_recoverable_versions
+        return list_recoverable_versions(self)
+
+    def restore_library_version(self, run_id):
+        from .library import restore_library_version
+        return restore_library_version(self, run_id)
 
     def latest_library_settings(self):
         from .library import latest_settings
@@ -138,12 +170,14 @@ class ExplorerService:
         from .library import revert_library
         return revert_library(self)
 
-    def search_library(self, query, *, run_id=None, product_ids=None, document_ids=None, limit=20):
+    def search_library(self, query, *, run_id=None, product_ids=None, document_ids=None, limit=None):
         from .search import search_library
         run = self.library_version(run_id)
         if not run:
             raise ValueError('Build the full library in Admin before searching.')
         corpus = self._pinned_corpus(run['xml_hash'])
+        if limit is None:
+            limit = self.config.settings.get('search', {}).get('result_limit', 20)
         return search_library(query, run, self.config, corpus,
                               product_ids=product_ids, document_ids=document_ids, limit=limit)
 
@@ -275,7 +309,7 @@ class ExplorerService:
             if document.product_id == product_id and (not document_id or document.id == document_id):
                 if document.id in active.get("document_ids", []):
                     self._verified_document(document.id, corpus, active["xml_hash"])
-        evidence = retrieve(question, product_id, active, self.config, document_id=document_id)
+        evidence = retrieve(question, product_id, active, self.config, document_id=document_id, corpus=corpus)
         self._validate_evidence_policy(evidence, corpus)
         return evidence
 
@@ -315,12 +349,18 @@ class ExplorerService:
 
     def answer(self, question, product_id, mode="Plain language", document_id=None, history=None, *, run_id=None):
         from amgen_explorer.teaching import teach
-        evidence = self._evidence(question, product_id, document_id, run_id=run_id)
-        if evidence is None:
-            return TeachingResponse("This medicine has no published learning corpus yet. Open Admin to build the entire searchable library.", abstained=True)
-        response = teach(question, evidence, self.config, mode=mode, history=history)
-        response.evidence = evidence
-        return response
+        from .learning_policy import route_learning_question
+        from .reliability import deadline_scope, settings_for
+        route = route_learning_question(question, history=history)
+        if route.kind != 'educational':
+            return TeachingResponse(route.reason, abstained=True)
+        with deadline_scope(settings_for(self.config.settings)['response_deadline_seconds']):
+            evidence = self._evidence(question, product_id, document_id, run_id=run_id)
+            if evidence is None:
+                return TeachingResponse("This medicine has no published learning corpus yet. Open Admin to build the entire searchable library.", abstained=True)
+            response = teach(question, evidence, self.config, mode=mode, history=history)
+            response.evidence = evidence
+            return response
 
     def reexplain(self, question, prior_response, mode, product_id, document_id=None):
         """Change reading depth using exactly the prior answer's evidence."""
@@ -335,16 +375,20 @@ class ExplorerService:
             if document_id and metadata["document_id"] != document_id:
                 raise ValueError("This answer belongs to a different source scope.")
             self._verified_document(metadata["document_id"], corpus, evidence.xml_hash)
-        response = teach(question, evidence, self.config, mode=mode)
+        from .reliability import deadline_scope, settings_for
+        with deadline_scope(settings_for(self.config.settings)['response_deadline_seconds']):
+            response = teach(question, evidence, self.config, mode=mode)
         response.evidence = evidence
         return response
 
     def quiz(self, product_id, document_id=None, *, run_id=None):
         from amgen_explorer.teaching import make_quiz
-        evidence = self._evidence("How does this medicine work? Explain its mechanism of action.", product_id, document_id, run_id=run_id)
-        if evidence is None or not evidence.passages:
-            return {"error": "Build the full library and select a source with mechanism information before starting a knowledge check."}
-        return make_quiz(evidence, self.config)
+        from .reliability import deadline_scope, settings_for
+        with deadline_scope(settings_for(self.config.settings)['response_deadline_seconds']):
+            evidence = self._evidence("How does this medicine work? Explain its mechanism of action.", product_id, document_id, run_id=run_id)
+            if evidence is None or not evidence.passages:
+                return {"error": "Build the full library and select a source with complete mechanism information before starting a knowledge check."}
+            return make_quiz(evidence, self.config)
 
     def presets(self):
         path = self.config.root / "data/chunk-presets.json"

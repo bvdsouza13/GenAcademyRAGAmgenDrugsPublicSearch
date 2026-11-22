@@ -67,3 +67,30 @@ Keep source files, XML and `data/` together. The registry defines expected inven
 | Older conversation | Continue using its pinned version, or explicitly start a fresh search on the latest library. |
 
 Local Admin is not server-side authorization. Public/shared deployment requires authentication, roles and durable shared storage.
+
+## Optional search and reliability settings
+
+Older configuration files continue to load. These tables set the compatibility defaults:
+
+```toml
+[search]
+result_limit = 20
+semantic_candidates = 60
+
+[reliability]
+response_deadline_seconds = 60
+max_attempts = 4
+retry_budget_seconds = 60
+backoff_base_seconds = 1
+backoff_cap_seconds = 8
+```
+
+Search limits accept 1–100; the candidate pool is at least the requested result count. Response/retry budgets accept 1–300 seconds, attempts 1–6, and backoff satisfies 1 ≤ base ≤ cap ≤ 60 seconds. Teaching's existing `[retrieval] evidence_token_budget=4000` remains a conservative byte budget including prefixes and reserve. Keep 600/80 chunk defaults until measured comparisons justify changing them.
+
+The learning deadline covers retrieval, generation and entailment through remaining request timeouts and cooperative late-result rejection. It cannot forcibly cancel all operating-system transport work. Retryable failures use bounded exponential jitter and Retry-After;401/403are not retried. Unknown usage after interrupted/retried calls is labeled unknown, not zero.
+
+Admin's **Check search and generated answers** explicitly tests model access, semantic search and one cited answer. Last-check timestamps are historical. `scripts/check_connections.py` checks access only; `scripts/manage_corpus.py readiness` requests verified generation. A source-only fallback is not successful generation. Existing credentials do not need to be rewritten.
+
+Admin's **Verify stored library** compares all expected records and every document scope. **Repair missing or changed records** restores exact original content from intact local pins. It cannot repair altered local provenance. Use **Details → Open library recovery** for trusted XML regeneration or retained-version restoration. Never treat a connection outage as evidence that the index is empty.
+
+Retention inventory reports local storage and provider-reported usage. Remote storage/dollar charges remain unknown. The official Documents API supports asynchronous [deletion by explicit IDs](https://docs.pinecone.io/reference/api/2026-07/data-plane/delete_documents), but this app deliberately retains versions until durable publication/conversation references can prove cleanup safe; it has no deletion adapter. A 202 acceptance would not prove deletion complete.

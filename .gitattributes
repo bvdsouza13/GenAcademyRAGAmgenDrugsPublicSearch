@@ -1,0 +1,2 @@
+# Exact extracted PDF text uses xml:space="preserve"; trailing spaces are evidence.
+XML/AmgenProducts.xml whitespace=-blank-at-eol,-blank-at-eof

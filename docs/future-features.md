@@ -10,7 +10,7 @@ Bulk source verification, whole-library content discovery and controlled chunk e
 | Label update provenance | Verified acquisition URLs/dates, revisions, exact changes and explicit supersession/applicability decisions; preserve old citation snapshots. |
 | OCR and layout-aware tables | Add readable coverage for scanned pages and trustworthy table structure; retain confidence, units and footnotes, and avoid inferred relationships. |
 | Optional clinical review workflow | Record independent professional judgments separately from automatic extraction verification and historical source-fidelity review. |
-| Richer coverage inspection | Medicine/section coverage and layout limitations with useful source-backed query suggestions. |
+| Richer section coverage inspection | Page/native-text coverage and layout exceptions now exist; extend to curated section completeness and source-backed query suggestions. |
 
 ## Learning and discovery
 
@@ -26,7 +26,7 @@ Bulk source verification, whole-library content discovery and controlled chunk e
 | Required work | Acceptance boundary |
 |---|---|
 | Authentication and roles | Server-enforced learner/operator permissions; Admin navigation alone is insufficient. |
-| Durable jobs and recovery | Shared artifact storage, tested backup/restore, concurrency/cancellation and deliberate retention/cleanup. |
-| Operations and spending | Sanitized diagnostics, actual provider usage, quotas, alerts and bounded retries without credential or unnecessary chat logging. |
+| Durable jobs and recovery | Local exact repair and recovery now exist; add shared artifact storage, durable job cancellation, backups and a durable publication/conversation reference ledger before enabling cleanup. |
+| Operations and spending | Readiness, bounded retries and recorded usage now exist; add quotas, alerts and provider billing reconciliation without credential or unnecessary chat logging. |
 
 Public hosting, inferred clinical fact normalization, new embedding providers and cross-medicine treatment recommendations are outside this refactor. Keep scientific/clinical evaluation distinct from software correctness and extraction provenance.

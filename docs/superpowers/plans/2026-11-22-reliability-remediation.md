@@ -10,7 +10,7 @@
 
 **Spec:** [Reliability remediation design](../specs/2026-11-22-reliability-remediation-design.md).
 
-**Status:** Approved by the user on 2026-11-22 ("Fix all the 8"); implementation in progress. OpenAI authentication and one verified three-citation answer have already recovered following the user's credential update; software readiness improvements remain in scope.
+**Status:** Approved by the user on 2026-11-22 ("Fix all the 8"); implementation complete; final clean-checkout and local release integration in progress. OpenAI authentication and one verified three-citation answer have already recovered following the user's credential update; software readiness improvements remain in scope.
 
 ## Global constraints
 
@@ -55,12 +55,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `score_discovery(case: dict, hits: list[dict], *, k: int) -> dict` scores the visible search results before teaching-budget clipping. Case fields separate `requested_filters` from expected source identities/spans and carry relevance judgments plus development/holdout partition. Preserve `score_case(..., evidence_budget=...)` for teaching coverage.
 
-- [ ] Add failing tests showing a relevant-first/noisy-tail result list scores worse on precision/graded relevance than a focused list; expected sources must never become hidden home-page filters.
-- [ ] Run `python -m pytest -q tests/test_learner_evaluation.py tests/test_evaluation_metrics.py` and confirm the missing behavior fails.
-- [ ] Add unfiltered versions of all 37 source questions and conversational brand, typo, generic ambiguity, multi-product, semantic paraphrase, nonsense, unrelated, safety/overview and follow-up cases. Keep each suite within the existing 100-case input bound, or explicitly update/test that bound if necessary. Bind judgments to source/page/span, not chunk IDs; distinguish unjudged hits from irrelevant ones.
-- [ ] Implement precision@5/@10, graded relevance, no-answer correctness, suggestion correctness and judgment coverage. Retain citation resolution, quote coverage, latency and usage as distinct measures. Execute behavioral assertions instead of merely counting retained behavioral fixtures.
-- [ ] Measure and save the current baseline before changing ranking; freeze the holdout partition before calibration. Do not invent aggregate precision targets before labeling and baseline measurement. The named failure examples have unconditional acceptance requirements.
-- [ ] Run the evaluation tests and independently review/commit this package. Update the characterization test documenting the old metric blind spot to require the new metric to detect it.
+- [x] Add failing tests showing a relevant-first/noisy-tail result list scores worse on precision/graded relevance than a focused list; expected sources must never become hidden home-page filters.
+- [x] Run `python -m pytest -q tests/test_learner_evaluation.py tests/test_evaluation_metrics.py` and confirm the missing behavior fails.
+- [x] Add unfiltered versions of all 37 source questions and conversational brand, typo, generic ambiguity, multi-product, semantic paraphrase, nonsense, unrelated, safety/overview and follow-up cases. Keep each suite within the existing 100-case input bound, or explicitly update/test that bound if necessary. Bind judgments to source/page/span, not chunk IDs; distinguish unjudged hits from irrelevant ones.
+- [x] Implement precision@5/@10, graded relevance, no-answer correctness, suggestion correctness and judgment coverage. Retain citation resolution, quote coverage, latency and usage as distinct measures. Execute behavioral assertions instead of merely counting retained behavioral fixtures.
+- [x] Measure and save the current baseline before changing ranking; freeze the holdout partition before calibration. Do not invent aggregate precision targets before labeling and baseline measurement. The named failure examples have unconditional acceptance requirements.
+- [x] Run the evaluation tests and independently review/commit this package. Update the characterization test documenting the old metric blind spot to require the new metric to detect it.
 
 ## Task 2 — Query interpretation, relevance ranking and no-results behavior
 
@@ -68,12 +68,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `analyze_query(query: str, corpus: Corpus) -> QueryIntent`, with meaningful terms, recognized product candidates, ambiguity, section intent and suggestions. Extend `SearchResults` compatibly with `outcome` (`results`, `no_results`, `clarification`) and `suggestions`. Add `search_local(query, run, config, corpus, *, product_ids=None, document_ids=None, limit=20) -> SearchResults`, which cannot contact Pinecone.
 
-- [ ] Remove the six search xfail markers and run `python -m pytest -q tests/test_failure_search.py`; confirm the three failure families fail under both lexical engines.
-- [ ] Add retained-v1-artifact, ambiguous `denosumab`, multi-product, meaningful negation, numeric/unit, no-literal-overlap semantic paraphrase, and local typo-suggestion tests.
-- [ ] Recognize catalog aliases inside questions using token boundaries; remove conversational filler from lexical queries while retaining meaningful qualifiers. Keep the original query for semantic retrieval. Names influence relevance; only explicit filters impose hard scope.
-- [ ] Replace unconditional document round-robin with relevance-first selection and diversity among relevant candidates. Calibrate a relevance gate on the development cases using lexical/name/section/semantic features; do not use RRF as confidence or apply an arbitrary universal vector threshold. Suggest catalog typos without silently substituting another medicine.
-- [ ] Separate immutable artifact-format identity from runtime ranking-policy version. Existing v1 paths/checksums/pins remain authoritative; old descriptors continue validating. Evaluation controls record the actual query ranking policy. A ranking-only change must make zero upsert calls.
-- [ ] Run `python -m pytest -q tests/test_failure_search.py tests/test_global_search.py tests/test_search_artifacts.py tests/test_search_experience.py tests/test_learner_evaluation.py`. Require both known named-question examples, all negative examples, variants and body-content cases to pass; review held-out tradeoffs and commit.
+- [x] Remove the six search xfail markers and run `python -m pytest -q tests/test_failure_search.py`; confirm the three failure families fail under both lexical engines.
+- [x] Add retained-v1-artifact, ambiguous `denosumab`, multi-product, meaningful negation, numeric/unit, no-literal-overlap semantic paraphrase, and local typo-suggestion tests.
+- [x] Recognize catalog aliases inside questions using token boundaries; remove conversational filler from lexical queries while retaining meaningful qualifiers. Keep the original query for semantic retrieval. Names influence relevance; only explicit filters impose hard scope.
+- [x] Replace unconditional document round-robin with relevance-first selection and diversity among relevant candidates. Calibrate a relevance gate on the development cases using lexical/name/section/semantic features; do not use RRF as confidence or apply an arbitrary universal vector threshold. Suggest catalog typos without silently substituting another medicine.
+- [x] Separate immutable artifact-format identity from runtime ranking-policy version. Existing v1 paths/checksums/pins remain authoritative; old descriptors continue validating. Evaluation controls record the actual query ranking policy. A ranking-only change must make zero upsert calls.
+- [x] Run `python -m pytest -q tests/test_failure_search.py tests/test_global_search.py tests/test_search_artifacts.py tests/test_search_experience.py tests/test_learner_evaluation.py`. Require both known named-question examples, all negative examples, variants and body-content cases to pass; review held-out tradeoffs and commit.
 
 ## Task 3 — Provider readiness, truthful smoke tests and bounded work
 
@@ -81,12 +81,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `check_readiness(service, *, require_generation=False) -> ReadinessReport` separates model access, semantic retrieval and verified generation, with time/configuration identity and sanitized status. `Deadline(seconds, *, clock)` exposes `remaining()` and expiry. `ProviderError` gains an optional sanitized retry delay; no raw response is persisted.
 
-- [ ] Remove OPS-03's xfail marker and add tests for model-access success with generation 401/429/refusal, expected layout fallback, numeric/date/malformed Retry-After, and fake-clock deadline exhaustion.
-- [ ] Run the new operations/reliability tests and confirm missing readiness/deadline behavior fails.
-- [ ] Make `live_library_check.py --chat` require designated supported cases to generate and pass entailment; grade deliberately restricted cases as source-fallback contracts. Model-list success alone cannot satisfy generation readiness. Do not call providers on page render.
-- [ ] Add a 60-second total learning-response budget, pass remaining time into retrieval/generation/verification, and reject late/unverified output. Preserve safe quotations on timeout. Preserve four total upload attempts; use exponential backoff with jitter and bounded Retry-After. Do not retry 401/403. Interrupted/ambiguous provider usage remains explicitly unknown where appropriate.
-- [ ] Add optional `[reliability]` settings with validated compatibility defaults: `response_deadline_seconds=60`, `max_attempts=4`, `retry_budget_seconds=60`, `backoff_base_seconds=1`, `backoff_cap_seconds=8`. Existing config files continue loading; don't rewrite the user's secrets. Show last-checked readiness, and distinguish stale/unchecked from current failure.
-- [ ] Run `python -m pytest -q tests/test_failure_operations.py tests/test_reliability.py tests/test_config.py tests/test_connectivity.py tests/test_teaching.py`. Keep unrelated operational xfails until their owning tasks land; review and commit.
+- [x] Remove OPS-03's xfail marker and add tests for model-access success with generation 401/429/refusal, expected layout fallback, numeric/date/malformed Retry-After, and fake-clock deadline exhaustion.
+- [x] Run the new operations/reliability tests and confirm missing readiness/deadline behavior fails.
+- [x] Make `live_library_check.py --chat` require designated supported cases to generate and pass entailment; grade deliberately restricted cases as source-fallback contracts. Model-list success alone cannot satisfy generation readiness. Do not call providers on page render.
+- [x] Add a 60-second total learning-response budget, pass remaining time into retrieval/generation/verification, and reject late/unverified output. Preserve safe quotations on timeout. Preserve four total upload attempts; use exponential backoff with jitter and bounded Retry-After. Do not retry 401/403. Interrupted/ambiguous provider usage remains explicitly unknown where appropriate.
+- [x] Add optional `[reliability]` settings with validated compatibility defaults: `response_deadline_seconds=60`, `max_attempts=4`, `retry_budget_seconds=60`, `backoff_base_seconds=1`, `backoff_cap_seconds=8`. Existing config files continue loading; don't rewrite the user's secrets. Show last-checked readiness, and distinguish stale/unchecked from current failure.
+- [x] Run `python -m pytest -q tests/test_failure_operations.py tests/test_reliability.py tests/test_config.py tests/test_connectivity.py tests/test_teaching.py`. Keep unrelated operational xfails until their owning tasks land; review and commit.
 
 ## Task 4 — Verify and repair the entire remote library
 
@@ -94,12 +94,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `ExplorerService.verify_library(run_id=None, *, repair=False, on_progress=None) -> LibraryVerificationReport`. Report fields include run/time, outcome (`verified`, `drift`, `unavailable`, `local_invalid`), expected/matched/missing/mismatched counts, document visibility and sanitized errors. Reports live under `data/health/`; they do not overwrite historical immutable identity. `library_status()` reads reports locally.
 
-- [ ] Remove REC-01/02's xfail markers; add all-missing, one-missing, metadata-drift, intact-library/no-upsert, outage-not-data-loss, concurrent repair and interrupted repair tests.
-- [ ] Run targeted recovery/indexing tests and confirm the recovery defects fail.
-- [ ] Validate the pinned source snapshots, record set, artifact and unchanged provider profile before remote checks. Fetch expected IDs in bounded batches, compare fields, and check each document's search visibility. Label the scope as expected-record verification, not proof of absence of extra records.
-- [ ] Repair only missing/mismatched expected records in the original namespace with identical IDs/content. Reconcile historical checkpoints against current observations. Hold library/index locks in consistent order, checkpoint repair work, and fully reverify. Healthy records are not uploaded again. Source/parser/chunk/profile changes still use isolated candidates.
-- [ ] Make an explicit unchanged Build reverify and reconcile instead of trusting its old verified status. Keep verification read-only until repair is requested; show repairing/degraded states and update the last-verified timestamp only after success. Never activate an incomplete candidate.
-- [ ] Run `python -m pytest -q tests/test_failure_recovery.py tests/test_indexing.py tests/test_regression_indexing.py tests/test_library_build.py tests/test_admin_library_experience.py`; independently review and commit. Destructive cases use temporary providers only.
+- [x] Remove REC-01/02's xfail markers; add all-missing, one-missing, metadata-drift, intact-library/no-upsert, outage-not-data-loss, concurrent repair and interrupted repair tests.
+- [x] Run targeted recovery/indexing tests and confirm the recovery defects fail.
+- [x] Validate the pinned source snapshots, record set, artifact and unchanged provider profile before remote checks. Fetch expected IDs in bounded batches, compare fields, and check each document's search visibility. Label the scope as expected-record verification, not proof of absence of extra records.
+- [x] Repair only missing/mismatched expected records in the original namespace with identical IDs/content. Reconcile historical checkpoints against current observations. Hold library/index locks in consistent order, checkpoint repair work, and fully reverify. Healthy records are not uploaded again. Source/parser/chunk/profile changes still use isolated candidates.
+- [x] Make an explicit unchanged Build reverify and reconcile instead of trusting its old verified status. Keep verification read-only until repair is requested; show repairing/degraded states and update the last-verified timestamp only after success. Never activate an incomplete candidate.
+- [x] Run `python -m pytest -q tests/test_failure_recovery.py tests/test_indexing.py tests/test_regression_indexing.py tests/test_library_build.py tests/test_admin_library_experience.py`; independently review and commit. Destructive cases use temporary providers only.
 
 ## Task 5 — Recover damaged local state without losing navigation
 
@@ -107,12 +107,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `ExplorerService.recover_working_xml() -> BuildReport` regenerates working XML from validated registry/PDFs. `list_recoverable_versions() -> dict` returns separately validated entries and sanitized warnings. `restore_library_version(run_id: str)` validates selected local assets plus remote readiness before atomic activation. Quarantine actions occur only during explicit recovery.
 
-- [ ] Remove REC-03/04/05 and OPS-01/02 xfail markers. Add malformed JSON/object type, manifest filename/run mismatch, bad config, damaged selected snapshot, invalid registry, no recoverable version and failed restoration tests.
-- [ ] Run `python -m pytest -q tests/test_failure_recovery.py tests/test_failure_operations.py` and confirm remaining cases fail for the intended reasons.
-- [ ] Hash existing PDFs before classifying uploads as duplicates. Honor explicit replacement to restore original registered bytes transactionally; preserve identity and traversal checks.
-- [ ] Regenerate malformed working XML via a temporary file from the validated complete registry and intact PDFs, validate it, preserve damaged bytes in quarantine and replace atomically. Never mutate published source snapshots or guess an inventory when trusted registry copies are unavailable.
-- [ ] Render a recovery-capable shell before active-state loading. Isolate malformed historical entries; contain Home/Admin status failures. Active/selected versions remain strictly validated. Offer validated retained versions for recovery and keep Demo independent; no repair or quarantine on rerender.
-- [ ] Run source-import, library, regression-UI, search-experience and new fault tests. Require active snapshots and prior learning references to remain intact; review and commit.
+- [x] Remove REC-03/04/05 and OPS-01/02 xfail markers. Add malformed JSON/object type, manifest filename/run mismatch, bad config, damaged selected snapshot, invalid registry, no recoverable version and failed restoration tests.
+- [x] Run `python -m pytest -q tests/test_failure_recovery.py tests/test_failure_operations.py` and confirm remaining cases fail for the intended reasons.
+- [x] Hash existing PDFs before classifying uploads as duplicates. Honor explicit replacement to restore original registered bytes transactionally; preserve identity and traversal checks.
+- [x] Regenerate malformed working XML via a temporary file from the validated complete registry and intact PDFs, validate it, preserve damaged bytes in quarantine and replace atomically. Never mutate published source snapshots or guess an inventory when trusted registry copies are unavailable.
+- [x] Render a recovery-capable shell before active-state loading. Isolate malformed historical entries; contain Home/Admin status failures. Active/selected versions remain strictly validated. Offer validated retained versions for recovery and keep Demo independent; no repair or quarantine on rerender.
+- [x] Run source-import, library, regression-UI, search-experience and new fault tests. Require active snapshots and prior learning references to remain intact; review and commit.
 
 ## Task 6 — Shared evidence rules, local chat fallback and context allocation
 
@@ -120,12 +120,12 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `assess_evidence(evidence: EvidenceBundle) -> EvidenceAssessment` provides validated sources, generation/quiz eligibility and reason codes. `select_evidence(question, records, ranked_ids, *, budget_bytes, intent) -> EvidenceSelection` returns selected records plus explicit omissions/completeness reasons. Task 2's `search_local` supplies a scoped, provider-free fallback.
 
-- [ ] Remove FT-05/06 xfail markers; add atomic continuation-group, misleading missing-sibling, wrong variant/run, corrupted local artifact, and mechanism/indications/safety allocation tests.
-- [ ] Confirm current chat-outage and warning-starvation tests fail. At the current 4,000-byte budget, the supplied overview fixture must retain its relevant indication passage alongside relevant safety evidence.
-- [ ] Introduce shared eligibility checks without weakening source/record validation. Pack continuation groups atomically; keep requested facts and required qualifiers together. If full required context cannot fit, state the limitation and withhold unsupported generation.
-- [ ] Route Pinecone outage retrieval to verified local search scoped to the same run/product/document. Do not recurse into global search and call the failed provider again. Label degraded mode and preserve the existing service evidence validator.
-- [ ] Compare 4,000/6,000/8,000 budgets on the fixed suite after selection changes. Include prefix bytes consistently in packing and evaluation. Report completeness, qualifier retention, answer eligibility, latency and usage before choosing a new default.
-- [ ] Run `python -m pytest -q tests/test_failure_teaching.py tests/test_retrieval.py tests/test_regression_evidence.py tests/test_service.py tests/test_bulk_eligibility.py`; independently review and commit.
+- [x] Remove FT-05/06 xfail markers; add atomic continuation-group, misleading missing-sibling, wrong variant/run, corrupted local artifact, and mechanism/indications/safety allocation tests.
+- [x] Confirm current chat-outage and warning-starvation tests fail. At the current 4,000-byte budget, the supplied overview fixture must retain its relevant indication passage alongside relevant safety evidence.
+- [x] Introduce shared eligibility checks without weakening source/record validation. Pack continuation groups atomically; keep requested facts and required qualifiers together. If full required context cannot fit, state the limitation and withhold unsupported generation.
+- [x] Route Pinecone outage retrieval to verified local search scoped to the same run/product/document. Do not recurse into global search and call the failed provider again. Label degraded mode and preserve the existing service evidence validator.
+- [x] Compare 4,000/6,000/8,000 budgets on the fixed suite after selection changes. Include prefix bytes consistently in packing and evaluation. Report completeness, qualifier retention, answer eligibility, latency and usage before choosing a new default.
+- [x] Run `python -m pytest -q tests/test_failure_teaching.py tests/test_retrieval.py tests/test_regression_evidence.py tests/test_service.py tests/test_bulk_eligibility.py`; independently review and commit.
 
 ## Task 7 — Learning intent and vetted follow-up suggestions
 
@@ -133,11 +133,11 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `route_learning_question(question: str, history=None) -> LearningRoute` distinguishes educational, personal-treatment, unsupported and clarification outcomes. `suggest_followups(assessment: EvidenceAssessment, intent) -> list[str]` chooses vetted, source-appropriate educational prompts.
 
-- [ ] Remove FT-01 and all three FT-02 xfail markers. Add indirect/third-person/age/breastfeeding, multi-turn “what about me?”, general pregnancy-label questions and harmless first-person learning requests.
-- [ ] Confirm injected unsafe follow-ups and the three known paraphrases fail under current behavior; retain positive educational controls.
-- [ ] Route personal-treatment intent before retrieval in the service, with a matching defensive gate for direct teaching callers. Preserve educational access to general source warnings. Use fixed educational follow-up templates; ignore model-supplied follow-up text rather than publishing it after a phrase-only filter.
-- [ ] Keep exact citation and independent entailment checks for generated answers. Add injection, product-switch and alternate-reading-depth tests; do not claim exhaustive natural-language safety from finite tests.
-- [ ] Run `python -m pytest -q tests/test_failure_teaching.py tests/test_teaching.py tests/test_service.py tests/test_regression_ui.py`; review and commit.
+- [x] Remove FT-01 and all three FT-02 xfail markers. Add indirect/third-person/age/breastfeeding, multi-turn “what about me?”, general pregnancy-label questions and harmless first-person learning requests.
+- [x] Confirm injected unsafe follow-ups and the three known paraphrases fail under current behavior; retain positive educational controls.
+- [x] Route personal-treatment intent before retrieval in the service, with a matching defensive gate for direct teaching callers. Preserve educational access to general source warnings. Use fixed educational follow-up templates; ignore model-supplied follow-up text rather than publishing it after a phrase-only filter.
+- [x] Keep exact citation and independent entailment checks for generated answers. Add injection, product-switch and alternate-reading-depth tests; do not claim exhaustive natural-language safety from finite tests.
+- [x] Run `python -m pytest -q tests/test_failure_teaching.py tests/test_teaching.py tests/test_service.py tests/test_regression_ui.py`; review and commit.
 
 ## Task 8 — Grounded quizzes with stable shuffled answers
 
@@ -145,10 +145,10 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `make_quiz(evidence, config, *, rng=None) -> dict` calls Task 6's shared eligibility policy, chooses a supported extractive/section-matching template, and shuffles once. Existing session quiz state retains displayed choices, answer index, rationale and source/run identity.
 
-- [ ] Remove FT-03/04 xfail markers. Replace the probabilistic 20-draw position test with controlled-RNG assertions demonstrating answer-position variation and correct remapping.
-- [ ] Add rerun/navigation persistence, correct grading after shuffle, source-switch isolation and shared layout/continuation-restriction tests; confirm current behavior fails.
-- [ ] Generate only source-grounded quizzes, avoid invented medicine/dosing distractors, remove position-dependent rationale wording and persist the complete generated quiz. Ineligible evidence yields an explanation/source-reading option, not a scored quiz.
-- [ ] Run teaching plus UI/quiz regression suites, review and commit. All nine teaching diagnostic failure instances should now pass normally.
+- [x] Remove FT-03/04 xfail markers. Replace the probabilistic 20-draw position test with controlled-RNG assertions demonstrating answer-position variation and correct remapping.
+- [x] Add rerun/navigation persistence, correct grading after shuffle, source-switch isolation and shared layout/continuation-restriction tests; confirm current behavior fails.
+- [x] Generate only source-grounded quizzes, avoid invented medicine/dosing distractors, remove position-dependent rationale wording and persist the complete generated quiz. Ineligible evidence yields an explanation/source-reading option, not a scored quiz.
+- [x] Run teaching plus UI/quiz regression suites, review and commit. All nine teaching diagnostic failure instances should now pass normally.
 
 ## Task 9 — Precise layout restrictions and visible page coverage
 
@@ -156,11 +156,11 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `coverage_summary(corpus: Corpus) -> dict` exposes total pages, pages with searchable text, no-text pages and limitation reasons. Layout spans preserve original archive offsets and extraction/parser/policy version; no OCR text is silently substituted for native text.
 
-- [ ] Add failures for clean narrative adjacent to a separable table/figure, heading-only references, ambiguous multicolumn/continuing tables, repeated strings and mixed readable/image-only pages.
-- [ ] Split demonstrably separable native-text narrative from restricted layout regions while keeping exact archive coverage. Keep ambiguous row/column/caption relationships restricted. Version extraction changes and validate them as a new candidate.
-- [ ] Display “pages with searchable text / total pages” and no-text/possible-OCR exceptions before/after build. Distinguish true unreadability from unknown blank-or-image-only status; preserve raw readable-character coverage separately.
-- [ ] Run `python -m pytest -q tests/test_xml_pipeline.py tests/test_bulk_coverage.py tests/test_bulk_eligibility.py tests/test_failure_recovery.py tests/test_teaching.py tests/test_admin_library_experience.py` and exact-span round-trip validation.
-- [ ] Repeat the same 37-document mechanism probe against baseline/candidate. Report each fallback reason; resolve validated avoidable cases without requiring unsupported 37/37 generation. Preserve the old active version until complete candidate verification; review and commit.
+- [x] Add failures for clean narrative adjacent to a separable table/figure, heading-only references, ambiguous multicolumn/continuing tables, repeated strings and mixed readable/image-only pages.
+- [x] Split demonstrably separable native-text narrative from restricted layout regions while keeping exact archive coverage. Keep ambiguous row/column/caption relationships restricted. Version extraction changes and validate them as a new candidate.
+- [x] Display “pages with searchable text / total pages” and no-text/possible-OCR exceptions before/after build. Distinguish true unreadability from unknown blank-or-image-only status; preserve raw readable-character coverage separately.
+- [x] Run `python -m pytest -q tests/test_xml_pipeline.py tests/test_bulk_coverage.py tests/test_bulk_eligibility.py tests/test_failure_recovery.py tests/test_teaching.py tests/test_admin_library_experience.py` and exact-span round-trip validation.
+- [x] Repeat the same 37-document mechanism probe against baseline/candidate. Report each fallback reason; resolve validated avoidable cases without requiring unsupported 37/37 generation. Preserve the old active version until complete candidate verification; review and commit.
 
 ## Task 10 — Experiment cost, retention and local capacity controls
 
@@ -168,11 +168,11 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 
 **Interfaces:** `plan_cleanup(config, *, selected_run_ids: list[str]) -> CleanupPlan` produces a dry-run inventory and protected references. `apply_cleanup(plan: CleanupPlan) -> CleanupReport` revalidates the plan and performs only explicitly selected safe actions. Default selection is empty; published/active/rollback/reference-held versions are protected.
 
-- [ ] Add tests for zero-mutation preview, no automatic cleanup/reset deletion, protected runs, shared snapshots, concurrent reference changes, provider failure and idempotent retries.
-- [ ] Show prepared chunk volume, retained local storage, previous provider-reported usage and clearly labeled unknown remote/dollar cost. Reuse a healthy retained experiment without uploading again; apply Task 4 verification when checking current remote integrity.
-- [ ] Implement protected-reference inventory and explicit selection. Verify the current official Pinecone Documents API listing/deletion capability before adding that adapter; do not guess endpoints. Do not delete local provenance until the selected remote cleanup is confirmed. If a safe capability/reference proof is unavailable, retain the version and state exactly what was not cleaned.
-- [ ] Measure the current corpus under one and five concurrent local read sessions, including cold/warm query and page-render latency and memory. Establish a measured capacity note. Any validation caching must retain checksum/source-identity protections and invalidate on change; no performance claim substitutes for integrity tests.
-- [ ] Run retention/experiment/indexing tests, review results and commit. Full OCR, public hosting and clinical currency certification remain documented separate capabilities.
+- [x] Add tests for zero-mutation preview, no automatic cleanup/reset deletion, protected runs, shared snapshots, concurrent reference changes, provider failure and idempotent retries.
+- [x] Show prepared chunk volume, retained local storage, previous provider-reported usage and clearly labeled unknown remote/dollar cost. Reuse a healthy retained experiment without uploading again; apply Task 4 verification when checking current remote integrity.
+- [x] Implement protected-reference inventory and explicit selection. Verify the current official Pinecone Documents API listing/deletion capability before adding that adapter; do not guess endpoints. Do not delete local provenance until the selected remote cleanup is confirmed. If a safe capability/reference proof is unavailable, retain the version and state exactly what was not cleaned.
+- [x] Measure the current corpus under one and five concurrent local read sessions, including cold/warm query and page-render latency and memory. Establish a measured capacity note. Any validation caching must retain checksum/source-identity protections and invalidate on change; no performance claim substitutes for integrity tests.
+- [x] Run retention/experiment/indexing tests, review results and commit. Full OCR, public hosting and clinical currency certification remain documented separate capabilities.
 
 ## Task 11 — Integrated regression, live verification and release documentation
 
@@ -183,7 +183,7 @@ Tasks 2, 4–5 and 6–8 can be developed in parallel after their contracts are 
 - [ ] Run explicit live provider readiness plus verified generation, expected source fallback and safe redirects. Run held-out global search and all 37 document retrieval probes, with citations/scopes verified and category-level regressions reviewed.
 - [ ] Fetch/compare every expected remote record and test every document scope for a new candidate; verify activation/revert and an existing conversation pinned to the previous run. Real active records are never deleted for tests.
 - [ ] Refresh documentation and demo to show global search, honest readiness, one whole-library repair flow, source limitations and chunk comparison. Record the resolved credential incident separately from software remediation; report remaining capability boundaries accurately.
-- [ ] Independently review the integrated diff, launch the verified app locally, and provide the release report and commit summary. Any remote publication follows the user's approved delivery scope; this planning turn performs no commit, push, activation or code change.
+- [ ] Independently review the integrated diff, launch the verified app locally, and provide the release report and commit summary. Remote publication follows the user's approved delivery scope.
 
 ## Traceability: every demonstrated failing instance
 
@@ -212,6 +212,6 @@ Additional assessment gaps map to Task 1 (evaluation blind spot), Task 2 (typos 
 
 ## Approval and completion
 
-Approval would authorize implementing the proposed local-app changes and testing them in stages. The proposal does not authorize real destructive fault injection, automatic retention deletion, a public deployment or claims of clinical validation. Full OCR remains a separately described extension.
+The user approved implementing the proposed local-app changes and testing them in stages on 2026-11-22. The proposal does not authorize real destructive fault injection, automatic retention deletion, a public deployment or claims of clinical validation. Full OCR remains a separately described extension.
 
 Completion means every demonstrated defect is resolved, new regressions and migration checks pass, required live checks pass, remaining source limitations are visible and safe, documentation is refreshed, and the application is running locally. If a required outcome cannot be met, report it as outstanding rather than declaring the plan complete.

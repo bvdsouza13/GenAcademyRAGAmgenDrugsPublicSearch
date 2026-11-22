@@ -1,8 +1,4 @@
-"""Fault simulations and explicit known search-quality gaps (no live APIs).
-
-Strict xfails describe desirable behavior that currently fails; they are not
-passing acceptance tests for the present ranking. Remove xfail when addressed.
-"""
+"""Search regression cases under both lexical engines."""
 from dataclasses import asdict
 import copy
 import json
@@ -25,7 +21,7 @@ def diagnostic_library(config, plan, request):
             Document('other-label', 'other', 'other.pdf', 'b'*64, 1, '2025', '')]
     texts = [('act', 'act-label', 'a'*64, 'What is ACTIMMUNE? ACTIMMUNE is a medicine.'),
              ('act', 'act-label', 'a'*64, 'ACTIMMUNE binds to specific receptors.'),
-             ('act', 'act-label', 'a'*64, 'ACTIMMUNE is stored refrigerated.'),
+             ('act', 'act-label', 'a'*64, 'ACTIMMUNE is stored refrigerated, not in direct light.'),
              ('other', 'other-label', 'b'*64, 'What is OTHER? OTHER is a medicine.')]
     template = plan.chunks[0]
     plan.chunks = []
@@ -47,14 +43,12 @@ def diagnostic_library(config, plan, request):
     return run, records, corpus, fake
 
 
-@pytest.mark.xfail(strict=True, reason='Known gap: OR stopwords and document round-robin introduce unrelated products.')
 def test_named_question_keeps_unrelated_boilerplate_out(config, diagnostic_library):
     run, _, corpus, fake = diagnostic_library
     result = search_library('What is ACTIMMUNE?', run, config, corpus, client=fake, limit=2)
     assert result.hits and all(h['product_id'] == 'act' for h in result.hits)
 
 
-@pytest.mark.xfail(strict=True, reason='Known gap: weak semantic neighbors are accepted without an answerability/relevance gate.')
 def test_irrelevant_semantic_neighbor_does_not_become_search_result(config, diagnostic_library):
     run, records, corpus, fake = diagnostic_library
     fake.search = lambda *args: [{**records[-1], '_score':0.000001}]
@@ -62,7 +56,6 @@ def test_irrelevant_semantic_neighbor_does_not_become_search_result(config, diag
     assert result.hits == []
 
 
-@pytest.mark.xfail(strict=True, reason='Known gap: conversational stopwords alone match medicine boilerplate.')
 def test_stopword_only_query_does_not_return_drug_results(config, diagnostic_library):
     run, _, corpus, fake = diagnostic_library
     result = search_library('what is', run, config, corpus, client=fake)
@@ -98,3 +91,12 @@ def test_no_match_and_no_semantic_evidence_is_empty(config, diagnostic_library):
     run, _, corpus, fake = diagnostic_library
     result = search_library('qzxvnmqzxvnm', run, config, corpus, client=fake)
     assert result.hits == []
+
+
+def test_negation_without_a_source_topic_cannot_anchor_unrelated_search(config, diagnostic_library):
+    from amgen_explorer.search import search_local
+    run,_,corpus,_=diagnostic_library
+    # This query must not match a medicine solely because its label says 'not'.
+    from amgen_explorer.query_intent import analyze_query
+    assert 'not' in analyze_query('not football',corpus).meaningful_terms
+    assert not search_local('not football',run,config,corpus).hits

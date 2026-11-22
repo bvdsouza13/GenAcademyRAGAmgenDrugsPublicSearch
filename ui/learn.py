@@ -161,11 +161,14 @@ def quiz_panel(service,product,document,key,ready,run_id=None):
     if st.button('Create a source-based quiz',disabled=not ready,key=f'make_quiz_{key}'):
         ok,quiz = action('Create quiz',lambda:service.quiz(product.id,document_id=document,**({'run_id':run_id} if run_id else {})))
         if ok:
-            if isinstance(quiz,dict) and 'error' not in quiz and isinstance(quiz.get('choices'),list) and isinstance(quiz.get('correct_index'),int) and 0 <= quiz['correct_index'] < len(quiz['choices']):
+            scope_matches = isinstance(quiz,dict) and all(quiz.get(field, expected) == expected
+                for field,expected in (('product_id',product.id),('document_id',document),('run_id',run_id))
+                if expected is not None)
+            if scope_matches and 'error' not in quiz and not quiz.get('limited_source') and isinstance(quiz.get('choices'),list) and type(quiz.get('correct_index')) is int and 0 <= quiz['correct_index'] < len(quiz['choices']):
                 quizzes[key]={'quiz':quiz,'submitted':False}
                 st.session_state.pop(f'quiz_answer_{key}',None)
             else:
-                st.warning('A supported quiz could not be created from the available evidence. Try another source or review the source coverage.')
+                st.warning('A supported quiz could not be created from complete, matching source context. Read the original source using Learning sources, or choose another source.')
     record = quizzes.get(key)
     if not record:
         st.caption('A short quiz is generated only when you request one. Your progress stays in this session.')

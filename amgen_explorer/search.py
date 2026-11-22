@@ -18,10 +18,13 @@ import tempfile
 import time
 
 from .connectivity import DocumentsClient, ProviderError
+from .query_intent import analyze_query, tokens, CONCEPTS, SECTIONS
 from .indexing import digest, guard_text, manifest_records, validate_manifest_records
 from scripts.setup_pinecone import SetupError
 
-RANKING_VERSION = 'global-rrf-v1'
+# Artifact bytes/paths are immutable independently of runtime ranking policy.
+ARTIFACT_VERSION = 'global-rrf-v1'
+RANKING_VERSION = 'intent-relevance-v2'
 
 
 @dataclass(frozen=True)
@@ -50,6 +53,8 @@ class SearchResults:
     ranking_version: str = RANKING_VERSION
     usage: dict = field(default_factory=dict)
     latency_ms: float = 0
+    outcome: str = 'no_results'
+    suggestions: list[str] = field(default_factory=list)
 
 
 def _json(value):
@@ -62,7 +67,7 @@ def _policy_fingerprint(run):
 
 
 def _artifact_path(run, config):
-    return config.path('manifest_dir') / (run['run_id'] + '.' + RANKING_VERSION + '.sqlite')
+    return config.path('manifest_dir') / (run['run_id'] + '.' + ARTIFACT_VERSION + '.sqlite')
 
 
 def _catalog(run, records, corpus):
@@ -86,7 +91,7 @@ def _catalog(run, records, corpus):
 
 def _pin(run, records, catalog):
     return {'run_id':run['run_id'], 'xml_hash':run['xml_hash'], 'records_digest':digest(records),
-            'catalog_digest':digest(catalog), 'ranking_version':RANKING_VERSION,
+            'catalog_digest':digest(catalog), 'ranking_version':ARTIFACT_VERSION,
             'policy_fingerprint':_policy_fingerprint(run)}
 
 
@@ -211,7 +216,7 @@ def _validated_payload(run, records, config, corpus=None):
 
 
 def validate_search_artifact(run, records, config, corpus=None):
-    """Fail closed on stale content, path substitution or changed policy/ranking."""
+    """Fail closed on stale content, path substitution or changed artifact pins."""
     return _validated_payload(run, records, config, corpus)[0]
 
 
@@ -274,14 +279,59 @@ def _overlaps(left, right, text_field):
     return bool(shortest and shared / shortest >= .5)
 
 
-def search_library(query, run, config, corpus, *, client=None, product_ids=None, document_ids=None, limit=20):
-    """Explicit global discovery call. Teaching must select one returned scope.
+def _relevance(record, intent, product, *, semantic=False):
+    """Gate on source features, never RRF or a universal provider score cutoff.
 
-    Returned dictionaries preserve original source spans and record metadata;
-    rank-fusion scores are retrieval scores, never clinical confidence values.
-    Semantic-provider failure preserves verified local text matches and labels
-    the response degraded. Invalid local artifacts never fall through to cloud.
+    Named overviews admit catalog matches; topical questions also rank their
+    actual source/section overlap. Cross-product body matches remain eligible.
+    Semantic-only candidates need a source-grounded concept/section feature.
     """
+    text = record.get('source_text', '')
+    body = set(tokens(text + ' ' + str(record.get('section_title', ''))))
+    terms = set(intent.meaningful_terms)
+    qualifiers = terms - set(intent.alias_terms)
+    named = record['product_id'] in intent.product_candidates
+    source_words=' '+' '.join(tokens(text))+' '
+    body_reference=any(' '+alias+' ' in source_words for alias in intent.matched_aliases)
+    overlap = len(qualifiers & body)
+    topical_overlap = bool((qualifiers - {'not','no','never','without'}) & body)
+    section_words = set(SECTIONS.get(intent.section_intent, ()))
+    section = bool(section_words & set(tokens(str(record.get('section_title', '')))))
+    concept = sum(bool(terms & group) and bool(body & group) for group in CONCEPTS)
+    # Generic conversational words alone provide no retrieval evidence.
+    relevant = bool((named and (not qualifiers or topical_overlap or section or concept))
+                    or topical_overlap or (semantic and concept))
+    # Overview queries intentionally browse the named product's source.
+    if named and intent.section_intent == 'overview':relevant = True
+    if intent.product_candidates and not qualifiers:relevant = named or body_reference
+    if intent.product_candidates and not named:
+        # Shared section labels (mechanism, storage, warnings) cannot make
+        # another medicine relevant to a named question. Specific body terms
+        # still admit cross-product discoveries such as ACTIMMUNE latex.
+        specific = qualifiers - section_words - {'not','no','never','without'}
+        relevant = bool(specific & body) or body_reference
+    if not terms:relevant = False
+    coverage = overlap / len(qualifiers) if qualifiers else 0
+    return relevant, 4 * named + 3 * section + 2 * coverage + .5 * concept
+
+
+def search_local(query, run, config, corpus=None, *, product_ids=None, document_ids=None, limit=20):
+    """Search pinned local records without constructing or contacting a provider.
+
+    Legacy manual-review runs may not have a catalog/artifact. They use their
+    validated manifest records; full-library runs always require their artifact.
+    """
+    return _search(query,run,config,corpus,product_ids=product_ids,
+                   document_ids=document_ids,limit=limit,local_only=True)
+
+
+def search_library(query, run, config, corpus, *, client=None, product_ids=None, document_ids=None, limit=20):
+    """Explicit global discovery. Original query goes unchanged to semantics."""
+    return _search(query,run,config,corpus,client=client,product_ids=product_ids,
+                   document_ids=document_ids,limit=limit)
+
+
+def _search(query, run, config, corpus, *, client=None, product_ids=None, document_ids=None, limit=20, local_only=False):
     started = time.perf_counter()
     guard_text(query)
     if type(limit) is not int or not 1 <= limit <= 100:
@@ -289,89 +339,87 @@ def search_library(query, run, config, corpus, *, client=None, product_ids=None,
     if not run or run.get('status') != 'verified':
         raise ValueError('Choose a verified library version before searching.')
     for scope in (product_ids, document_ids):
-        if scope is not None and (not isinstance(scope, list) or not all(isinstance(v,str) and v for v in scope)):
+        if scope is not None and (not isinstance(scope,list) or not all(isinstance(v,str) and v for v in scope)):
             raise ValueError('Search filters must be lists of source identities.')
     records = manifest_records(run, config)
-    artifact, payload = _validated_payload(run, records, config, corpus)
-    result = SearchResults(query, run['run_id'], run['namespace'], run['xml_hash'])
+    manual = local_only and corpus is None and not run.get('full_library') and not run.get('search_artifact')
+    if manual:
+        validate_manifest_records(run, records, config)
+        artifact = payload = None
+    else:
+        artifact, payload = _validated_payload(run, records, config, corpus)
+    result = SearchResults(query,run['run_id'],run['namespace'],run['xml_hash'])
+    intent = analyze_query(query,corpus)
+    result.suggestions = intent.suggestions
     scoped = {r['_id']:r for r in records if (product_ids is None or r['product_id'] in product_ids)
               and (document_ids is None or r['document_id'] in document_ids)}
-    if not scoped:
-        result.latency_ms = (time.perf_counter()-started)*1000
-        return result
-    lexical = [rid for rid in _lexical_ids(payload, artifact.engine, query) if rid in scoped]
-    filters = [{ 'xml_hash':{'$eq':run['xml_hash']}}]
-    if product_ids is not None:
-        filters.append({'product_id':{'$in':sorted(set(product_ids))}})
-    if document_ids is not None:
-        filters.append({'document_id':{'$in':sorted(set(document_ids))}})
+    if manual:
+        lexical = [rid for rid,r in scoped.items() if set(intent.meaningful_terms)&set(tokens(r.get('source_text',r[config.settings['pinecone']['text_field']])+' '+str(r.get('section_title',''))))]
+    else:
+        lexical = [rid for rid in _lexical_ids(payload,artifact.engine,' '.join(intent.meaningful_terms)) if rid in scoped]
+    filters = [{'xml_hash':{'$eq':run['xml_hash']}}]
+    if product_ids is not None:filters.append({'product_id':{'$in':sorted(set(product_ids))}})
+    if document_ids is not None:filters.append({'document_id':{'$in':sorted(set(document_ids))}})
     semantic = []
-    client = client or DocumentsClient(config)
-    try:
-        if not getattr(client, 'host', True):
-            client.check()
-        hits = client.search(run['namespace'], query, {'$and':filters}, min(100,max(20,limit*3)))
-        if not isinstance(hits, list):
-            raise ValueError('Invalid semantic result shape.')
-        for hit in hits:
-            expected = scoped.get(hit.get('_id')) if isinstance(hit,dict) else None
-            if expected is None or any(hit.get(k) != v for k,v in expected.items()):
-                result.warnings.append('A semantic hit failed pinned source/scope verification and was excluded.')
-                continue
-            if expected['_id'] not in semantic:
-                semantic.append(expected['_id'])
-        reported = getattr(client, 'last_usage', None)
-        if isinstance(reported,dict):
-            result.usage = dict(reported)
-    except (ProviderError, SetupError, ValueError, OSError):
-        result.degraded = True
-        result.warnings.append('Semantic search is unavailable. Showing verified local text search matches only (degraded mode).')
-    ranks = {}
-    for channel in (lexical, semantic):
-        for rank, rid in enumerate(channel, 1):
-            ranks[rid] = ranks.get(rid,0) + 1/(60+rank)
-    names = {p.id:p for p in corpus.products}
-    normalized = ' '.join(_tokens(query))
+    if not local_only and scoped:
+        client = client or DocumentsClient(config)
+        try:
+            if not getattr(client,'host',True):client.check()
+            candidate_count = min(100,max(limit,config.settings.get('search',{}).get('semantic_candidates',60)))
+            hits = client.search(run['namespace'],query,{'$and':filters},candidate_count)
+            if not isinstance(hits,list):raise ValueError('Invalid semantic result shape.')
+            for hit in hits:
+                expected = scoped.get(hit.get('_id')) if isinstance(hit,dict) else None
+                if expected is None or any(hit.get(k)!=v for k,v in expected.items()):
+                    result.warnings.append('A semantic hit failed pinned source/scope verification and was excluded.')
+                    continue
+                if expected['_id'] not in semantic:semantic.append(expected['_id'])
+            reported = getattr(client,'last_usage',None)
+            if isinstance(reported,dict):result.usage=dict(reported)
+        except (ProviderError,SetupError,ValueError,OSError):
+            result.degraded=True
+            result.warnings.append('Semantic search is unavailable. Showing verified local text search matches only (degraded mode).')
+    ranks={}
+    for channel in (lexical,semantic):
+        for rank,rid in enumerate(channel,1):ranks[rid]=ranks.get(rid,0)+1/(60+rank)
+    field_name=config.settings['pinecone']['text_field']
+    relevance={}
     for rid in ranks:
-        product = names[scoped[rid]['product_id']]
-        # At most one quarter of a first-rank RRF contribution. Exact aliases
-        # help discovery without overriding relevance across both engines.
-        if normalized and normalized in {' '.join(_tokens(product.name)), ' '.join(_tokens(product.generic_name))}:
-            ranks[rid] += .004
-    ranked = sorted(ranks, key=lambda rid:(-ranks[rid], rid))
-    by_document = {}
-    field_name = config.settings['pinecone']['text_field']
-    for rid in ranked:
-        record = scoped[rid]
-        key = (record['product_id'], record['document_id'])
-        group = by_document.setdefault(key, [])
-        if not any(_overlaps(record, scoped[prior], field_name) for prior in group):
-            group.append(rid)
-    # Round robin prevents a long document's overlapping name hits from hiding
-    # other medicines or device variants at the global discovery limit.
-    chosen = []
-    depth = 0
-    while len(chosen) < limit:
-        current = [ids[depth] for ids in by_document.values() if len(ids) > depth]
-        if not current:
-            break
-        chosen.extend(current[:limit-len(chosen)])
-        depth += 1
-    catalog = {r['id']:r for r in _catalog(run, records, corpus)}
-    groups = {}
+        record=scoped[rid]
+        # Legacy records have source text in the configured indexed field.
+        candidate={**record,'source_text':record.get('source_text',record[field_name])}
+        relevant,score=_relevance(candidate,intent,None,semantic=rid in semantic)
+        if relevant:relevance[rid]=score
+    # Relevance first; document diversity only breaks equivalent relevance.
+    ranked=sorted(relevance,key=lambda rid:(-relevance[rid],-ranks[rid],rid))
+    chosen=[];seen_documents={}
+    while ranked and len(chosen)<limit:
+        best=relevance[ranked[0]]
+        peers=[rid for rid in ranked if relevance[rid]==best]
+        rid=min(peers,key=lambda rid:(seen_documents.get(scoped[rid]['document_id'],0),-ranks[rid],rid))
+        ranked.remove(rid);record=scoped[rid]
+        if any(_overlaps(record,scoped[prior],field_name) for prior in chosen):continue
+        chosen.append(rid);did=record['document_id'];seen_documents[did]=seen_documents.get(did,0)+1
+    catalog={r['id']:r for r in _catalog(run,records,corpus)} if not manual else {}
+    groups={}
     for rid in chosen:
-        record = scoped[rid]
-        metadata = {k:v for k,v in record.items() if k not in {'_id',field_name}}
-        metadata['source_spans'] = _spans(record)
-        hit = {'id':rid, 'text':record.get('source_text',record[field_name]), 'metadata':metadata,
-               'run_id':run['run_id'], 'namespace':run['namespace'], 'xml_hash':run['xml_hash'],
-               'score':ranks[rid], **{k:v for k,v in catalog[rid].items() if k != 'id'}}
+        record=scoped[rid]
+        metadata={k:v for k,v in record.items() if k not in {'_id',field_name}}
+        metadata['source_spans']=_spans(record)
+        metadata['indexed_text_bytes']=len(record[field_name].encode('utf-8'))
+        source=catalog.get(rid,{'product_id':record['product_id'],'document_id':record['document_id']})
+        hit={'id':rid,'text':record.get('source_text',record[field_name]),'metadata':metadata,
+             'run_id':run['run_id'],'namespace':run['namespace'],'xml_hash':run['xml_hash'],
+             'score':ranks[rid],**{k:v for k,v in source.items() if k!='id'}}
         result.hits.append(hit)
-        key = (record['product_id'],record['document_id'])
-        groups.setdefault(key, {'product_id':key[0], 'document_id':key[1], 'hits':[]})['hits'].append(hit)
+        key=(record['product_id'],record['document_id'])
+        groups.setdefault(key,{'product_id':key[0],'document_id':key[1],'hits':[]})['hits'].append(hit)
         if record.get('extraction_limitations') or record.get('layout_limitations'):
             result.warnings.append('A source has extraction/layout limitations. View its PDF page before interpreting table or figure relationships.')
-    result.groups = list(groups.values())
-    result.warnings = list(dict.fromkeys(result.warnings))
-    result.latency_ms = (time.perf_counter()-started)*1000
+    result.groups=list(groups.values())
+    if intent.ambiguity or intent.needs_context or (not chosen and result.suggestions):
+        result.outcome='clarification'
+    elif chosen:result.outcome='results'
+    result.warnings=list(dict.fromkeys(result.warnings))
+    result.latency_ms=(time.perf_counter()-started)*1000
     return result

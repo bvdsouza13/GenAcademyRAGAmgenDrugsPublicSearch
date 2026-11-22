@@ -71,7 +71,7 @@
 <text x="1022" y="517" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">7  Local lexical</text>
 <text x="1022" y="554" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">SQLite FTS5 if available</text>
 <text x="1022" y="581" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Deterministic fallback</text>
-<text x="1022" y="608" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Run + ranking identity</text>
+<text x="1022" y="608" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Pinned format; runtime ranking</text>
 <rect x="1305" y="475" width="275" height="158" rx="14" fill="#DCEEFE" stroke="#0063C3" stroke-width="1.5"/>
 <rect x="1305" y="495" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="1327" y="517" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">6  Upload chunks</text>
@@ -105,9 +105,9 @@
 <text x="412" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Use pinned XML catalog</text>
 <rect x="695" y="804" width="275" height="158" rx="14" fill="#DCEEFE" stroke="#0063C3" stroke-width="1.5"/>
 <rect x="695" y="824" width="5" height="29" rx="2" fill="#0063C3"/>
-<text x="717" y="846" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Fuse verified ranks</text>
+<text x="717" y="846" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Rank relevant evidence</text>
 <text x="717" y="883" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Local + semantic search</text>
-<text x="717" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Bounded name boost</text>
+<text x="717" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Names / typos / no-results gate</text>
 <text x="717" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Labeled degraded fallback</text>
 <rect x="1000" y="804" width="275" height="158" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="1000" y="824" width="5" height="29" rx="2" fill="#0063C3"/>
@@ -119,7 +119,7 @@
 <rect x="1305" y="824" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="1327" y="846" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Scoped teaching</text>
 <text x="1327" y="883" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Pinned product + doc + run</text>
-<text x="1327" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Checked OpenAI explanation</text>
+<text x="1327" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">60s budget; checked explanation</text>
 <text x="1327" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Snapshot PDF citations</text>
 <path d="M 360 883 L 390 883" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="390,883 380.0,888.0 380.0,878.0" fill="#0063C3"/>
@@ -149,7 +149,7 @@
 <text x="717" y="1166" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Equal evaluation</text>
 <text x="717" y="1203" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Same suite / search profile</text>
 <text x="717" y="1230" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Equal evidence budget</text>
-<text x="717" y="1257" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Recall / spans / latency</text>
+<text x="717" y="1257" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Precision / behavior / latency</text>
 <rect x="1000" y="1124" width="275" height="158" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="1000" y="1144" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="1022" y="1166" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Use configuration</text>
@@ -173,5 +173,5 @@
 <rect x="60" y="1370" width="1560" height="93" rx="12" fill="#FFF5DF" stroke="#E7C990" stroke-width="1.5"/>
 <text x="82" y="1404" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Provider usage occurs only on explicit build/search/evaluate/teach actions. Default/current control resets call no provider.</text>
 <text x="82" y="1433" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#153B5C" font-weight="400" text-anchor="start">Retrieval observations and source provenance do not establish clinical accuracy. Retain all version artifacts for old citations.</text>
-<text x="60" y="1524" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  11 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
+<text x="60" y="1524" font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#4D667B" font-weight="400" text-anchor="start">LOCAL IMPLEMENTATION  •  22 NOV 2026  •  Blue = application / service exchange; amber = source or release constraint</text>
 </svg>

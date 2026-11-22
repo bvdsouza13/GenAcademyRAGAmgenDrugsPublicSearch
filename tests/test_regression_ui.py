@@ -251,3 +251,52 @@ def test_demo_exit_reentry_restart_and_missing_source_keep_state_honest(app, mon
     assert not at.success
     assert at.button(key='demo_check').disabled
     assert service.calls == []
+
+
+def test_limited_quiz_offers_source_reading_instead_of_scoring(app):
+    at, service = app
+    service.quiz = lambda *args, **kwargs: {'error':'Incomplete continuation context.', 'limited_source': True}
+    choose_quiz(at)
+    click(at, 'Create a source-based quiz')
+    assert not [r for r in at.radio if r.label == 'Your answer']
+    assert any('original source' in item.value.lower() for item in at.warning)
+
+
+def test_quiz_with_wrong_explicit_product_identity_cannot_be_scored(app):
+    at, service = app
+    service.quiz = lambda *args, **kwargs: {'question':'Wrong scope', 'choices':['a','b'],
+        'correct_index':1,'product_id':'other','document_id':'other-doc'}
+    choose_quiz(at)
+    click(at, 'Create a source-based quiz')
+    assert not [r for r in at.radio if r.label == 'Your answer']
+    assert at.warning
+
+
+def test_real_shuffled_quiz_keeps_choices_correct_grading_and_rationale_after_navigation(app):
+    from amgen_explorer.models import EvidenceBundle
+    from amgen_explorer.teaching import make_quiz
+    at, service = app
+    bundle = EvidenceBundle('Read source','repatha','staged','xml-sha',[{
+        'id':'c1','text':'Exact source passage with its studied population and limitation.',
+        'metadata':{'product_id':'repatha','document_id':'doc','document_sha256':'sha',
+                    'section_id':'1','section_title':'Indications and usage','page_start':1,
+                    'page_end':1,'filename':'repatha.pdf','xml_hash':'xml-sha','review_state':'accepted'},
+        'namespace':'staged'}])
+    class Rotate:
+        def shuffle(self, choices): choices[:] = choices[1:] + choices[:1]
+    generated = make_quiz(bundle, None, rng=Rotate())
+    assert generated['correct_index'] == 2
+    service.quiz = lambda *args, **kwargs: generated
+    choose_quiz(at)
+    click(at, 'Create a source-based quiz')
+    original_options = list(quiz_answer(at).options)
+    quiz_answer(at).set_value(2).run()
+    click(at, 'Check answer')
+    assert any('Correct.' in item.value for item in at.success)
+    navigate(at, 'My learning')
+    navigate(at, 'Learn with chat')
+    at.selectbox(key='document_id').set_value('doc').run()
+    choose_quiz(at)
+    assert quiz_answer(at).value == 2 and list(quiz_answer(at).options) == original_options
+    assert any('Correct.' in item.value for item in at.success)
+    assert any(generated['rationale'] in item.value for item in at.markdown)

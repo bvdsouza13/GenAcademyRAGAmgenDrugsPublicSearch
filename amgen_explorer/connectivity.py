@@ -9,13 +9,16 @@ from scripts.setup_pinecone import (NoRedirect, PineconeControlPlane, SetupError
                                     normalize_host, validate_index)
 
 class ProviderError(RuntimeError):
-    def __init__(self, provider, status=None):
+    def __init__(self, provider, status=None, *, retry_after=None):
         self.status = status
+        self.retry_after = retry_after
         self.retryable = status in (408, 429, 500, 502, 503, 504) or status is None
         super().__init__(f"{provider} request failed" + (f" (HTTP {status})" if status else "") + ". Check connectivity, configuration and service permissions.")
 
 def request_json(url, payload=None, *, headers=None, method="POST", timeout=30):
     """Never follow redirects or expose remote bodies/headers in exceptions."""
+    from .reliability import deadline_timeout, check_deadline, parse_retry_after
+    timeout = deadline_timeout(timeout)
     body = None if payload is None else json.dumps(payload, ensure_ascii=False, allow_nan=False).encode()
     req = Request(url, data=body, method=method,
                   headers={"Content-Type": "application/json", "Accept": "application/json", **(headers or {})})
@@ -24,12 +27,14 @@ def request_json(url, payload=None, *, headers=None, method="POST", timeout=30):
             result = json.loads(response.read())
     except HTTPError as exc:
         code = exc.code
+        retry_after = parse_retry_after(exc.headers.get('Retry-After')) if exc.headers else None
         exc.close()
-        raise ProviderError("Cloud", code) from None
+        raise ProviderError("Cloud", code, retry_after=retry_after) from None
     except (URLError, OSError, HTTPException, ValueError, UnicodeError):
         raise ProviderError("Cloud") from None
     if not isinstance(result, dict):
         raise ProviderError("Cloud")
+    check_deadline()
     return result
 
 class DocumentsClient:
@@ -49,12 +54,15 @@ class DocumentsClient:
         return {"ready": True, "host": self.host, "api_version": self.pc["api_version"]}
 
     def _call(self, operation, namespace, body):
+        from .reliability import retry_call, deadline_timeout
         if not self.config.pinecone_api_key:
             raise ValueError("PINECONE_API_KEY is missing.")
         host = normalize_host(self.host)
-        return self.transport(f"https://{host}/namespaces/{quote(namespace, safe='')}/documents/{operation}", body,
+        def request():
+            return self.transport(f"https://{host}/namespaces/{quote(namespace, safe='')}/documents/{operation}", body,
                               headers={"Api-Key": self.config.pinecone_api_key,
-                                       "X-Pinecone-Api-Version": self.pc["api_version"]})
+                                       "X-Pinecone-Api-Version": self.pc["api_version"]}, timeout=deadline_timeout(30))
+        return retry_call(request, settings=self.config.settings) if operation in {'fetch', 'search'} else request()
 
     def upsert(self, namespace, documents):
         return self._call("upsert", namespace, {"documents": documents})
@@ -80,8 +88,9 @@ def check_connections(config):
     try:
         status = DocumentsClient(config).check()
         result["pinecone"] = {"ok": True, **status}
-    except (SetupError, ProviderError, ValueError):
+    except (SetupError, ProviderError, ValueError) as error:
         result["pinecone"]["message"] = "Pinecone unavailable or index/schema incompatible. Check settings, key and index readiness."
+        result['pinecone']['http_status'] = getattr(error, 'status', None)
     try:
         errors = config.validate(require_chat=True)
         if errors:
@@ -91,7 +100,9 @@ def check_connections(config):
                      method="GET", headers={"Authorization": "Bearer " + config.openai_api_key},
                      timeout=config.settings["openai"]["request_timeout_seconds"])
         result["openai"] = {"ok": True, "model": model,
+                            "generation_checked": False,
                             "message": "Model is available; generation was not requested."}
-    except (ProviderError, ValueError):
+    except (ProviderError, ValueError) as error:
         result["openai"]["message"] = "OpenAI unavailable. Check key, model access and settings."
+        result['openai']['http_status'] = getattr(error, 'status', None)
     return result

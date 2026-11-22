@@ -17,6 +17,9 @@ if page == 'Demo tour':
     sidebar(None, demo_mode=True)
     demo.render(None, None, None)
 else:
+    service = None
+    active = None
+    startup_failed = False
     try:
         service = ExplorerService()
         active = service.active()
@@ -28,9 +31,12 @@ else:
             corpus = service.library_corpus(active['run_id'])
             st.warning('The working XML could not be opened. Search and existing conversations continue using the verified library snapshot. Repair or update local sources in Admin.')
     except Exception:
-        st.error('The local library could not be opened. Check the configuration file and local source paths, then reload.')
-        st.stop()
+        startup_failed = True
     sidebar(active)
+    if startup_failed:
+        from ui.recovery import render as render_recovery
+        render_recovery(service)
+        st.stop()
     if page == 'Search & Learn':
         if st.session_state.get('learning_view'):
             learn.render(service,corpus,active)

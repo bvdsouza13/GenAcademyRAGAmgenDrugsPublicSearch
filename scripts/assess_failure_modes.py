@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 from amgen_explorer.connectivity import ProviderError
 from amgen_explorer.indexing import manifest_records
 from amgen_explorer.service import ExplorerService
-from amgen_explorer.teaching import _incomplete_continuations, _sources
+from amgen_explorer.evidence_policy import assess_evidence
 from scripts.setup_pinecone import SetupError
 
 
@@ -68,14 +68,17 @@ def assess(service, *, live=False, verify_remote=False):
             row = {'document_id': document.id, 'product_id': document.product_id, 'question': question}
             try:
                 evidence = service._evidence(question, document.product_id, document.id, run_id=run['run_id'])
-                sources = _sources(evidence)
+                assessment = assess_evidence(evidence)
+                sources = assessment.sources
                 state = 'eligible_for_generation'
                 if not sources:
                     state = 'no_verified_evidence'
                 elif any(p['metadata'].get('extraction_limitations') for p in sources.values()):
                     state = 'layout_source_fallback'
-                elif _incomplete_continuations(sources) or any('continuation context' in w.lower() for w in evidence.warnings):
+                elif 'incomplete_continuations' in assessment.reasons or 'missing_required_context' in assessment.reasons:
                     state = 'incomplete_context_source_fallback'
+                elif not assessment.generation_eligible:
+                    state = 'source_validation_fallback'
                 row.update(state=state, passages=len(sources), warnings=list(dict.fromkeys(evidence.warnings)),
                            sections=sorted({p['metadata']['section_title'] for p in sources.values()}))
             except ProviderError as exc:
