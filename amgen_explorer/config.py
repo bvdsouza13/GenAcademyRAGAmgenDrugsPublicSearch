@@ -132,8 +132,12 @@ class AppConfig:
                 errors.append(f'search.{key} must be between 1 and 100.')
         app, pc = self.settings["app"], self.settings["pinecone"]
         chunk, retrieval, ai = (self.settings[k] for k in ("chunking", "retrieval", "openai"))
-        if app["mode"] != "local" or app["auth_enabled"]:
-            errors.append("Only local mode with auth_enabled=false is implemented; hosted authorization is not built.")
+        if app["mode"] not in {"local", "hosted"}:
+            errors.append("app.mode must be local or hosted.")
+        elif app["mode"] == "local" and app["auth_enabled"]:
+            errors.append("Local mode must keep auth_enabled=false so the offline workflow remains usable.")
+        elif app["mode"] == "hosted" and not app["auth_enabled"]:
+            errors.append("Hosted mode requires auth_enabled=true.")
         if not app["name"].strip():
             errors.append("app.name must be nonempty.")
         for name in ("auto_create_index", "auto_reindex"):

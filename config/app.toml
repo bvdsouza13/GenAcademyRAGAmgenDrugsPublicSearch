@@ -2,6 +2,8 @@
 # Shared by the Streamlit application, pipeline and command-line checks.
 [app]
 name = "Amgen Medicine Explorer"
+# Keep local mode for the offline workflow. Hosted mode requires Streamlit OIDC
+# settings and the ADMIN_EMAILS allowlist configured outside this file.
 mode = "local"
 auth_enabled = false
 auto_create_index = false

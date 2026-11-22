@@ -1,9 +1,11 @@
 """Reachable recovery controls even when the active pointer is unreadable."""
 import streamlit as st
+from amgen_explorer.auth import require_admin
 from ui.common import action
 
 
-def render(service=None, startup_error=None):
+def render(service=None, startup_error=None, *, settings=None):
+    require_admin(settings)
     if startup_error:
         st.error('The persistent library could not be restored: ' + startup_error)
     else:

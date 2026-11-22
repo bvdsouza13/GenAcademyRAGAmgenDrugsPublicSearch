@@ -10,9 +10,15 @@ python -m streamlit run app.py --server.address 0.0.0.0 --server.port 5000
 
 Use the **Demo tour** or open `/?demo=1` to see the prepared offline walkthrough. It does not require provider credentials or a built library.
 
+## Access modes
+
+The checked-in configuration keeps the app in local mode so the offline demo and local workflow remain available without sign-in. For a hosted pilot, set `[app].mode = "hosted"` and `auth_enabled = true` in `config/app.toml`, configure Streamlit's OIDC `[auth]` settings in the private `.streamlit/secrets.toml`, and add `ADMIN_EMAILS` as a Replit Secret containing comma-separated verified administrator email addresses. Do not commit a populated secrets file.
+
+Hosted learner pages require OIDC sign-in. Admin, source-management, and recovery pages also check the verified email allowlist in server-side Python; hiding a navigation item is not the authorization control. The prepared offline demo remains available without sign-in or provider credentials.
+
 ## Current limitations
 
-The app remains in local mode by default. Do not publish it as a shared service until protected learner access and server-side Admin authorization are in place. The local Admin workflow can perform cloud operations when configured, so use it only in a trusted development workspace.
+The app remains in local mode by default. Hosted use requires configured OIDC and an administrator allowlist. Do not use real learner or administrator data until the hosted Admin safeguards are complete and the configured App Storage bucket has passed an upload/restore round trip. The local Admin workflow can perform cloud operations when configured, so use it only in a trusted development workspace.
 
 Live search and generated answers require `PINECONE_API_KEY` and `OPENAI_API_KEY` in Replit Secrets, plus an explicitly built library and configured Pinecone index. No provider credentials are configured by this setup. The offline demo is available without them.
 

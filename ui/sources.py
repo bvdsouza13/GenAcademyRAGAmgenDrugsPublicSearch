@@ -4,10 +4,12 @@ from pathlib import Path
 from html import escape
 import json
 import streamlit as st
+from amgen_explorer.auth import require_admin
 from ui.common import action, hero, source_text, source_variant, source_view
 
 
-def render(service,corpus,active):
+def render(service,corpus,active,*,settings=None):
+    require_admin(settings)
     hero('Build a trusted learning library.', 'From source PDFs to searchable, cited explanations.','KNOWLEDGE WORKSHOP')
     st.html('<div class="journey"><span>1 · Source files</span><span>2 · Build XML</span><span>3 · Review content</span><span>4 · Stage & publish</span></div>')
     st.caption('Local curator workspace · Review decisions apply to the exact source passage and content hash.')

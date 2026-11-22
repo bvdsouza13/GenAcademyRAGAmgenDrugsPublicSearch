@@ -59,14 +59,17 @@ def navigate(page, product=None, document=None, run_id=None, pending_query=None)
         st.session_state['pending_query'] = pending_query or ''
 
 
-def sidebar(active, *, demo_mode=False):
+def sidebar(active, *, demo_mode=False, hosted=False, admin_user=True):
     with st.sidebar:
         st.image(str(ROOT / 'docs/assets/amgen-blue-logo.png'), width=195)
         st.caption('This is Test App for Educational Purposes')
         st.header('Medicine Explorer')
         st.caption('Discover. Understand. Keep learning.')
         st.divider()
-        st.radio('Your workspace', LEGACY_PAGES if st.query_params.get('legacy') == '1' else PAGES, key='nav', label_visibility='collapsed')
+        pages = LEGACY_PAGES if st.query_params.get('legacy') == '1' else PAGES
+        if hosted and not admin_user:
+            pages = [page for page in pages if page not in {'Admin', 'Manage sources'}]
+        st.radio('Your workspace', pages, key='nav', label_visibility='collapsed')
         st.divider()
         if demo_mode:
             st.info('Three-minute guided demo')
@@ -77,7 +80,7 @@ def sidebar(active, *, demo_mode=False):
         else:
             st.info('Library setup in progress')
             st.caption('Build the entire library in Admin to enable search and learning.')
-        st.caption('LOCAL EDUCATIONAL PROTOTYPE')
+        st.caption('LEARNER PILOT' if hosted else 'LOCAL EDUCATIONAL PROTOTYPE')
         st.caption('Based on your prescribing-information library. Personal treatment decisions belong with your healthcare professional.')
 
 

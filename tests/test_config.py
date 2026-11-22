@@ -123,6 +123,13 @@ class ConfigTests(unittest.TestCase):
                 cfg.settings["app"][key] = value
                 self.assertTrue(cfg.validate())
 
+    def test_hosted_mode_is_valid_only_with_auth_enabled(self):
+        cfg = self.load()
+        cfg.settings["app"].update(mode="hosted", auth_enabled=True)
+        self.assertFalse(cfg.validate())
+        cfg.settings["app"]["auth_enabled"] = False
+        self.assertTrue(any("Hosted mode requires auth_enabled=true" in error for error in cfg.validate()))
+
     def test_default_chat_model_accepts_max_reasoning(self):
         cfg = self.load()
         cfg.settings["openai"]["reasoning_effort"] = "max"
