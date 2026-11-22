@@ -34,3 +34,15 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[deployment]
+deploymentTarget = "cloudrun"
+
+[deployment.run]
+args = ["sh", "-c", "/nix/store/mnjsfz2lyr84m1d51pygk55i4wa1lbc3-python3-wrapper/bin/python3 $file"]
+
+[deployment.run.env]
+file = "app.py"
+
+[objectStorage]
+defaultBucketID = "replit-objstore-ed1b5add-8303-4ce8-bc57-0885b20efe94"
