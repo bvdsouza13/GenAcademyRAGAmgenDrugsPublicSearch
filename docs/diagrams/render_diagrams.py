@@ -97,7 +97,7 @@ class Diagram:
 def architecture():
     d = Diagram("01-solution-architecture", "01", "Whole-library solution architecture", "One registered library, global content discovery and version-pinned source teaching")
     d.rect(60, 185, 1560, 142, NAVY, NAVY)
-    d.text(85, 222, "LOCAL STREAMLIT EXPERIENCE", 18, WHITE, 700)
+    d.text(85, 222, "LOCAL STREAMLIT EXPERIENCE  /  EDUCATIONAL TEST APP", 18, WHITE, 700)
     for x, title, detail in [(85, "Search & Learn", "Body text, names, source excerpts"), (600, "Admin: Library", "Build, verify, repair and recover"), (1115, "Chunk experiments", "Test, Use, Default, Restore, Revert")]:
         d.text(x, 264, title, 24, WHITE, 700)
         d.text(x, 298, detail, 18, "#C7E7FF")
@@ -114,8 +114,8 @@ def architecture():
         "Verify / exact repair; activate together", "Retain previous full library",
     ], body=17.5)
     d.card(825, 458, 340, 221, "Discovery and teaching", [
-        "Query intent + relevance ranking", "Group medicine / document hits", "Ask one selected source",
-        "Pin run through chat and quiz", "Shared evidence gate + safe fallback",
+        "Condition + positive use evidence", "Indications first; complete groups", "Group medicine / document hits",
+        "Pin run through chat and quiz", "Recheck context before teaching",
     ], body=17.5)
     d.arrow([(425, 568), (455, 568)])
     d.arrow([(795, 568), (825, 568)])
@@ -179,9 +179,9 @@ def data_flow():
     query = [
         ("Submit content query", ["Body / heading / brand", "Generic names included", "Medicine choice optional"], WHITE, LINE),
         ("Pin verified run", ["Check immutable records", "Check lexical artifact", "Use pinned XML catalog"], WHITE, LINE),
-        ("Rank relevant evidence", ["Local + semantic search", "Names / typos / no-results gate", "Labeled degraded fallback"], "#DCEEFE", BLUE),
+        ("Rank relevant evidence", ["Local + semantic search", "Positive use / indications first", "No filler; labeled fallback"], "#DCEEFE", BLUE),
         ("Grouped sources", ["Deduplicate overlap", "Keep source variants apart", "View / Ask about source"], WHITE, LINE),
-        ("Scoped teaching", ["Pinned product + doc + run", "60s budget; checked explanation", "Snapshot PDF citations"], "#DCEEFE", BLUE),
+        ("Scoped teaching", ["Same use gate; atomic context", "Recheck chat / quiz evidence", "Pinned PDF / 60s budget"], "#DCEEFE", BLUE),
     ]
     for x, (title, lines, fill, stroke) in zip(cols, query):
         d.card(x, 804, width, 158, title, lines, fill, stroke, 20, 17, 27)
@@ -215,11 +215,11 @@ def deployment():
     d.rect(1160,190,460,735,"#F5F9FC",LINE,dashed=True)
     d.text(1185,232,"REMOTE PROVIDER BOUNDARY",21,NAVY,700)
     d.card(90,285,400,190,"Local browser",[
-        "Search & Learn / Admin", "Session learning and prepared demo", "Keys stay in server-side Python",
+        "Search & Learn / Admin", "Educational Test App notice", "Session learning and prepared demo", "Keys stay in server-side Python",
     ],body=18)
     d.card(600,285,450,240,"Python + Streamlit",[
         "127.0.0.1:8501 / local process", "Whole-library build + search + teach", "Explicit submissions; persisted jobs",
-        "Run-pinned chat, quiz and citations", "Local operator controls; no hosted auth",
+        "Shared use gate; pinned chat / quiz", "Local operator controls; no hosted auth",
     ],body=18)
     d.arrow([(490,374),(600,374)],both=True)
     d.lines(514,329,["Local","HTTP"],17,BLUE,23)

@@ -16,15 +16,16 @@
 <rect x="90" y="305" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="112" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Local browser</text>
 <text x="112" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Search &amp; Learn / Admin</text>
-<text x="112" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Session learning and prepared demo</text>
-<text x="112" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Keys stay in server-side Python</text>
+<text x="112" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Educational Test App notice</text>
+<text x="112" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Session learning and prepared demo</text>
+<text x="112" y="451" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Keys stay in server-side Python</text>
 <rect x="600" y="285" width="450" height="240" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="600" y="305" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="622" y="327" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Python + Streamlit</text>
 <text x="622" y="364" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">127.0.0.1:8501 / local process</text>
 <text x="622" y="393" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Whole-library build + search + teach</text>
 <text x="622" y="422" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Explicit submissions; persisted jobs</text>
-<text x="622" y="451" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Run-pinned chat, quiz and citations</text>
+<text x="622" y="451" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Shared use gate; pinned chat / quiz</text>
 <text x="622" y="480" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#153B5C" font-weight="400" text-anchor="start">Local operator controls; no hosted auth</text>
 <path d="M 490 374 L 600 374" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="600,374 590.0,379.0 590.0,369.0" fill="#0063C3"/>

@@ -94,3 +94,7 @@ Admin's **Check search and generated answers** explicitly tests model access, se
 Admin's **Verify stored library** compares all expected records and every document scope. **Repair missing or changed records** restores exact original content from intact local pins. It cannot repair altered local provenance. Use **Details → Open library recovery** for trusted XML regeneration or retained-version restoration. Never treat a connection outage as evidence that the index is empty.
 
 Retention inventory reports local storage and provider-reported usage. Remote storage/dollar charges remain unknown. The official Documents API supports asynchronous [deletion by explicit IDs](https://docs.pinecone.io/reference/api/2026-07/data-plane/delete_documents), but this app deliberately retains versions until durable publication/conversation references can prove cleanup safe; it has no deletion adapter. A 202 acceptance would not prove deletion complete.
+
+## Treatment-query relevance update
+
+The shared condition-use policy is code, not a new Pinecone setting. Existing secrets, index, namespace, XML, 600/80 controls and lexical artifacts remain usable. A ranking-only update needs no re-upload or re-embedding. `search.result_limit` is a maximum: fewer qualifying results is intentional. The local regression command is `scripts/check_condition_search.py`; add `--live` only for an explicit provider query check. See the [current release report](implementation/condition-search-release.md) for observed results and limitations.

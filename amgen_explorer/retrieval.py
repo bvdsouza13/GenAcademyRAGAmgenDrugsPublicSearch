@@ -5,7 +5,7 @@ from .models import EvidenceBundle
 from .indexing import guard_text, manifest_records
 from .connectivity import DocumentsClient, ProviderError
 from scripts.setup_pinecone import SetupError
-from .evidence_selection import select_evidence
+from .evidence_selection import condition_context, select_evidence
 from .learning_policy import learning_intent
 from .eligibility import policy_for, BULK_POLICY
 
@@ -99,6 +99,16 @@ def retrieve(question, product_id, active, config, document_id=None, *, client=N
             continue
         candidates.append(record)
     intent = learning_intent(question)
+    context = condition_context(question, scoped, corpus, product_id=product_id, primary_only=True)
+    if context.active:
+        empty.warnings.extend(context.reasons)
+        if not context.records:
+            return empty
+        # Source-use eligibility is identical for cloud and local fallback.
+        # Feed only complete eligible groups into packing; the general topic
+        # expansion must not reintroduce a different indication subsection.
+        scoped = context.records
+        candidates = context.records
     if intent in ('overview', 'safety') and not any(
             any(word in (str(r.get('section_kind',''))+' '+str(r.get('section_title',''))).lower()
                 for word in SAFETY_KINDS) for r in scoped):
@@ -107,8 +117,10 @@ def retrieve(question, product_id, active, config, document_id=None, *, client=N
         return empty
     field = config.settings['pinecone']['text_field']
     selection = select_evidence(question, [{**r, '_evidence_text': r[field]} for r in scoped],
-                                [r['_id'] for r in candidates],
-                                budget_bytes=config.settings['retrieval']['evidence_token_budget'], intent=intent)
+                                context.ranked_ids if context.active else [r['_id'] for r in candidates],
+                                budget_bytes=config.settings['retrieval']['evidence_token_budget'],
+                                intent='general' if context.active else intent,
+                                required_groups=context.required_groups if context.active else None)
     empty.warnings.extend(selection.reasons)
     for record in selection.records:
         empty.passages.append({'id': record['_id'], 'text': record.get('source_text', record[field]),

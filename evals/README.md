@@ -1,6 +1,6 @@
 # Evaluation and historical pilot evidence
 
-The evaluation contract separates global discovery from source-scoped teaching. Current verification outcomes are recorded in the [bulk-refactor release report](../docs/implementation/bulk-refactor-release-report.md); a test fixture's existence does not mean its live evaluation has been run.
+The evaluation contract separates global discovery from source-scoped teaching. Current verification outcomes are recorded in the [condition-search release report](../docs/implementation/condition-search-release.md); a test fixture's existence does not mean its live evaluation has been run.
 
 `questions.jsonl` retains the 50 provenance fixtures: one mechanism question per supplied PDF plus scope, safety, missing-evidence, qualifier and source-instruction cases. These support source integrity and regression testing. Global cases additionally need name-free content queries with expected documents and exact quotes/spans. Expected evidence is independent of a chunk configuration's IDs.
 
@@ -32,4 +32,15 @@ Behavioral retrieval cases execute outcome, no-results and suggestion assertions
 
 The 2026-11-22 remediation baseline was captured before ranking changes using 51 read-only local queries over the retained full-library run and v1 SQLite artifact. No provider calls, uploads or embeddings were made. The saved baseline, frozen suite hash and candidate replay live in `.superpowers/sdd/2026-11-22-reliability-remediation/search-{baseline,evaluation}.json`. This measures local discovery only; it does not establish live hybrid precision or calibrate provider similarity scores. No aggregate acceptance target was inferred from these labels. Development calibration removed conversational filler and gates candidates by catalog/body/section/concept evidence. Provider scores and RRF are not confidence values and there is no universal vector-score cutoff. Semantic paraphrases outside these conservative source features may need more development labels and live read-only evaluation.
 
-Runtime query policy (`intent-relevance-v2`) is recorded separately from immutable artifact identity (`global-rrf-v1`). Retained descriptors, paths, checksums and source pins stay authoritative, so a ranking-only deployment requires zero upserts or re-embedding. Automatic coverage questions use a product name when no meaningful mechanism heading exists; parser headings such as “PDF page 1: extracted text layer” are not learner queries.
+Runtime query policy (`intent-relevance-v3`) is recorded separately from immutable artifact identity (`global-rrf-v1`). Retained descriptors, paths, checksums and source pins stay authoritative, so a ranking-only deployment requires zero upserts or re-embedding. Automatic coverage questions use a product name when no meaningful mechanism heading exists; parser headings such as “PDF page 1: extracted text layer” are not learner queries.
+
+## Condition-use regression suite
+
+`condition-search.json` is a separately audited suite of 12 source-use cases / 24 query formulations. Expected medicine sets and leading indication blocks were frozen from the supplied labels, independently of search ranking. It covers migraine prevention versus acute relief, osteoporosis populations, rheumatoid/psoriatic arthritis, asthma maintenance versus acute relief, unsupported malaria and linked diabetic-macular-edema headings. The 51-case learner suite remains unchanged.
+
+```bash
+.venv-corpus/bin/python scripts/check_condition_search.py --output output/condition-search/local.json
+.venv-corpus/bin/python scripts/check_condition_search.py --live --output output/condition-search/live.json
+```
+
+Default evaluation reads the active pinned local artifact. `--live` explicitly calls semantic search and rejects degraded results. Neither mode uploads, rebuilds, embeds or changes the active pointer. Expected identities never become retrieval filters. The checker validates source/XML hashes, literal quotes and audited blocks, exact returned medicine sets, leading indication evidence and citation resolution. It exits nonzero on mismatches. These are product-set and leading-evidence checks, not a claim that every lower passage is clinically relevant or that all possible treatments are covered. Preserve the fixture when tuning; separately version new source labels.

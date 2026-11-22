@@ -107,8 +107,8 @@
 <rect x="695" y="824" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="717" y="846" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Rank relevant evidence</text>
 <text x="717" y="883" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Local + semantic search</text>
-<text x="717" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Names / typos / no-results gate</text>
-<text x="717" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Labeled degraded fallback</text>
+<text x="717" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Positive use / indications first</text>
+<text x="717" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">No filler; labeled fallback</text>
 <rect x="1000" y="804" width="275" height="158" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="1000" y="824" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="1022" y="846" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Grouped sources</text>
@@ -118,9 +118,9 @@
 <rect x="1305" y="804" width="275" height="158" rx="14" fill="#DCEEFE" stroke="#0063C3" stroke-width="1.5"/>
 <rect x="1305" y="824" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="1327" y="846" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#072B50" font-weight="700" text-anchor="start">Scoped teaching</text>
-<text x="1327" y="883" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Pinned product + doc + run</text>
-<text x="1327" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">60s budget; checked explanation</text>
-<text x="1327" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Snapshot PDF citations</text>
+<text x="1327" y="883" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Same use gate; atomic context</text>
+<text x="1327" y="910" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Recheck chat / quiz evidence</text>
+<text x="1327" y="937" font-family="Helvetica, Arial, sans-serif" font-size="17" fill="#153B5C" font-weight="400" text-anchor="start">Pinned PDF / 60s budget</text>
 <path d="M 360 883 L 390 883" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="390,883 380.0,888.0 380.0,878.0" fill="#0063C3"/>
 <path d="M 665 883 L 695 883" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>

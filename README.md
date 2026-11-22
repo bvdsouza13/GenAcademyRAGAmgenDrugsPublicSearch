@@ -20,9 +20,11 @@ python3.12 -m venv .venv-corpus
 
 ## Search & Learn
 
-Submit a word or question under **Search all medicine information**. Try `ACTIMMUNE`, `latex` or `storage temperature`. Search covers body text, headings, brand names and generic names across the selected library version. Results group by medicine and document, keep the two Repatha sources separate, and show exact excerpts, physical PDF pages, section and available revision.
+Submit a word or question under **Search all medicine information**. Try `ACTIMMUNE`, `latex`, `storage temperature` or `What can treat migraine?`. Search covers body text, headings, brand names and generic names across the selected library version. Results group by medicine and document, keep the two Repatha sources separate, and show exact excerpts, physical PDF pages, section and available revision.
 
 **View source** opens the retained PDF. **Ask about this source** starts teaching within that medicine/document and pins its library version. Changing the active library cannot silently change an existing conversation or its citations. Global discovery may show multiple medicines; teaching uses the selected source. If semantic search is unavailable, an explicit notice identifies verified local text results as degraded search.
+
+Recognized treatment/prevention questions show **Treatment evidence from your library**. The same conservative source-use checks apply to search, chat, re-explanation and quiz evidence. Indications rank first; incidental/adverse mentions and generic matches such as “intent-to-treat” cannot qualify on their own. Results retain the source’s population and preventive/acute limits and may contain fewer passages. No matching evidence means this loaded library did not establish a use. Ordinary mechanism, safety, dose and storage questions retain their own context. The sidebar labels the application **This is Test App for Educational Purposes**.
 
 Search runs on submission. Changing a filter, explanation style or navigation item does not repeat a provider request. The medicine catalog is an optional browse view. Session progress and the prepared **Demo tour** remain secondary navigation.
 
@@ -89,6 +91,7 @@ The adapter targets the existing Pinecone Documents API `2026-07`, `chunk_text`,
 ```bash
 .venv-corpus/bin/python -m pytest
 .venv-corpus/bin/python scripts/test_offline.py --shuffle-seed 271828
+.venv-corpus/bin/python scripts/check_condition_search.py --output output/condition-search/local.json
 .venv-corpus/bin/python scripts/build_amgen_xml.py --validate-only
 .venv-corpus/bin/python scripts/manage_corpus.py --help
 ```
@@ -113,7 +116,7 @@ Retain `Documents/`, `XML/` and `data/` together. `data/source-registry.json` is
 
 The earlier six-chunk/four-mechanism-passage pilot and its live smoke results are historical. They do not describe the searchable coverage of a new bulk run. Source-fidelity review is separate from clinical review, and supplied documents are not asserted to be the latest labels. This custom XML is not FDA SPL.
 
-The [reliability remediation report](docs/implementation/reliability-remediation-release.md) records the latest changes and checks. The historical [bulk-refactor release report](docs/implementation/bulk-refactor-release-report.md) records its verified coverage, regression results, live searches, chunk comparison and operating limits. Earlier [release QA](docs/implementation/release-qa-report.md), [regression assessment](docs/implementation/additional-regression-assessment.md) and [pilot evidence](evals/pilot-report.md) describe their original scope and are superseded for current workflow/status claims. Their recorded measurements must not be read as a new full-library cloud evaluation.
+The [condition-search release report](docs/implementation/condition-search-release.md) records the current relevance changes, full regression results and release status. The [reliability remediation report](docs/implementation/reliability-remediation-release.md) records the preceding eight-area fixes. The historical [bulk-refactor release report](docs/implementation/bulk-refactor-release-report.md) records its verified coverage, regression results, live searches, chunk comparison and operating limits. Earlier [release QA](docs/implementation/release-qa-report.md), [regression assessment](docs/implementation/additional-regression-assessment.md) and [pilot evidence](evals/pilot-report.md) describe their original scope and are superseded for current workflow/status claims. Their recorded measurements must not be read as a new full-library cloud evaluation.
 
 - [Architecture and editable diagrams](docs/architecture.md)
 - [Current product design](docs/amgen-medicine-explorer-design.md), [approved bulk/search design](docs/superpowers/specs/2026-11-11-bulk-library-global-search-design.md), [refactor implementation plan](docs/superpowers/plans/2026-11-11-bulk-library-global-search-refactor.md)

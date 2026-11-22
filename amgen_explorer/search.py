@@ -18,13 +18,13 @@ import tempfile
 import time
 
 from .connectivity import DocumentsClient, ProviderError
-from .query_intent import analyze_query, tokens, CONCEPTS, SECTIONS
+from .query_intent import analyze_query, tokens, CONCEPTS, SECTIONS, TREATMENT_WORDS
 from .indexing import digest, guard_text, manifest_records, validate_manifest_records
 from scripts.setup_pinecone import SetupError
 
 # Artifact bytes/paths are immutable independently of runtime ranking policy.
 ARTIFACT_VERSION = 'global-rrf-v1'
-RANKING_VERSION = 'intent-relevance-v2'
+RANKING_VERSION = 'intent-relevance-v3'
 
 
 @dataclass(frozen=True)
@@ -55,6 +55,7 @@ class SearchResults:
     latency_ms: float = 0
     outcome: str = 'no_results'
     suggestions: list[str] = field(default_factory=list)
+    match_mode: str = 'content'
 
 
 def _json(value):
@@ -279,13 +280,16 @@ def _overlaps(left, right, text_field):
     return bool(shortest and shared / shortest >= .5)
 
 
-def _relevance(record, intent, product, *, semantic=False):
+def _relevance(record, intent, product, *, semantic=False, clinical_support=False):
     """Gate on source features, never RRF or a universal provider score cutoff.
 
     Named overviews admit catalog matches; topical questions also rank their
     actual source/section overlap. Cross-product body matches remain eligible.
     Semantic-only candidates need a source-grounded concept/section feature.
     """
+    if intent.treatment_intent:
+        from .condition_evidence import treatment_relevance
+        return treatment_relevance(record,intent,product,allow_study=clinical_support)
     text = record.get('source_text', '')
     body = set(tokens(text + ' ' + str(record.get('section_title', ''))))
     terms = set(intent.meaningful_terms)
@@ -351,12 +355,19 @@ def _search(query, run, config, corpus, *, client=None, product_ids=None, docume
     result = SearchResults(query,run['run_id'],run['namespace'],run['xml_hash'])
     intent = analyze_query(query,corpus)
     result.suggestions = intent.suggestions
+    result.match_mode = 'treatment_evidence' if intent.treatment_intent else 'content'
     scoped = {r['_id']:r for r in records if (product_ids is None or r['product_id'] in product_ids)
               and (document_ids is None or r['document_id'] in document_ids)}
+    lexical_terms = intent.meaningful_terms
+    if intent.treatment_intent:
+        # Clinical verbs are intent, not retrieval anchors. Include normalized
+        # condition inflections so local fallback handles e.g. migraines.
+        lexical_terms = intent.condition_terms + [w for w in intent.meaningful_terms
+            if w not in TREATMENT_WORDS]
     if manual:
-        lexical = [rid for rid,r in scoped.items() if set(intent.meaningful_terms)&set(tokens(r.get('source_text',r[config.settings['pinecone']['text_field']])+' '+str(r.get('section_title',''))))]
+        lexical = [rid for rid,r in scoped.items() if set(lexical_terms)&set(tokens(r.get('source_text',r[config.settings['pinecone']['text_field']])+' '+str(r.get('section_title',''))))]
     else:
-        lexical = [rid for rid in _lexical_ids(payload,artifact.engine,' '.join(intent.meaningful_terms)) if rid in scoped]
+        lexical = [rid for rid in _lexical_ids(payload,artifact.engine,' '.join(lexical_terms)) if rid in scoped]
     filters = [{'xml_hash':{'$eq':run['xml_hash']}}]
     if product_ids is not None:filters.append({'product_id':{'$in':sorted(set(product_ids))}})
     if document_ids is not None:filters.append({'document_id':{'$in':sorted(set(document_ids))}})
@@ -383,16 +394,44 @@ def _search(query, run, config, corpus, *, client=None, product_ids=None, docume
     for channel in (lexical,semantic):
         for rank,rid in enumerate(channel,1):ranks[rid]=ranks.get(rid,0)+1/(60+rank)
     field_name=config.settings['pinecone']['text_field']
+    products = {p.id:p for p in corpus.products} if corpus else {}
+    clinical_scores = {}
+    clinical_groups = []
+    if intent.treatment_intent:
+        from .condition_evidence import treatment_scores, treatment_evidence_groups
+        clinical_scores = treatment_scores(scoped.values(),intent,products)
+        clinical_groups = treatment_evidence_groups(scoped.values(),intent,products)
     relevance={}
     for rid in ranks:
         record=scoped[rid]
         # Legacy records have source text in the configured indexed field.
         candidate={**record,'source_text':record.get('source_text',record[field_name])}
-        relevant,score=_relevance(candidate,intent,None,semantic=rid in semantic)
+        if intent.treatment_intent:
+            relevant,score = rid in clinical_scores, clinical_scores.get(rid,0)
+        else:
+            relevant,score=_relevance(candidate,intent,products.get(record['product_id']),semantic=rid in semantic)
         if relevant:relevance[rid]=score
     # Relevance first; document diversity only breaks equivalent relevance.
     ranked=sorted(relevance,key=lambda rid:(-relevance[rid],-ranks[rid],rid))
     chosen=[];seen_documents={}
+    if intent.treatment_intent:
+        # A lexical child-heading match also needs its explicit use predicate;
+        # complete continuations and linked parents cannot be clipped by top-k.
+        groups = [group for group in clinical_groups if any(rid in ranks for rid in group)]
+        while groups and len(chosen) < limit:
+            best = max(max(clinical_scores[rid] for rid in group) for group in groups)
+            peers = [group for group in groups if max(clinical_scores[rid] for rid in group) == best]
+            group = min(peers,key=lambda group:(seen_documents.get(scoped[group[0]]['document_id'],0),
+                -sum(ranks.get(rid,0) for rid in group),tuple(group)))
+            groups.remove(group)
+            added = [rid for rid in group if rid not in chosen]
+            if not added or len(chosen)+len(added)>limit:
+                continue
+            if any(_overlaps(scoped[rid],scoped[prior],field_name) for rid in added for prior in chosen):
+                continue
+            chosen.extend(added)
+            did=scoped[group[0]]['document_id'];seen_documents[did]=seen_documents.get(did,0)+1
+        ranked = []
     while ranked and len(chosen)<limit:
         best=relevance[ranked[0]]
         peers=[rid for rid in ranked if relevance[rid]==best]
@@ -410,7 +449,7 @@ def _search(query, run, config, corpus, *, client=None, product_ids=None, docume
         source=catalog.get(rid,{'product_id':record['product_id'],'document_id':record['document_id']})
         hit={'id':rid,'text':record.get('source_text',record[field_name]),'metadata':metadata,
              'run_id':run['run_id'],'namespace':run['namespace'],'xml_hash':run['xml_hash'],
-             'score':ranks[rid],**{k:v for k,v in source.items() if k!='id'}}
+             'score':ranks.get(rid,0),**{k:v for k,v in source.items() if k!='id'}}
         result.hits.append(hit)
         key=(record['product_id'],record['document_id'])
         groups.setdefault(key,{'product_id':key[0],'document_id':key[1],'hits':[]})['hits'].append(hit)

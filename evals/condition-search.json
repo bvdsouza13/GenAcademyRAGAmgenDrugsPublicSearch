@@ -1,0 +1,1551 @@
+{
+  "schema_version": 1,
+  "audit_created_at": "2026-11-22T20:32:26.113334+00:00",
+  "scope": "Independent read-only acceptance-case audit of the supplied local label corpus; no network or clinical external inference. Exact expected sets refer only to this snapshot, not all treatment options.",
+  "corpus": {
+    "xml_path": "XML/AmgenProducts.xml",
+    "xml_sha256": "f6b6786246c8bcd09233ead3e4f2d675886f7bf4df23b8d68d2904df435e41cc",
+    "active_run_id": "47b75fa785673734b5c00c994c6b289fc211e85694271d11bfc6c51f487c0742",
+    "active_xml_hash_matches": true,
+    "source_registry_fingerprint": "e8542f6fdd21adb8bd75467aaba7222be6406c3e8d510e2041a8df0e465a0482",
+    "product_count": 36,
+    "document_count": 37,
+    "physical_page_count": 1439,
+    "block_count": 6805,
+    "section_1_block_count": 139,
+    "source_validation": {
+      "status": "passed",
+      "source_pdf_hashes_verified": 37,
+      "page_text_roundtrips_verified": 1439
+    }
+  },
+  "source_documents": [
+    {
+      "document_id": "doc-actimmune-prescribing-information",
+      "product_id": "product-actimmune",
+      "filename": "actimmune_prescribing_information.pdf",
+      "sha256": "754cba658992f741da8bb50f74c03d1719b0c85397c8a6146138dbde4e9b755d",
+      "page_count": 12
+    },
+    {
+      "document_id": "doc-aimovig-prescribing-information",
+      "product_id": "product-aimovig",
+      "filename": "aimovig_prescribing_information.pdf",
+      "sha256": "6365bde8c613ce959b69ec1335ba81dcc8354e022f538f2911018f94bfa56713",
+      "page_count": 45
+    },
+    {
+      "document_id": "doc-amjevita-prescribing-information",
+      "product_id": "product-amjevita",
+      "filename": "amjevita_prescribing_information.pdf",
+      "sha256": "f8f7c8f8fde56d76eed4fd4da90a062c2820262714472e06cc01f3f01d07e212",
+      "page_count": 114
+    },
+    {
+      "document_id": "doc-aranesp-prescribing-information",
+      "product_id": "product-aranesp",
+      "filename": "aranesp_prescribing_information.pdf",
+      "sha256": "0d029b7060ea12d8b0aacf833aa9f4dd61e6e37d2419bb6755c1a542942962bf",
+      "page_count": 47
+    },
+    {
+      "document_id": "doc-avsola-prescribing-information",
+      "product_id": "product-avsola",
+      "filename": "avsola_prescribing_information.pdf",
+      "sha256": "018529c30c1d8e925df332649eb97283a7fb583fbfeb2e42734f32946128f13b",
+      "page_count": 54
+    },
+    {
+      "document_id": "doc-bkemv-prescribing-information",
+      "product_id": "product-bkemv",
+      "filename": "bkemv_prescribing_information.pdf",
+      "sha256": "354c7a80961ad62be0504d649a368e27c79c995d736084f14d513e394b2ef751",
+      "page_count": 38
+    },
+    {
+      "document_id": "doc-blincyto-prescribing-information",
+      "product_id": "product-blincyto",
+      "filename": "blincyto_prescribing_information.pdf",
+      "sha256": "c7f359dd1e011ac35af86a8541468cc7fd9c050e0f4f245b27d60a2158d0921a",
+      "page_count": 57
+    },
+    {
+      "document_id": "doc-corlanor-prescribing-information",
+      "product_id": "product-corlanor",
+      "filename": "corlanor_prescribing_information.pdf",
+      "sha256": "9d09c41361263cbc2ddd46778e9ec01dc322c69f0e9343008f684dbc22973692",
+      "page_count": 23
+    },
+    {
+      "document_id": "doc-enbrel-prescribing-information",
+      "product_id": "product-enbrel",
+      "filename": "enbrel_prescribing_information.pdf",
+      "sha256": "5cbe6568ae3e68109a68c5db4c933893760b63623b0918c626d3cb94d3c61cdd",
+      "page_count": 97
+    },
+    {
+      "document_id": "doc-epogen-prescribing-information",
+      "product_id": "product-epogen",
+      "filename": "epogen_prescribing_information.pdf",
+      "sha256": "ab2a92f74cc27e8b2d0d7622db4b3224cd401a395b9c5bfce9af1326b39b00f7",
+      "page_count": 40
+    },
+    {
+      "document_id": "doc-evenity-prescribing-information",
+      "product_id": "product-evenity",
+      "filename": "evenity_prescribing_information.pdf",
+      "sha256": "4106e31aaa115961dd8f3c4d4f6eed502433104e0b61365d9e4bd54c6bf40058",
+      "page_count": 24
+    },
+    {
+      "document_id": "doc-imdelltra-prescribing-information",
+      "product_id": "product-imdelltra",
+      "filename": "imdelltra_prescribing_information.pdf",
+      "sha256": "7c9fc6d4acec2c09894e1ab6ac417c7d615e0943b6a3848523569603b7682fbe",
+      "page_count": 38
+    },
+    {
+      "document_id": "doc-imlygic-prescribing-information",
+      "product_id": "product-imlygic",
+      "filename": "imlygic_prescribing_information.pdf",
+      "sha256": "c47782618e2a1ac3f27d432ad57ec51f1060a1a6eb10c9009e05af4ca34338da",
+      "page_count": 20
+    },
+    {
+      "document_id": "doc-kanjinti-prescribing-information",
+      "product_id": "product-kanjinti",
+      "filename": "kanjinti_prescribing_information.pdf",
+      "sha256": "b6df7b5b6681135388ea276142ce189dfbad43028603bcb7a7cefce76415699f",
+      "page_count": 41
+    },
+    {
+      "document_id": "doc-krystexxa-prescribing-information",
+      "product_id": "product-krystexxa",
+      "filename": "krystexxa_prescribing_information.pdf",
+      "sha256": "af9cae39c582bb7a4bcf489f2dd54285113629ef118729266e7d75ea2c74ec03",
+      "page_count": 21
+    },
+    {
+      "document_id": "doc-kyprolis-prescribing-information",
+      "product_id": "product-kyprolis",
+      "filename": "kyprolis_prescribing_information.pdf",
+      "sha256": "62eee303b42d104f70ca952917e07c6c100685399f6e9a216fde1f513ce89e67",
+      "page_count": 86
+    },
+    {
+      "document_id": "doc-lumakras-prescribing-information",
+      "product_id": "product-lumakras",
+      "filename": "lumakras_prescribing_information.pdf",
+      "sha256": "81ef3e15daa3e1064c34dba0e75a99d18c2a21c94ba694ea602e862865969248",
+      "page_count": 25
+    },
+    {
+      "document_id": "doc-mvasi-prescribing-information",
+      "product_id": "product-mvasi",
+      "filename": "mvasi_prescribing_information.pdf",
+      "sha256": "b74eb0d332090494667cad5c750d712a29049f07b1039581fc3dd0ce2a70fdb9",
+      "page_count": 43
+    },
+    {
+      "document_id": "doc-neulasta-prescribing-information",
+      "product_id": "product-neulasta",
+      "filename": "neulasta_prescribing_information.pdf",
+      "sha256": "32d99fe2f39d48998f7b4e149eb8f49cfeb408089c783e1a54c7b6d25efd12b6",
+      "page_count": 71
+    },
+    {
+      "document_id": "doc-neupogen-prescribing-information",
+      "product_id": "product-neupogen",
+      "filename": "neupogen_prescribing_information.pdf",
+      "sha256": "841979f3c7e01bc50a619366006403a493f6534079678040ed2747b57ad4dbf6",
+      "page_count": 49
+    },
+    {
+      "document_id": "doc-nplate-prescribing-information",
+      "product_id": "product-nplate",
+      "filename": "nplate_prescribing_information.pdf",
+      "sha256": "a5dbd59dd7d7b90043299f012e4f21716095075c6b91fdfc881ccecbde1401a1",
+      "page_count": 20
+    },
+    {
+      "document_id": "doc-otezla-prescribing-information",
+      "product_id": "product-otezla",
+      "filename": "otezla_prescribing_information.pdf",
+      "sha256": "71a1e833ab2e34dde9d5277388775787b180fbefd88f82e403c0d3612898e324",
+      "page_count": 32
+    },
+    {
+      "document_id": "doc-parsabiv-prescribing-information",
+      "product_id": "product-parsabiv",
+      "filename": "parsabiv_prescribing_information.pdf",
+      "sha256": "3b0ef6759019d8b672d8f501aa402c9a77c58281b0285aaae8ffc89a7bfdcaf0",
+      "page_count": 13
+    },
+    {
+      "document_id": "doc-pavblu-prescribing-information",
+      "product_id": "product-pavblu",
+      "filename": "pavblu_prescribing_information.pdf",
+      "sha256": "729edc643e89de5f8ad002d8587e7690e164427cce01082e2cf0d06e7fe09186",
+      "page_count": 28
+    },
+    {
+      "document_id": "doc-procysbi-prescribing-information",
+      "product_id": "product-procysbi",
+      "filename": "procysbi_prescribing_information.pdf",
+      "sha256": "047555ab4acf1197de7ef0684f574ad458d72586078ae8c9cd1f9cad525142aa",
+      "page_count": 23
+    },
+    {
+      "document_id": "doc-prolia-prescribing-information",
+      "product_id": "product-prolia",
+      "filename": "prolia_prescribing_information.pdf",
+      "sha256": "fd14fd26be4def095e43ae0bfc2bcfb2d4ad1e05b4a38ff494c5f73be805d7aa",
+      "page_count": 34
+    },
+    {
+      "document_id": "doc-ravicti-prescribing-information",
+      "product_id": "product-ravicti",
+      "filename": "ravicti_prescribing_information.pdf",
+      "sha256": "3616ed9be7b9b9a42085b89db1020ce693fc5c3a44064a52d6181dd5f62cc36b",
+      "page_count": 30
+    },
+    {
+      "document_id": "doc-repatha-contains-dry-natural-rubber-prescribing-information",
+      "product_id": "product-repatha",
+      "filename": "repatha_contains_dry_natural_rubber_prescribing_information.pdf",
+      "sha256": "d89df1ec2a1e88fbe890c50c7cd618d40becea6f768abbe49c0ed660ac81725a",
+      "page_count": 48
+    },
+    {
+      "document_id": "doc-repatha-not-made-with-natural-rubber-latex-prescribing-information",
+      "product_id": "product-repatha",
+      "filename": "repatha_not_made_with_natural_rubber_latex_prescribing_information.pdf",
+      "sha256": "7cd077380de177a50ea2dc253abd095a6a91904a7cbc6cf673acdc4218b5c0b9",
+      "page_count": 61
+    },
+    {
+      "document_id": "doc-riabni-prescribing-information",
+      "product_id": "product-riabni",
+      "filename": "riabni_prescribing_information.pdf",
+      "sha256": "96f7b5c8433218c385167c6ab44ee03a749378102a0cf62d30bc05c51a407810",
+      "page_count": 56
+    },
+    {
+      "document_id": "doc-sensipar-prescribing-information",
+      "product_id": "product-sensipar",
+      "filename": "sensipar_prescribing_information.pdf",
+      "sha256": "b6ae7e28ec66792375fcbb596b034f4734bc40e440fed232cf40b0b4a4c4c420",
+      "page_count": 19
+    },
+    {
+      "document_id": "doc-tavneos-prescribing-information",
+      "product_id": "product-tavneos",
+      "filename": "tavneos_prescribing_information.pdf",
+      "sha256": "ca013844e2f19b6579299573fd776f6c24254800c8e9ae7cd832829b61705300",
+      "page_count": 18
+    },
+    {
+      "document_id": "doc-tepezza-prescribing-information",
+      "product_id": "product-tepezza",
+      "filename": "tepezza_prescribing_information.pdf",
+      "sha256": "24664a05907c0e4f268d1624bac583ec24bf60ba434a89b1b5571f4b8200fd49",
+      "page_count": 13
+    },
+    {
+      "document_id": "doc-tezspire-prescribing-information",
+      "product_id": "product-tezspire",
+      "filename": "tezspire_prescribing_information.pdf",
+      "sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+      "page_count": 16
+    },
+    {
+      "document_id": "doc-uplizna-prescribing-information",
+      "product_id": "product-uplizna",
+      "filename": "uplizna_prescribing_information.pdf",
+      "sha256": "2e48de7d1b1653380901f34ca7a2ff81ac39dca80b702f20fa237831e04c57d4",
+      "page_count": 29
+    },
+    {
+      "document_id": "doc-vectibix-prescribing-information",
+      "product_id": "product-vectibix",
+      "filename": "vectibix_prescribing_information.pdf",
+      "sha256": "5887061be04d19dd7a03493d99d9ea8301f997538aee9e8e75422fe69828deac",
+      "page_count": 31
+    },
+    {
+      "document_id": "doc-xgeva-prescribing-information",
+      "product_id": "product-xgeva",
+      "filename": "xgeva_prescribing_information.pdf",
+      "sha256": "c215bd0cb5ea5435ced65f0557d6c9dec3f210446378611e1c36e0fbc5f95a9b",
+      "page_count": 23
+    }
+  ],
+  "acceptance_cases": [
+    {
+      "id": "migraine_preventive_adults",
+      "query": "Which medicines in the supplied labels treat migraine?",
+      "query_variants": [
+        "What medications treat migraines?",
+        "Which medicine is indicated for migraine prevention in adults?",
+        "What can treat migraine?",
+        "What treats migraine?",
+        "migraine treatment",
+        "medicines for migraine"
+      ],
+      "expected_treatment_product_ids": [
+        "product-aimovig"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-otezla",
+        "product-riabni"
+      ],
+      "supporting_evidence_refs": [
+        "aimovig_migraine"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "otezla_adverse_migraine_table",
+        "otezla_adverse_migraine_prose",
+        "riabni_adverse_migraine_table"
+      ],
+      "acceptance_requirements": [
+        "Identify AIMOVIG with the exact limitation preventive treatment of migraine in adults; do not rewrite this as relief of an ongoing attack.",
+        "OTEZLA and RIABNI migraine mentions are adverse reactions, not indications."
+      ],
+      "expected_leading_evidence": {
+        "product-aimovig": [
+          "aimovig_migraine"
+        ]
+      }
+    },
+    {
+      "id": "acute_migraine_no_indicated_match",
+      "query": "Which supplied medicine is indicated to stop an acute migraine attack?",
+      "query_variants": [],
+      "expected_treatment_product_ids": [],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-aimovig",
+        "product-otezla",
+        "product-riabni"
+      ],
+      "supporting_evidence_refs": [
+        "aimovig_migraine"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "otezla_adverse_migraine_prose",
+        "riabni_adverse_migraine_table"
+      ],
+      "acceptance_requirements": [
+        "No treatment-supported product match for acute migraine relief.",
+        "AIMOVIG may be explained as the related preventive indication, but must not be presented as an acute treatment.",
+        "This is a local label-supported absence, not a claim that acute migraine treatments do not exist."
+      ],
+      "expected_leading_evidence": {}
+    },
+    {
+      "id": "osteoporosis_multiple_indications",
+      "query": "Which medicines in the supplied labels treat osteoporosis?",
+      "query_variants": [
+        "Which supplied medicines treat osteoporosis in postmenopausal women at high risk for fracture?",
+        "What treats osteoporosis?"
+      ],
+      "expected_treatment_product_ids": [
+        "product-evenity",
+        "product-prolia"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-xgeva"
+      ],
+      "supporting_evidence_refs": [
+        "evenity_postmenopausal",
+        "prolia_postmenopausal",
+        "prolia_men",
+        "prolia_glucocorticoid"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "evenity_limitations",
+        "xgeva_bone_metastases",
+        "xgeva_giant_cell_tumor",
+        "xgeva_hypercalcemia"
+      ],
+      "acceptance_requirements": [
+        "Return both EVENITY and PROLIA; do not collapse distinct product IDs.",
+        "Preserve postmenopausal women at high risk for fracture for EVENITY and PROLIA.",
+        "Distinguish PROLIA indications for men and glucocorticoid-induced osteoporosis.",
+        "If discussing duration, EVENITY Section 1.2 limits use to 12 monthly doses."
+      ],
+      "expected_leading_evidence": {
+        "product-evenity": [
+          "evenity_postmenopausal"
+        ],
+        "product-prolia": [
+          "prolia_postmenopausal",
+          "prolia_men",
+          "prolia_glucocorticoid"
+        ]
+      }
+    },
+    {
+      "id": "osteoporosis_men",
+      "query": "Which supplied medicine is indicated to increase bone mass in men with osteoporosis at high risk for fracture?",
+      "query_variants": [],
+      "expected_treatment_product_ids": [
+        "product-prolia"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-evenity",
+        "product-xgeva"
+      ],
+      "supporting_evidence_refs": [
+        "prolia_men"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "evenity_postmenopausal"
+      ],
+      "acceptance_requirements": [
+        "Return PROLIA with the men/high-fracture-risk population.",
+        "Do not broaden EVENITY postmenopausal-women indication to men."
+      ],
+      "expected_leading_evidence": {
+        "product-prolia": [
+          "prolia_men"
+        ]
+      }
+    },
+    {
+      "id": "glucocorticoid_induced_osteoporosis",
+      "query": "Which supplied medicine treats glucocorticoid-induced osteoporosis?",
+      "query_variants": [],
+      "expected_treatment_product_ids": [
+        "product-prolia"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-evenity",
+        "product-xgeva"
+      ],
+      "supporting_evidence_refs": [
+        "prolia_glucocorticoid"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "evenity_postmenopausal"
+      ],
+      "acceptance_requirements": [
+        "Preserve men and women at high fracture risk plus systemic glucocorticoid criteria.",
+        "If describing eligibility, retain daily prednisone-equivalent dose at least 7.5 mg and anticipated glucocorticoid duration at least 6 months."
+      ],
+      "expected_leading_evidence": {
+        "product-prolia": [
+          "prolia_glucocorticoid"
+        ]
+      }
+    },
+    {
+      "id": "rheumatoid_arthritis",
+      "query": "Which medicines in the supplied labels are indicated for rheumatoid arthritis?",
+      "query_variants": [
+        "medicines for rheumatoid arthritis"
+      ],
+      "expected_treatment_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-enbrel",
+        "product-riabni"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-otezla"
+      ],
+      "supporting_evidence_refs": [
+        "amjevita_ra",
+        "avsola_ra",
+        "enbrel_ra",
+        "riabni_ra"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "otezla_psa"
+      ],
+      "acceptance_requirements": [
+        "Return all four distinct source-supported products.",
+        "RIABNI requires combination methotrexate and inadequate response to one or more TNF antagonist therapies in adults with moderately to severely active RA.",
+        "AVSOLA requires combination methotrexate; AMJEVITA and ENBREL section 1 passages permit use alone or with methotrexate.",
+        "Do not convert psoriatic arthritis into rheumatoid arthritis."
+      ],
+      "expected_leading_evidence": {
+        "product-amjevita": [
+          "amjevita_ra"
+        ],
+        "product-avsola": [
+          "avsola_ra"
+        ],
+        "product-enbrel": [
+          "enbrel_ra"
+        ],
+        "product-riabni": [
+          "riabni_ra"
+        ]
+      }
+    },
+    {
+      "id": "psoriatic_arthritis_adults",
+      "query": "Which medicines in the supplied labels treat active psoriatic arthritis in adults?",
+      "query_variants": [
+        "What treats psoriatic arthritis in adults?"
+      ],
+      "expected_treatment_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-enbrel",
+        "product-otezla"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-riabni"
+      ],
+      "supporting_evidence_refs": [
+        "amjevita_psa",
+        "avsola_psa",
+        "enbrel_psa",
+        "otezla_psa"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "riabni_ra"
+      ],
+      "acceptance_requirements": [
+        "Return all four product IDs.",
+        "OTEZLA and OTEZLA XR are one corpus product ID, not duplicate treatment products.",
+        "Do not convert RIABNI rheumatoid-arthritis indication into psoriatic arthritis."
+      ],
+      "expected_leading_evidence": {
+        "product-amjevita": [
+          "amjevita_psa"
+        ],
+        "product-avsola": [
+          "avsola_psa"
+        ],
+        "product-enbrel": [
+          "enbrel_psa"
+        ],
+        "product-otezla": [
+          "otezla_psa"
+        ]
+      }
+    },
+    {
+      "id": "psoriatic_arthritis_age_two",
+      "query": "Which supplied label supports treatment of active psoriatic arthritis in a 2-year-old child?",
+      "query_variants": [],
+      "expected_treatment_product_ids": [
+        "product-enbrel"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-otezla",
+        "product-riabni"
+      ],
+      "supporting_evidence_refs": [
+        "enbrel_juvenile_psa"
+      ],
+      "negative_or_qualifying_evidence_refs": [
+        "otezla_psa",
+        "amjevita_psa",
+        "avsola_psa",
+        "riabni_ra"
+      ],
+      "acceptance_requirements": [
+        "ENBREL Section 1.6 explicitly supports active juvenile psoriatic arthritis from age 2 years.",
+        "OTEZLA Section 1.1 begins at age 6 with minimum body weights, and AMJEVITA/AVSOLA PsA passages specify adults; do not broaden those populations."
+      ],
+      "expected_leading_evidence": {
+        "product-enbrel": [
+          "enbrel_juvenile_psa"
+        ]
+      }
+    },
+    {
+      "id": "severe_asthma_maintenance",
+      "query": "Which supplied medicine is indicated for add-on maintenance treatment of severe asthma in patients aged 12 years and older?",
+      "query_variants": [
+        "What treats severe asthma?"
+      ],
+      "expected_treatment_product_ids": [
+        "product-tezspire"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [],
+      "supporting_evidence_refs": [
+        "tezspire_asthma"
+      ],
+      "negative_or_qualifying_evidence_refs": [],
+      "acceptance_requirements": [
+        "Return TEZSPIRE with add-on maintenance, severe asthma, and age 12 years and older qualifiers.",
+        "The same passage explicitly excludes relief of acute bronchospasm or status asthmaticus.",
+        "Do not discard the complete prose solely because its source block inherited unresolved_figure."
+      ],
+      "expected_leading_evidence": {
+        "product-tezspire": [
+          "tezspire_asthma"
+        ]
+      }
+    },
+    {
+      "id": "acute_asthma_relief_not_indicated",
+      "query": "Which supplied medicine is indicated for relief of acute bronchospasm or status asthmaticus?",
+      "query_variants": [],
+      "expected_treatment_product_ids": [],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [
+        "product-tezspire"
+      ],
+      "supporting_evidence_refs": [
+        "tezspire_asthma"
+      ],
+      "negative_or_qualifying_evidence_refs": [],
+      "acceptance_requirements": [
+        "No treatment-supported product match.",
+        "The explicit not-indicated clause in TEZSPIRE Section 1.1 must override lexical overlap with the acute condition.",
+        "May cite TEZSPIRE to explain the limitation but must not present it as the requested treatment."
+      ],
+      "expected_leading_evidence": {}
+    },
+    {
+      "id": "malaria_unsupported",
+      "query": "Which medicines in the supplied labels treat malaria?",
+      "query_variants": [
+        "malaria treatment"
+      ],
+      "expected_treatment_product_ids": [],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [],
+      "supporting_evidence_refs": [],
+      "negative_or_qualifying_evidence_refs": [],
+      "acceptance_requirements": [
+        "Return no supported treatment match and state that the supplied corpus does not support an answer.",
+        "Do not fill the answer with clinically plausible medicines from memory or with unrelated condition matches.",
+        "Read-only case-insensitive whole-word scan found zero malaria occurrences across canonical blocks, including all archived pages."
+      ],
+      "expected_leading_evidence": {}
+    },
+    {
+      "id": "diabetic_macular_edema_fragmented_indication",
+      "query": "Which supplied medicine is indicated for diabetic macular edema?",
+      "query_variants": [],
+      "expected_treatment_product_ids": [
+        "product-pavblu"
+      ],
+      "expected_set_semantics": "Exact set of treatment-supported products in this pinned 37-document corpus for the stated condition/population/use, not all clinical options.",
+      "must_not_present_as_treatment_product_ids": [],
+      "supporting_evidence_refs": [
+        "pavblu_indicated_preamble",
+        "pavblu_dme_heading"
+      ],
+      "negative_or_qualifying_evidence_refs": [],
+      "acceptance_requirements": [
+        "Recover PAVBLU by joining Section 1 preamble with its 1.3 child heading within the same document.",
+        "Do not require the condition and is indicated to appear in the same extracted block.",
+        "The DME subsection is only a heading and is flagged unresolved_heading_only, but the preceding Section 1 preamble supplies the treatment predicate."
+      ],
+      "expected_leading_evidence": {
+        "product-pavblu": [
+          "pavblu_dme_heading"
+        ]
+      },
+      "required_leading_evidence_pairs": {
+        "product-pavblu": {
+          "xml_sha256": "f6b6786246c8bcd09233ead3e4f2d675886f7bf4df23b8d68d2904df435e41cc",
+          "evidence_refs": [
+            "pavblu_indicated_preamble",
+            "pavblu_dme_heading"
+          ]
+        }
+      }
+    }
+  ],
+  "evidence": {
+    "aimovig_migraine": {
+      "product_id": "product-aimovig",
+      "document_id": "doc-aimovig-prescribing-information",
+      "pdf_filename": "aimovig_prescribing_information.pdf",
+      "pdf_sha256": "6365bde8c613ce959b69ec1335ba81dcc8354e022f538f2911018f94bfa56713",
+      "block_id": "doc-aimovig-prescribing-information-section-1-p0002",
+      "section_id": "doc-aimovig-prescribing-information-section-1",
+      "section_title": "1 \nINDICATIONS AND USAGE ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 2,
+      "block_sha256": "eae96fdb3b3b9b7f1db3fb858612ffd80a5e142d6b0f37358bc1c2edb822b91c",
+      "quote_exact": "1 \nINDICATIONS AND USAGE \n \nAIMOVIG is indicated for the preventive treatment of migraine in adults. \n \n",
+      "source_spans": [
+        {
+          "page": 2,
+          "block_id": "doc-aimovig-prescribing-information-page-0002-text",
+          "start": 49,
+          "end": 153
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "evenity_postmenopausal": {
+      "product_id": "product-evenity",
+      "document_id": "doc-evenity-prescribing-information",
+      "pdf_filename": "evenity_prescribing_information.pdf",
+      "pdf_sha256": "4106e31aaa115961dd8f3c4d4f6eed502433104e0b61365d9e4bd54c6bf40058",
+      "block_id": "doc-evenity-prescribing-information-section-1-1-p0002",
+      "section_id": "doc-evenity-prescribing-information-section-1-1",
+      "section_title": "1.1 \nTreatment of Postmenopausal Women with Osteoporosis at High Risk for Fracture ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 2,
+      "block_sha256": "692da44fd8320a2d763ef1fdda7f3a7dc0c67ed1f5adb66d375d30dd60bad718",
+      "quote_exact": "1.1 \nTreatment of Postmenopausal Women with Osteoporosis at High Risk for Fracture \n \nEVENITY is indicated for the treatment of osteoporosis in postmenopausal women at high risk for \nfracture, defined as a history of osteoporotic fracture, or multiple risk factors for fracture; or patients who \nhave failed or are intolerant to other available osteoporosis therapy.  \n \n",
+      "source_spans": [
+        {
+          "page": 2,
+          "block_id": "doc-evenity-prescribing-information-page-0002-text",
+          "start": 623,
+          "end": 994
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "evenity_limitations": {
+      "product_id": "product-evenity",
+      "document_id": "doc-evenity-prescribing-information",
+      "pdf_filename": "evenity_prescribing_information.pdf",
+      "pdf_sha256": "4106e31aaa115961dd8f3c4d4f6eed502433104e0b61365d9e4bd54c6bf40058",
+      "block_id": "doc-evenity-prescribing-information-section-1-2-p0002",
+      "section_id": "doc-evenity-prescribing-information-section-1-2",
+      "section_title": "1.2 \nLimitations of Use ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 2,
+      "block_sha256": "b3acaec2e1438e18a89363484530383dd147fff7e539f77221be563f4161ceda",
+      "quote_exact": "1.2 \nLimitations of Use \n \nThe anabolic effect of EVENITY wanes after 12 monthly doses of therapy. Therefore, the duration of \nEVENITY use should be limited to 12 monthly doses. If osteoporosis therapy remains warranted, \ncontinued therapy with an anti-resorptive agent should be considered [see Dosage and Administration \n(2.2) and Clinical Studies (14.1)]. \n \n \n",
+      "source_spans": [
+        {
+          "page": 2,
+          "block_id": "doc-evenity-prescribing-information-page-0002-text",
+          "start": 994,
+          "end": 1358
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "prolia_postmenopausal": {
+      "product_id": "product-prolia",
+      "document_id": "doc-prolia-prescribing-information",
+      "pdf_filename": "prolia_prescribing_information.pdf",
+      "pdf_sha256": "fd14fd26be4def095e43ae0bfc2bcfb2d4ad1e05b4a38ff494c5f73be805d7aa",
+      "block_id": "doc-prolia-prescribing-information-section-1-1-p0003",
+      "section_id": "doc-prolia-prescribing-information-section-1-1",
+      "section_title": "1.1 \nTreatment of Postmenopausal Women with Osteoporosis at High Risk for Fracture ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "3fdc33d8f07e93e89091c31c28b53e35c5063f16c105dedffa25a0d021bd410c",
+      "quote_exact": "1.1 \nTreatment of Postmenopausal Women with Osteoporosis at High Risk for Fracture \n \nProlia is indicated for the treatment of postmenopausal women with osteoporosis at high risk for fracture, \ndefined as a history of osteoporotic fracture, or multiple risk factors for fracture; or patients who have \nfailed or are intolerant to other available osteoporosis therapy.  In postmenopausal women with \nosteoporosis, Prolia reduces the incidence of vertebral, nonvertebral, and hip fractures [see Clinical \nStudies (14.1)]. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-prolia-prescribing-information-page-0003-text",
+          "start": 1015,
+          "end": 1538
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "prolia_men": {
+      "product_id": "product-prolia",
+      "document_id": "doc-prolia-prescribing-information",
+      "pdf_filename": "prolia_prescribing_information.pdf",
+      "pdf_sha256": "fd14fd26be4def095e43ae0bfc2bcfb2d4ad1e05b4a38ff494c5f73be805d7aa",
+      "block_id": "doc-prolia-prescribing-information-section-1-2-p0003",
+      "section_id": "doc-prolia-prescribing-information-section-1-2",
+      "section_title": "1.2 \nTreatment to Increase Bone Mass in Men with Osteoporosis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "4fa3854c8d2ead0e3330987833d442f3650f785e7c830adbc6ef310f400a3f96",
+      "quote_exact": "1.2 \nTreatment to Increase Bone Mass in Men with Osteoporosis  \n \nProlia is indicated for treatment to increase bone mass in men with osteoporosis at high risk for fracture, \ndefined as a history of osteoporotic fracture, or multiple risk factors for fracture; or patients who have \nfailed or are intolerant to other available osteoporosis therapy [see Clinical Studies (14.2)]. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-prolia-prescribing-information-page-0003-text",
+          "start": 1538,
+          "end": 1920
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "prolia_glucocorticoid": {
+      "product_id": "product-prolia",
+      "document_id": "doc-prolia-prescribing-information",
+      "pdf_filename": "prolia_prescribing_information.pdf",
+      "pdf_sha256": "fd14fd26be4def095e43ae0bfc2bcfb2d4ad1e05b4a38ff494c5f73be805d7aa",
+      "block_id": "doc-prolia-prescribing-information-section-1-3-p0003",
+      "section_id": "doc-prolia-prescribing-information-section-1-3",
+      "section_title": "1.3 \nTreatment of Glucocorticoid-Induced Osteoporosis ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "31c6efd85204fb3d121b31b3344c158155413181cc0d612c42a62d257f54314e",
+      "quote_exact": "1.3 \nTreatment of Glucocorticoid-Induced Osteoporosis \n \nProlia is indicated for the treatment of glucocorticoid-induced osteoporosis in men and women at high \nrisk of fracture who are either initiating or continuing systemic glucocorticoids in a daily dosage \nequivalent to 7.5 mg or greater of prednisone and expected to remain on glucocorticoids for at least \n6 months.  High risk of fracture is defined as a history of osteoporotic fracture, multiple risk factors for \nfracture, or patients who have failed or are intolerant to other available osteoporosis therapy [see Clinical \nStudies (14.3)]. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-prolia-prescribing-information-page-0003-text",
+          "start": 1920,
+          "end": 2524
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "amjevita_ra": {
+      "product_id": "product-amjevita",
+      "document_id": "doc-amjevita-prescribing-information",
+      "pdf_filename": "amjevita_prescribing_information.pdf",
+      "pdf_sha256": "f8f7c8f8fde56d76eed4fd4da90a062c2820262714472e06cc01f3f01d07e212",
+      "block_id": "doc-amjevita-prescribing-information-section-1-1-p0004",
+      "section_id": "doc-amjevita-prescribing-information-section-1-1",
+      "section_title": "1.1 \nRheumatoid Arthritis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "7a158a8cee4f2021fdccb64c91a20d7bc4daa84dd929a9aacaf37494359ffa1c",
+      "quote_exact": "1.1 \nRheumatoid Arthritis  \n \nAMJEVITA is indicated for reducing signs and symptoms, inducing major clinical response, \ninhibiting the progression of structural damage, and improving physical function in adult patients \nwith moderately to severely active rheumatoid arthritis. AMJEVITA can be used alone or in \ncombination with methotrexate or other non-biologic disease-modifying anti-rheumatic drugs \n(DMARDs). \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-amjevita-prescribing-information-page-0004-text",
+          "start": 390,
+          "end": 806
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "avsola_ra": {
+      "product_id": "product-avsola",
+      "document_id": "doc-avsola-prescribing-information",
+      "pdf_filename": "avsola_prescribing_information.pdf",
+      "pdf_sha256": "018529c30c1d8e925df332649eb97283a7fb583fbfeb2e42734f32946128f13b",
+      "block_id": "doc-avsola-prescribing-information-section-1-5-p0004",
+      "section_id": "doc-avsola-prescribing-information-section-1-5",
+      "section_title": "1.5 \nRheumatoid Arthritis ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "e529ee79d05b98e8cc186b70d2e3a2af5084175f852fa5f7daa70404f8cbfa3a",
+      "quote_exact": "1.5 \nRheumatoid Arthritis \n \nAVSOLA, in combination with methotrexate, is indicated for reducing signs and symptoms, inhibiting the \nprogression of structural damage, and improving physical function in adult patients with moderately to \nseverely active rheumatoid arthritis (RA). \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-avsola-prescribing-information-page-0004-text",
+          "start": 1363,
+          "end": 1646
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "enbrel_ra": {
+      "product_id": "product-enbrel",
+      "document_id": "doc-enbrel-prescribing-information",
+      "pdf_filename": "enbrel_prescribing_information.pdf",
+      "pdf_sha256": "5cbe6568ae3e68109a68c5db4c933893760b63623b0918c626d3cb94d3c61cdd",
+      "block_id": "doc-enbrel-prescribing-information-section-1-1-p0003",
+      "section_id": "doc-enbrel-prescribing-information-section-1-1",
+      "section_title": "1.1 \nRheumatoid Arthritis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "d8a5dd8df99394d7f0c9df029a9be06ae50d3d2794c20c624169e0b8c0aa21c0",
+      "quote_exact": "1.1 \nRheumatoid Arthritis  \n \nEnbrel is indicated for reducing signs and symptoms, inducing major clinical response, inhibiting the progression of \nstructural damage, and improving physical function in patients with moderately to severely active rheumatoid \narthritis (RA).  Enbrel can be initiated in combination with methotrexate (MTX) or used alone. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-enbrel-prescribing-information-page-0003-text",
+          "start": 2111,
+          "end": 2467
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "riabni_ra": {
+      "product_id": "product-riabni",
+      "document_id": "doc-riabni-prescribing-information",
+      "pdf_filename": "riabni_prescribing_information.pdf",
+      "pdf_sha256": "96f7b5c8433218c385167c6ab44ee03a749378102a0cf62d30bc05c51a407810",
+      "block_id": "doc-riabni-prescribing-information-section-1-3-p0005",
+      "section_id": "doc-riabni-prescribing-information-section-1-3",
+      "section_title": "1.3 \nRheumatoid Arthritis (RA)  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 5,
+      "block_sha256": "9a09328e48abf05a25bf245dffd922d61a71d32ee61f743bce08fd7af9e142c7",
+      "quote_exact": "1.3 \nRheumatoid Arthritis (RA)  \n \nRIABNI, in combination with methotrexate, is indicated for the treatment of adult patients with \nmoderately- to-severely- active rheumatoid arthritis who have had an inadequate response to one or \nmore TNF antagonist therapies. \n \n",
+      "source_spans": [
+        {
+          "page": 5,
+          "block_id": "doc-riabni-prescribing-information-page-0005-text",
+          "start": 245,
+          "end": 511
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "amjevita_psa": {
+      "product_id": "product-amjevita",
+      "document_id": "doc-amjevita-prescribing-information",
+      "pdf_filename": "amjevita_prescribing_information.pdf",
+      "pdf_sha256": "f8f7c8f8fde56d76eed4fd4da90a062c2820262714472e06cc01f3f01d07e212",
+      "block_id": "doc-amjevita-prescribing-information-section-1-3-p0004",
+      "section_id": "doc-amjevita-prescribing-information-section-1-3",
+      "section_title": "1.3 \nPsoriatic Arthritis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "77f621f30b5a5575924966f9988ad2b7c8eac9ab3296dd72bae34c65053113c4",
+      "quote_exact": "1.3 \nPsoriatic Arthritis  \n \nAMJEVITA is indicated for reducing signs and symptoms, inhibiting the progression of \nstructural damage, and improving physical function in adult patients with active psoriatic \narthritis. \nAMJEVITA can be used alone or in combination with non-biologic DMARDs. \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-amjevita-prescribing-information-page-0004-text",
+          "start": 1083,
+          "end": 1376
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "avsola_psa": {
+      "product_id": "product-avsola",
+      "document_id": "doc-avsola-prescribing-information",
+      "pdf_filename": "avsola_prescribing_information.pdf",
+      "pdf_sha256": "018529c30c1d8e925df332649eb97283a7fb583fbfeb2e42734f32946128f13b",
+      "block_id": "doc-avsola-prescribing-information-section-1-7-p0004",
+      "section_id": "doc-avsola-prescribing-information-section-1-7",
+      "section_title": "1.7 \nPsoriatic Arthritis ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "7686f5bac9a8339dc3708a4bed4837d170a0bb622dc088e9ce34f6c3c91917f7",
+      "quote_exact": "1.7 \nPsoriatic Arthritis \n \nAVSOLA is indicated for reducing signs and symptoms of active arthritis, inhibiting the progression of \nstructural damage, and improving physical function in adult patients with psoriatic arthritis (PsA). \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-avsola-prescribing-information-page-0004-text",
+          "start": 1792,
+          "end": 2028
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "enbrel_psa": {
+      "product_id": "product-enbrel",
+      "document_id": "doc-enbrel-prescribing-information",
+      "pdf_filename": "enbrel_prescribing_information.pdf",
+      "pdf_sha256": "5cbe6568ae3e68109a68c5db4c933893760b63623b0918c626d3cb94d3c61cdd",
+      "block_id": "doc-enbrel-prescribing-information-section-1-3-p0003",
+      "section_id": "doc-enbrel-prescribing-information-section-1-3",
+      "section_title": "1.3 \nPsoriatic Arthritis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "e826222fcafaeab306b475c785abfd7438489f4de0fd852fdcf8d1d6a2de1488",
+      "quote_exact": "1.3 \nPsoriatic Arthritis  \n \nEnbrel is indicated for reducing signs and symptoms, inhibiting the progression of structural damage of active \narthritis, and improving physical function in adult patients with psoriatic arthritis (PsA).  Enbrel can be used with or \nwithout methotrexate. \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-enbrel-prescribing-information-page-0003-text",
+          "start": 2698,
+          "end": 2984
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "otezla_psa": {
+      "product_id": "product-otezla",
+      "document_id": "doc-otezla-prescribing-information",
+      "pdf_filename": "otezla_prescribing_information.pdf",
+      "pdf_sha256": "71a1e833ab2e34dde9d5277388775787b180fbefd88f82e403c0d3612898e324",
+      "block_id": "doc-otezla-prescribing-information-section-1-1-p0003",
+      "section_id": "doc-otezla-prescribing-information-section-1-1",
+      "section_title": "1.1 \nPsoriatic Arthritis ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "cf430e0d212ffa27c7d66b66349a9e8f496e9cb9b8b4a738d8a27f4c692c8f8e",
+      "quote_exact": "1.1 \nPsoriatic Arthritis \n \nOTEZLA is indicated for the treatment of adult patients and pediatric patients 6 years of age and older \nand weighing at least 20 kg with active psoriatic arthritis. \n \nOTEZLA XR is indicated for the treatment of adult patients and pediatric patients 6 years of age and \nolder and weighing at least 50 kg with active psoriatic arthritis. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-otezla-prescribing-information-page-0003-text",
+          "start": 75,
+          "end": 444
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "enbrel_juvenile_psa": {
+      "product_id": "product-enbrel",
+      "document_id": "doc-enbrel-prescribing-information",
+      "pdf_filename": "enbrel_prescribing_information.pdf",
+      "pdf_sha256": "5cbe6568ae3e68109a68c5db4c933893760b63623b0918c626d3cb94d3c61cdd",
+      "block_id": "doc-enbrel-prescribing-information-section-1-6-p0004",
+      "section_id": "doc-enbrel-prescribing-information-section-1-6",
+      "section_title": "1.6 \nJuvenile Psoriatic Arthritis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "da180a9948f121908a258b41b76be7629dae921f21fa62cdb5b6234b2143cf44",
+      "quote_exact": "1.6 \nJuvenile Psoriatic Arthritis  \n \nEnbrel is indicated for the treatment of active juvenile psoriatic arthritis (JPsA) in pediatric patients 2 years of age \nand older.  \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-enbrel-prescribing-information-page-0004-text",
+          "start": 358,
+          "end": 533
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "tezspire_asthma": {
+      "product_id": "product-tezspire",
+      "document_id": "doc-tezspire-prescribing-information",
+      "pdf_filename": "tezspire_prescribing_information.pdf",
+      "pdf_sha256": "0deca746bfcd421c6b6aa2a6653a2859db59cd089d3b0e0204af2c0169065bd6",
+      "block_id": "doc-tezspire-prescribing-information-section-1-1-p0002",
+      "section_id": "doc-tezspire-prescribing-information-section-1-1",
+      "section_title": "1.1 Asthma",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 2,
+      "block_sha256": "5484338c4df7f375efb33d28ee0769cff1483e92c6776e61c4ad16a467324112",
+      "quote_exact": "1.1 Asthma\nTEZSPIRE is indicated for the add-on maintenance treatment of adult and pediatric \npatients aged 12 years and older with severe asthma.\nLimitations of Use:\nTEZSPIRE is not indicated for the relief of acute bronchospasm or status asthmaticus.\n",
+      "source_spans": [
+        {
+          "page": 2,
+          "block_id": "doc-tezspire-prescribing-information-page-0002-text",
+          "start": 53,
+          "end": 306
+        }
+      ],
+      "extraction_warnings": [
+        "unresolved_figure"
+      ]
+    },
+    "pavblu_indicated_preamble": {
+      "product_id": "product-pavblu",
+      "document_id": "doc-pavblu-prescribing-information",
+      "pdf_filename": "pavblu_prescribing_information.pdf",
+      "pdf_sha256": "729edc643e89de5f8ad002d8587e7690e164427cce01082e2cf0d06e7fe09186",
+      "block_id": "doc-pavblu-prescribing-information-section-1-preamble-p0002",
+      "section_id": "doc-pavblu-prescribing-information-section-1-preamble",
+      "section_title": "1 \nINDICATIONS AND USAGE  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 2,
+      "block_sha256": "362fec48f0ab991d4fbef79ce25b465c1d78f8f9551797f5a1ed0dd33693c0d5",
+      "quote_exact": "1 \nINDICATIONS AND USAGE  \n \nPAVBLU is indicated for the treatment of: \n \n",
+      "source_spans": [
+        {
+          "page": 2,
+          "block_id": "doc-pavblu-prescribing-information-page-0002-text",
+          "start": 41,
+          "end": 115
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "pavblu_dme_heading": {
+      "product_id": "product-pavblu",
+      "document_id": "doc-pavblu-prescribing-information",
+      "pdf_filename": "pavblu_prescribing_information.pdf",
+      "pdf_sha256": "729edc643e89de5f8ad002d8587e7690e164427cce01082e2cf0d06e7fe09186",
+      "block_id": "doc-pavblu-prescribing-information-section-1-3-p0002",
+      "section_id": "doc-pavblu-prescribing-information-section-1-3",
+      "section_title": "1.3 \nDiabetic Macular Edema (DME)  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 2,
+      "block_sha256": "35f005772c9aa1d29f1d9c141b3b7867e56558dab7bc0ab82e8ce31881bf273c",
+      "quote_exact": "1.3 \nDiabetic Macular Edema (DME)  \n \n",
+      "source_spans": [
+        {
+          "page": 2,
+          "block_id": "doc-pavblu-prescribing-information-page-0002-text",
+          "start": 243,
+          "end": 281
+        }
+      ],
+      "extraction_warnings": [
+        "unresolved_heading_only"
+      ]
+    },
+    "otezla_adverse_migraine_table": {
+      "product_id": "product-otezla",
+      "document_id": "doc-otezla-prescribing-information",
+      "pdf_filename": "otezla_prescribing_information.pdf",
+      "pdf_sha256": "71a1e833ab2e34dde9d5277388775787b180fbefd88f82e403c0d3612898e324",
+      "block_id": "doc-otezla-prescribing-information-section-6-1-p0010-r004",
+      "section_id": "doc-otezla-prescribing-information-section-6-1",
+      "section_title": "6.1 \nClinical Trials Experience  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 10,
+      "block_sha256": "9cda7b1f1a94d7a3ecf8fbf1a1e0e6dfa49700bec4d9ab843e7204e925f0bf1e",
+      "quote_exact": "(Week 16) \n \nAdverse Reactions \nPlacebo (N = 506) \nn (%) \nOTEZLA 30 mg BIDb (N = 920) \nn (%) \nDiarrhea \n32 (6) \n160 (17) \nNausea \n35 (7) \n155 (17) \nUpper respiratory tract \ninfection \n31 (6) \n84 (9) \nTension headache \n21 (4) \n75 (8) \nHeadache \n19 (4) \n55 (6) \nAbdominal paina \n11 (2) \n39 (4) \nVomiting \n8 (2) \n35 (4) \nFatigue \n9 (2) \n29 (3) \nDyspepsia \n6 (1) \n29 (3) \nDecreased appetite \n5 (1) \n26 (3) \nInsomnia  \n4 (1) \n21 (2) \nBack pain \n4 (1) \n20 (2) \nMigraine \n5 (1) \n19 (2) \nFrequent bowel movements \n1 (0) \n17 (2) \nDepression \n2 (0) \n12 (1) \nBronchitis \n2 (0) \n12 (1) \nTooth abscess \n0 (0) \n10 (1) \nFolliculitis \n0 (0) \n9 (1) \nSinus headache \n0 (0) \n9 (1) \na Two subjects treated with OTEZLA experienced serious adverse reaction of abdominal pain. \nb   BID = twice daily. \n \nSevere worsening of psoriasis (rebound) occurred in 0.3% (4/1184) subjects following discontinuation of \ntreatment with OTEZLA. \n \nOTEZLA was evaluated in a Phase 3, multicenter, randomized, placebo-controlled trial (PSOR-3) in \nadults with moderate to severe plaque psoriasis of the scalp [see Clinical Studies (14.2)]. A total of \n302 subjects were randomized to receive OTEZLA 30 mg twice daily or placebo twice daily. The most \ncommonly reported adverse reactions that occurred at a higher rate in the OTEZLA group than in the \nplacebo group were: diarrhea (31% vs. 11%), nausea (22% vs. 6%), headache (12% vs. 5%), and \nvomiting (6% vs. 2%). The proportion of subjects who discontinued treatment because of any adverse \nreaction during the 16-week placebo-controlled period of the trial was 6% for subjects who received \nOTEZLA 30 mg twice daily and 3% for subjects who received placebo. Gastrointestinal adverse reactions \nthat led to discontinuation of treatment were diarrhea (3% vs. 0%), nausea (1.5% vs. 1%), and vomiting \n(1.5% vs. 0%) in the OTEZLA group compared to placebo. \n \nOTEZLA was evaluated in a Phase 3, multicenter, randomized, placebo-controlled trial (PSOR-5) in \nadults with moderate to severe plaque psoriasis of the genital area [see Clinical Studies (14.2)]. A total of \n",
+      "source_spans": [
+        {
+          "page": 10,
+          "block_id": "doc-otezla-prescribing-information-page-0010-text",
+          "start": 673,
+          "end": 2754
+        }
+      ],
+      "extraction_warnings": [
+        "unresolved_table"
+      ]
+    },
+    "otezla_adverse_migraine_prose": {
+      "product_id": "product-otezla",
+      "document_id": "doc-otezla-prescribing-information",
+      "pdf_filename": "otezla_prescribing_information.pdf",
+      "pdf_sha256": "71a1e833ab2e34dde9d5277388775787b180fbefd88f82e403c0d3612898e324",
+      "block_id": "doc-otezla-prescribing-information-section-6-1-p0012-r004",
+      "section_id": "doc-otezla-prescribing-information-section-6-1",
+      "section_title": "6.1 \nClinical Trials Experience  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 12,
+      "block_sha256": "6517c99242a050305837224281bd9cdbff8e7fb3fcf5d603ddbfbc257b403856",
+      "quote_exact": " \nAdverse Reactions \nPlacebo  \n(N = 103) \nn (%) \nOTEZLA 30 mg twice \ndaily (N = 104) \nn (%) \nDiarrheaa \n21 (20.4) \n43 (41.3) \nNauseaa \n11 (10.7) \n20 (19.2) \nHeadache \n11 (10.7) \n15 (14.4) \nUpper respiratory tract infection \n5 (4.9) \n12 (11.5) \nAbdominal pain upper \n2 (1.9) \n9 (8.7) \nVomitinga \n2 (1.9) \n9 (8.7) \nBack pain \n6 (5.8) \n8 (7.7) \nViral upper respiratory tract \ninfection \n5 (4.9) \n7 (6.7) \nArthralgia \n3 (2.9) \n6 (5.8) \na There were no serious adverse reactions of diarrhea, nausea or vomiting. \n \nOther adverse reactions reported in subjects on OTEZLA in psoriatic arthritis, plaque psoriasis, and \nBehçet’s Disease clinical trials are:  \n \nGastrointestinal Disorders: Gastroesophageal reflux disease \n \nImmune System Disorders: Hypersensitivity \n \nInvestigations: Weight decrease \n \nMetabolism and Nutrition Disorders: Decreased appetite* \n \nNervous System Disorders: Migraine \n \nRespiratory, Thoracic, and Mediastinal Disorders: Cough \n \nSkin and Subcutaneous Tissue Disorders: Rash \n* One subject treated with OTEZLA 30 mg twice daily experienced a serious adverse reaction. \n \n",
+      "source_spans": [
+        {
+          "page": 12,
+          "block_id": "doc-otezla-prescribing-information-page-0012-text",
+          "start": 196,
+          "end": 1297
+        }
+      ],
+      "extraction_warnings": [
+        "unresolved_table"
+      ]
+    },
+    "riabni_adverse_migraine_table": {
+      "product_id": "product-riabni",
+      "document_id": "doc-riabni-prescribing-information",
+      "pdf_filename": "riabni_prescribing_information.pdf",
+      "pdf_sha256": "96f7b5c8433218c385167c6ab44ee03a749378102a0cf62d30bc05c51a407810",
+      "block_id": "doc-riabni-prescribing-information-section-6-1-p0018",
+      "section_id": "doc-riabni-prescribing-information-section-6-1",
+      "section_title": "6.1 \nClinical Trials Experience  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 18,
+      "block_sha256": "79bf6d6454417cf090a7fed19f21efbb30c1129fef7da963beccf73a872cf2e7",
+      "quote_exact": "18 of 53 \n \nbronchitis.  \n \nIn placebo-controlled studies, patients received 2 × 500 mg or 2 × 1,000 mg intravenous infusions of \nrituximab or placebo, in combination with methotrexate, during a 24-week period. From these studies, \n938 patients treated with rituximab (2 × 1,000 mg) or placebo have been pooled (see Table 3). Adverse \nreactions reported in greater than or equal to 5% of patients were hypertension, nausea, upper \nrespiratory tract infection, arthralgia, pyrexia and pruritus (see Table 3). The rates and types of adverse \nreactions in patients who received rituximab 2 × 500 mg were similar to those observed in patients who \nreceived rituximab 2 × 1,000 mg. \n \nTable 3*. Incidence of All Adverse Reactions** Occurring in Greater Than or Equal to 2% and at Least \n1% Greater than Placebo Among Rheumatoid Arthritis Patients in Clinical Studies Up to Week 24 \n(Pooled) \n \nAdverse Reactions  \nPlacebo + MTX \nN = 398  \nn (%)  \nRituximab + MTX \nN = 540  \nn (%)  \nHypertension  \n \nNausea  \n \nUpper Respiratory Tract Infection  \n \nArthralgia  \n \nPyrexia  \n \nPruritus  \n \nChills  \n \nDyspepsia  \n \nRhinitis  \n \nParesthesia  \n \nUrticaria  \n \nAbdominal Pain Upper  \n \nThroat Irritation  \n \nAnxiety  \n \nMigraine  \n \nAsthenia  \n21 (5)  \n \n19 (5)  \n \n23 (6)  \n \n14 (4)  \n \n8 (2)  \n \n5 (1)  \n \n9 (2)  \n \n3 (< 1)  \n \n6 (2)  \n \n3 (< 1)  \n \n3 (< 1)  \n \n4 (1)  \n \n0 (0)  \n \n5 (1)  \n \n2 (< 1)  \n \n1 (< 1)  \n43 (8)  \n \n41 (8)  \n \n37 (7)  \n \n31 (6)  \n \n27 (5)  \n \n26 (5)  \n \n16 (3)  \n \n16 (3)  \n \n14 (3)  \n \n12 (2)  \n \n12 (2)  \n \n11 (2)  \n \n11 (2)  \n \n9 (2)  \n \n9 (2)  \n \n9 (2)  \n* These data are based on 938 patients treated in Phase 2 and 3 studies of \nrituximab (2 × 1,000 mg) or placebo administered in combination with \nmethotrexate. \n** Coded using MedDRA. \n \nInfusion-Related Reactions \nIn the rituximab RA pooled placebo-controlled studies, 32% of rituximab-treated patients experienced \nan adverse reaction during or within 24 hours following their first infusion, compared to 23% of \nplacebo-treated patients receiving their first infusion. The incidence of adverse reactions during the \n24-hour period following the second infusion, rituximab or placebo, decreased to 11% and 13%, \nrespectively. Acute infusion-related reactions (manifested by fever, chills, rigors, pruritus, urticaria/rash, \nangioedema, sneezing, throat irritation, cough, and/or bronchospasm, with or without associated \nhypotension or hypertension) were experienced by 27% of rituximab-treated patients following their \n",
+      "source_spans": [
+        {
+          "page": 18,
+          "block_id": "doc-riabni-prescribing-information-page-0018-text",
+          "start": 0,
+          "end": 2500
+        }
+      ],
+      "extraction_warnings": [
+        "unresolved_table"
+      ]
+    },
+    "enbrel_psa_page_number": {
+      "product_id": "product-enbrel",
+      "document_id": "doc-enbrel-prescribing-information",
+      "pdf_filename": "enbrel_prescribing_information.pdf",
+      "pdf_sha256": "5cbe6568ae3e68109a68c5db4c933893760b63623b0918c626d3cb94d3c61cdd",
+      "block_id": "doc-enbrel-prescribing-information-section-1-3-p0004",
+      "section_id": "doc-enbrel-prescribing-information-section-1-3",
+      "section_title": "1.3 \nPsoriatic Arthritis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "d304bf0306f402e5684bed61247057926a0d6e75138b27a78205d33b1dc4f992",
+      "quote_exact": " \n4 \n \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-enbrel-prescribing-information-page-0004-text",
+          "start": 0,
+          "end": 9
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "avsola_psa_page_number": {
+      "product_id": "product-avsola",
+      "document_id": "doc-avsola-prescribing-information",
+      "pdf_filename": "avsola_prescribing_information.pdf",
+      "pdf_sha256": "018529c30c1d8e925df332649eb97283a7fb583fbfeb2e42734f32946128f13b",
+      "block_id": "doc-avsola-prescribing-information-section-1-7-p0005",
+      "section_id": "doc-avsola-prescribing-information-section-1-7",
+      "section_title": "1.7 \nPsoriatic Arthritis ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 5,
+      "block_sha256": "6c43d5e4995dcfc65c1e255401aaac153c97c8bc76772fe7295e04af8f1de29e",
+      "quote_exact": " \n5 of 49 \n",
+      "source_spans": [
+        {
+          "page": 5,
+          "block_id": "doc-avsola-prescribing-information-page-0005-text",
+          "start": 0,
+          "end": 11
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "prolia_gio_page_number": {
+      "product_id": "product-prolia",
+      "document_id": "doc-prolia-prescribing-information",
+      "pdf_filename": "prolia_prescribing_information.pdf",
+      "pdf_sha256": "fd14fd26be4def095e43ae0bfc2bcfb2d4ad1e05b4a38ff494c5f73be805d7aa",
+      "block_id": "doc-prolia-prescribing-information-section-1-3-p0004",
+      "section_id": "doc-prolia-prescribing-information-section-1-3",
+      "section_title": "1.3 \nTreatment of Glucocorticoid-Induced Osteoporosis ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "b6dfa0f2e05d94cf2ca3809e301d8b0f4c35f5c9c6373492af00e7573dcc82f9",
+      "quote_exact": " \n \n \n4 of 31 \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-prolia-prescribing-information-page-0004-text",
+          "start": 0,
+          "end": 15
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "amjevita_uc_continuation": {
+      "product_id": "product-amjevita",
+      "document_id": "doc-amjevita-prescribing-information",
+      "pdf_filename": "amjevita_prescribing_information.pdf",
+      "pdf_sha256": "f8f7c8f8fde56d76eed4fd4da90a062c2820262714472e06cc01f3f01d07e212",
+      "block_id": "doc-amjevita-prescribing-information-section-1-6-p0005",
+      "section_id": "doc-amjevita-prescribing-information-section-1-6",
+      "section_title": "1.6 \nUlcerative Colitis  ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 5,
+      "block_sha256": "438cd374661d557dd159c8bf2586e772f2e3ba91ad9a7e64e33b6b3779647bee",
+      "quote_exact": "5 of 59 \n \nLimitations of Use  \nThe effectiveness of adalimumab products has not been established in patients who have lost \nresponse to or were intolerant to TNF blockers [see Clinical Studies (14.7)]. \n \n",
+      "source_spans": [
+        {
+          "page": 5,
+          "block_id": "doc-amjevita-prescribing-information-page-0005-text",
+          "start": 0,
+          "end": 206
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "epogen_indication_split_start": {
+      "product_id": "product-epogen",
+      "document_id": "doc-epogen-prescribing-information",
+      "pdf_filename": "epogen_prescribing_information.pdf",
+      "pdf_sha256": "ab2a92f74cc27e8b2d0d7622db4b3224cd401a395b9c5bfce9af1326b39b00f7",
+      "block_id": "doc-epogen-prescribing-information-section-1-4-p0003-r002",
+      "section_id": "doc-epogen-prescribing-information-section-1-4",
+      "section_title": "1.4 \n Reduction of Allogeneic Red Blood Cell Transfusions in Patients Undergoing Elective, Noncardiac, ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "d8ab83c91404fb8a045ec1b350f5f463d5291738e1ea5bb295e5eb49ca108819",
+      "quote_exact": "Nonvascular Surgery \n \nEpogen is indicated to reduce the need for allogeneic RBC transfusions among patients with perioperative \nhemoglobin > 10 to ≤ 13 g/dL who are at high risk for perioperative blood loss from elective, noncardiac, \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-epogen-prescribing-information-page-0003-text",
+          "start": 2804,
+          "end": 3040
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "epogen_indication_split_end": {
+      "product_id": "product-epogen",
+      "document_id": "doc-epogen-prescribing-information",
+      "pdf_filename": "epogen_prescribing_information.pdf",
+      "pdf_sha256": "ab2a92f74cc27e8b2d0d7622db4b3224cd401a395b9c5bfce9af1326b39b00f7",
+      "block_id": "doc-epogen-prescribing-information-section-1-4-p0004",
+      "section_id": "doc-epogen-prescribing-information-section-1-4",
+      "section_title": "1.4 \n Reduction of Allogeneic Red Blood Cell Transfusions in Patients Undergoing Elective, Noncardiac, ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 4,
+      "block_sha256": "3487550907ec2bda506323f670c4a8c9ed732fa0269c6968059e71f2bf548881",
+      "quote_exact": " \n4 of 27 \n \nnonvascular surgery.  Epogen is not indicated for patients who are willing to donate autologous blood \npre-operatively. \n \n",
+      "source_spans": [
+        {
+          "page": 4,
+          "block_id": "doc-epogen-prescribing-information-page-0004-text",
+          "start": 0,
+          "end": 136
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "bkemv_warning_within_section1": {
+      "product_id": "product-bkemv",
+      "document_id": "doc-bkemv-prescribing-information",
+      "pdf_filename": "bkemv_prescribing_information.pdf",
+      "pdf_sha256": "354c7a80961ad62be0504d649a368e27c79c995d736084f14d513e394b2ef751",
+      "block_id": "doc-bkemv-prescribing-information-section-1-3-p0003",
+      "section_id": "doc-bkemv-prescribing-information-section-1-3",
+      "section_title": "1.3 \nGeneralized Myasthenia Gravis (gMG) ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "479f64cd5a2d31b1bbfc10f23daeeee3fccf2afa9c6d9998b2060e84028473eb",
+      "quote_exact": "1.3 \nGeneralized Myasthenia Gravis (gMG) \n \nBKEMV is indicated for the treatment of generalized myasthenia gravis (gMG) in adult patients who are \nanti-acetylcholine receptor (AChR) antibody positive. \nWARNING: SERIOUS MENINGOCOCCAL INFECTIONS \n \nEculizumab products, complement inhibitors, increase the risk of serious infections caused \nby Neisseria meningitidis [see Warnings and Precautions (5.1)]. Life-threatening and fatal \nmeningococcal infections have occurred in patients treated with complement inhibitors. \nThese infections may become rapidly life-threatening or fatal if not recognized and treated \nearly. \n \nComplete or update vaccination for meningococcal bacteria (for serogroups A, C, W, Y, \nand B) at least 2 weeks prior to the first dose of BKEMV, unless the risks of delaying \ntherapy with BKEMV outweigh the risk of developing a serious infection. Comply with \nthe most current Advisory Committee on Immunization Practices (ACIP) \nrecommendations for vaccinations against meningococcal bacteria in patients receiving a \ncomplement inhibitor. See Warnings and Precautions (5.1) for additional guidance on the \nmanagement of the risk of serious infections caused by meningococcal bacteria. \n \nPatients receiving eculizumab products are at increased risk for invasive disease caused \nby Neisseria meningitidis, even if they develop antibodies following vaccination. Monitor \npatients for early signs and symptoms of serious meningococcal infections and evaluate \nimmediately if infection is suspected. \nBecause of the risk of serious meningococcal infections, BKEMV is available only through a \nrestricted program under a Risk Evaluation and Mitigation Strategy (REMS) called \nBKEMV REMS [see Warnings and Precautions (5.2)].  \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-bkemv-prescribing-information-page-0003-text",
+          "start": 607,
+          "end": 2355
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "xgeva_bone_metastases": {
+      "product_id": "product-xgeva",
+      "document_id": "doc-xgeva-prescribing-information",
+      "pdf_filename": "xgeva_prescribing_information.pdf",
+      "pdf_sha256": "c215bd0cb5ea5435ced65f0557d6c9dec3f210446378611e1c36e0fbc5f95a9b",
+      "block_id": "doc-xgeva-prescribing-information-section-1-1-p0003",
+      "section_id": "doc-xgeva-prescribing-information-section-1-1",
+      "section_title": "1.1 \nMultiple Myeloma and Bone Metastasis from Solid Tumors ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "4b8cf5193b4e57d5a6e2b20683483e3dd1b12cdfc8cc856a4d0fe162f73d6fa9",
+      "quote_exact": "1.1 \nMultiple Myeloma and Bone Metastasis from Solid Tumors \n \nXgeva is indicated for the prevention of skeletal-related events in patients with multiple myeloma and in \npatients with bone metastases from solid tumors. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-xgeva-prescribing-information-page-0003-text",
+          "start": 73,
+          "end": 295
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "xgeva_giant_cell_tumor": {
+      "product_id": "product-xgeva",
+      "document_id": "doc-xgeva-prescribing-information",
+      "pdf_filename": "xgeva_prescribing_information.pdf",
+      "pdf_sha256": "c215bd0cb5ea5435ced65f0557d6c9dec3f210446378611e1c36e0fbc5f95a9b",
+      "block_id": "doc-xgeva-prescribing-information-section-1-2-p0003",
+      "section_id": "doc-xgeva-prescribing-information-section-1-2",
+      "section_title": "1.2 \nGiant Cell Tumor of Bone ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "1dffc6e46843e232c7978103f1f168bce5a6f4715927e507158f7e89b77fc964",
+      "quote_exact": "1.2 \nGiant Cell Tumor of Bone \n \nXgeva is indicated for the treatment of adults and skeletally mature adolescents with giant cell tumor of \nbone that is unresectable or where surgical resection is likely to result in severe morbidity [see Clinical \nTrials (14.2)]. \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-xgeva-prescribing-information-page-0003-text",
+          "start": 295,
+          "end": 563
+        }
+      ],
+      "extraction_warnings": []
+    },
+    "xgeva_hypercalcemia": {
+      "product_id": "product-xgeva",
+      "document_id": "doc-xgeva-prescribing-information",
+      "pdf_filename": "xgeva_prescribing_information.pdf",
+      "pdf_sha256": "c215bd0cb5ea5435ced65f0557d6c9dec3f210446378611e1c36e0fbc5f95a9b",
+      "block_id": "doc-xgeva-prescribing-information-section-1-3-p0003",
+      "section_id": "doc-xgeva-prescribing-information-section-1-3",
+      "section_title": "1.3 \nHypercalcemia of Malignancy ",
+      "section_kind": "fullPrescribingInformation",
+      "physical_pdf_page": 3,
+      "block_sha256": "9553e9da08024bbd7f21b7621f6eeaf45748caab24f16fb30fa7be1d44af9293",
+      "quote_exact": "1.3 \nHypercalcemia of Malignancy \n \nXgeva is indicated for the treatment of hypercalcemia of malignancy refractory to bisphosphonate therapy. \n \n \n",
+      "source_spans": [
+        {
+          "page": 3,
+          "block_id": "doc-xgeva-prescribing-information-page-0003-text",
+          "start": 563,
+          "end": 710
+        }
+      ],
+      "extraction_warnings": []
+    }
+  },
+  "condition_scans": {
+    "migraine": {
+      "all_text_product_ids": [
+        "product-aimovig",
+        "product-otezla",
+        "product-riabni"
+      ],
+      "section_1_product_ids": [
+        "product-aimovig"
+      ],
+      "section_1_block_ids": [
+        "doc-aimovig-prescribing-information-section-1-p0002"
+      ]
+    },
+    "osteoporosis": {
+      "all_text_product_ids": [
+        "product-evenity",
+        "product-neupogen",
+        "product-prolia",
+        "product-xgeva"
+      ],
+      "section_1_product_ids": [
+        "product-evenity",
+        "product-prolia"
+      ],
+      "section_1_block_ids": [
+        "doc-evenity-prescribing-information-section-1-1-p0002",
+        "doc-evenity-prescribing-information-section-1-2-p0002",
+        "doc-prolia-prescribing-information-section-1-1-p0003",
+        "doc-prolia-prescribing-information-section-1-2-p0003",
+        "doc-prolia-prescribing-information-section-1-3-p0003"
+      ]
+    },
+    "rheumatoid arthritis": {
+      "all_text_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-enbrel",
+        "product-prolia",
+        "product-riabni"
+      ],
+      "section_1_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-enbrel",
+        "product-riabni"
+      ],
+      "section_1_block_ids": [
+        "doc-amjevita-prescribing-information-section-1-1-p0004",
+        "doc-avsola-prescribing-information-section-1-5-p0004",
+        "doc-enbrel-prescribing-information-section-1-1-p0003",
+        "doc-riabni-prescribing-information-section-1-3-p0005"
+      ]
+    },
+    "psoriatic arthritis": {
+      "all_text_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-enbrel",
+        "product-otezla"
+      ],
+      "section_1_product_ids": [
+        "product-amjevita",
+        "product-avsola",
+        "product-enbrel",
+        "product-otezla"
+      ],
+      "section_1_block_ids": [
+        "doc-amjevita-prescribing-information-section-1-3-p0004",
+        "doc-avsola-prescribing-information-section-1-7-p0004",
+        "doc-enbrel-prescribing-information-section-1-3-p0003",
+        "doc-enbrel-prescribing-information-section-1-6-p0004",
+        "doc-otezla-prescribing-information-section-1-1-p0003"
+      ]
+    },
+    "asthma": {
+      "all_text_product_ids": [
+        "product-amjevita",
+        "product-corlanor",
+        "product-kyprolis",
+        "product-tezspire"
+      ],
+      "section_1_product_ids": [
+        "product-tezspire"
+      ],
+      "section_1_block_ids": [
+        "doc-tezspire-prescribing-information-section-1-1-p0002"
+      ]
+    },
+    "malaria": {
+      "all_text_product_ids": [],
+      "section_1_product_ids": [],
+      "section_1_block_ids": []
+    },
+    "diabetic macular edema": {
+      "all_text_product_ids": [
+        "product-pavblu"
+      ],
+      "section_1_product_ids": [
+        "product-pavblu"
+      ],
+      "section_1_block_ids": [
+        "doc-pavblu-prescribing-information-section-1-3-p0002"
+      ]
+    }
+  },
+  "extraction_findings": [
+    {
+      "id": "pavblu_predicate_separate_from_disease",
+      "severity": "recall",
+      "finding": "PAVBLU Section 1 states the predicate; Sections 1.1 through 1.4 are only disease headings. All four headings have unresolved_heading_only. A block-only predicate matcher loses all four valid Section 1 indications.",
+      "evidence_refs": [
+        "pavblu_indicated_preamble",
+        "pavblu_dme_heading"
+      ]
+    },
+    {
+      "id": "same_section_page_number_fragments",
+      "severity": "false_evidence",
+      "finding": "Inherited section titles on next-page page-number fragments can match condition names despite having no indication content. Group meaningful continuations and do not cite page-number-only fragments.",
+      "evidence_refs": [
+        "enbrel_psa_page_number",
+        "avsola_psa_page_number",
+        "prolia_gio_page_number"
+      ]
+    },
+    {
+      "id": "tezspire_page_warning_in_prose",
+      "severity": "recall",
+      "finding": "TEZSPIRE Section 1.1 is complete prose with a positive maintenance indication and an explicit acute limitation, but carries unresolved_figure. Broad warning filtering can remove the only asthma indication.",
+      "evidence_refs": [
+        "tezspire_asthma"
+      ]
+    },
+    {
+      "id": "cross_page_limits",
+      "severity": "qualifier_loss",
+      "finding": "AMJEVITA ulcerative-colitis indication in Section 1.6 p4 has a Limitations of Use continuation on p5. General indication assembly should retain same-section meaningful continuation.",
+      "evidence_refs": [
+        "amjevita_uc_continuation"
+      ]
+    },
+    {
+      "id": "split_sentence_and_heading",
+      "severity": "qualifier_loss",
+      "finding": "EPOGEN Section 1.4 heading is split into an r001 block and a continuation; its indicated sentence ends on the following page, followed immediately by a not-indicated sentence. Parent section and page-continuation assembly must preserve these boundaries.",
+      "evidence_refs": [
+        "epogen_indication_split_start",
+        "epogen_indication_split_end"
+      ]
+    },
+    {
+      "id": "warning_embedded_in_section1",
+      "severity": "false_treatment",
+      "finding": "BKEMV Section 1.3 contains its gMG indication followed by WARNING: SERIOUS MENINGOCOCCAL INFECTIONS. Section 1 membership alone does not make every condition named in the block an indication.",
+      "evidence_refs": [
+        "bkemv_warning_within_section1"
+      ]
+    },
+    {
+      "id": "migraine_only_adverse_others",
+      "severity": "false_treatment",
+      "finding": "Only AIMOVIG, OTEZLA, RIABNI contain the word migraine anywhere in this corpus. Only AIMOVIG contains it in Section 1. OTEZLA and RIABNI occurrences are adverse-reaction evidence.",
+      "evidence_refs": [
+        "aimovig_migraine",
+        "otezla_adverse_migraine_table",
+        "otezla_adverse_migraine_prose",
+        "riabni_adverse_migraine_table"
+      ]
+    }
+  ],
+  "validation_rules": [
+    "Every evidence quote is an exact SourceBlock.text, with SHA-256 and original archive spans.",
+    "Every positive expected product has affirmative Section 1 indication evidence; PAVBLU evidence is composed from its Section 1 parent and child.",
+    "Negative expected sets are local support absence or explicit label limitation, not universal clinical claims.",
+    "Broad-condition matches must preserve population/use/combinational qualifiers; lexical mention alone is insufficient."
+  ],
+  "fixture_origin": {
+    "kind": "independent_source_audit",
+    "audit_sha256": "b3b40cc3b18b11e5c486de76ad88c2e733ee1512e81550acf1ef93874593076f",
+    "expectations": "The 12 case product sets and 31 evidence blocks are frozen from the pre-calibration source audit; wording variants do not change expectations."
+  },
+  "measurement_limits": [
+    "Exact returned product sets and the first displayed evidence for each expected product are graded; PAVBLU uses its explicitly audited contiguous parent/condition-heading pair.",
+    "This does not measure clinical precision of every returned passage, generated answers, or whether the supplied labels are current.",
+    "PAVBLU requires its audited parent and DME heading as the first adjacent same-product/document/XML source pair, with exact quotes and spans; either fragment alone fails.",
+    "Expected identities never become retrieval filters. All query variants run separately with the same frozen expected set."
+  ]
+}

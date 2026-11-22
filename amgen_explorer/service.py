@@ -358,7 +358,8 @@ class ExplorerService:
             evidence = self._evidence(question, product_id, document_id, run_id=run_id)
             if evidence is None:
                 return TeachingResponse("This medicine has no published learning corpus yet. Open Admin to build the entire searchable library.", abstained=True)
-            response = teach(question, evidence, self.config, mode=mode, history=history)
+            response = teach(question, evidence, self.config, mode=mode, history=history,
+                             corpus=self._pinned_corpus(evidence.xml_hash))
             response.evidence = evidence
             return response
 
@@ -377,7 +378,7 @@ class ExplorerService:
             self._verified_document(metadata["document_id"], corpus, evidence.xml_hash)
         from .reliability import deadline_scope, settings_for
         with deadline_scope(settings_for(self.config.settings)['response_deadline_seconds']):
-            response = teach(question, evidence, self.config, mode=mode)
+            response = teach(question, evidence, self.config, mode=mode, corpus=corpus)
         response.evidence = evidence
         return response
 
@@ -388,7 +389,7 @@ class ExplorerService:
             evidence = self._evidence("How does this medicine work? Explain its mechanism of action.", product_id, document_id, run_id=run_id)
             if evidence is None or not evidence.passages:
                 return {"error": "Build the full library and select a source with complete mechanism information before starting a knowledge check."}
-            return make_quiz(evidence, self.config)
+            return make_quiz(evidence, self.config, corpus=self._pinned_corpus(evidence.xml_hash))
 
     def presets(self):
         path = self.config.root / "data/chunk-presets.json"

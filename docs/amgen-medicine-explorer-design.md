@@ -20,6 +20,12 @@ Global search is discovery. Teaching retrieves and explains one selected source 
 
 Search and teaching happen on explicit submission, not each keystroke or Streamlit rerun. The optional medicine catalog, session learning view and prepared demo remain secondary entry points.
 
+## Treatment-use questions and educational identity
+
+Display **This is Test App for Educational Purposes** beside the Amgen logo in all navigation modes. Recognized questions such as “What can treat migraine?” show only source-supported medicine uses, favor indications and retain exact population and preventive/acute limits. Incidental mentions, adverse events and generic treatment words are insufficient. Show fewer strong results and explain that no match concerns the loaded library only. Bare content queries continue to search all document text.
+
+Use the same relevance policy before chat context packing and at the final chat/re-explanation/quiz boundary. Linked source fragments remain together. Keep mechanism, safety, dose and storage questions on their appropriate evidence paths; the current knowledge check uses mechanism evidence. This finite rule is conservative and does not establish exhaustive clinical coverage. Current measurements belong in the [release report](implementation/condition-search-release.md).
+
 ## Admin: Library
 
 One local operator screen contains multi-PDF upload, the registered Documents inventory, build status and **Build / update entire library**. Import validates title identity, deduplicates renamed identical bytes, preserves known medicine/document IDs and records explicit replacements. Missing registered files remain expected and block completion.

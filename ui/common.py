@@ -62,6 +62,7 @@ def navigate(page, product=None, document=None, run_id=None, pending_query=None)
 def sidebar(active, *, demo_mode=False):
     with st.sidebar:
         st.image(str(ROOT / 'docs/assets/amgen-blue-logo.png'), width=195)
+        st.caption('This is Test App for Educational Purposes')
         st.header('Medicine Explorer')
         st.caption('Discover. Understand. Keep learning.')
         st.divider()

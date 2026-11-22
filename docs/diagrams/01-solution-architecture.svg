@@ -9,7 +9,7 @@
 <text x="60" y="109" font-family="Helvetica, Arial, sans-serif" font-size="39" fill="#072B50" font-weight="700" text-anchor="start">Whole-library solution architecture</text>
 <text x="60" y="146" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#4D667B" font-weight="400" text-anchor="start">One registered library, global content discovery and version-pinned source teaching</text>
 <rect x="60" y="185" width="1560" height="142" rx="14" fill="#072B50" stroke="#072B50" stroke-width="1.5"/>
-<text x="85" y="222" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700" text-anchor="start">LOCAL STREAMLIT EXPERIENCE</text>
+<text x="85" y="222" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#FFFFFF" font-weight="700" text-anchor="start">LOCAL STREAMLIT EXPERIENCE  /  EDUCATIONAL TEST APP</text>
 <text x="85" y="264" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#FFFFFF" font-weight="700" text-anchor="start">Search &amp; Learn</text>
 <text x="85" y="298" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#C7E7FF" font-weight="400" text-anchor="start">Body text, names, source excerpts</text>
 <text x="600" y="264" font-family="Helvetica, Arial, sans-serif" font-size="24" fill="#FFFFFF" font-weight="700" text-anchor="start">Admin: Library</text>
@@ -40,11 +40,11 @@
 <rect x="825" y="458" width="340" height="221" rx="14" fill="#FFFFFF" stroke="#B8D2E8" stroke-width="1.5"/>
 <rect x="825" y="478" width="5" height="29" rx="2" fill="#0063C3"/>
 <text x="847" y="500" font-family="Helvetica, Arial, sans-serif" font-size="22" fill="#072B50" font-weight="700" text-anchor="start">Discovery and teaching</text>
-<text x="847" y="537" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Query intent + relevance ranking</text>
-<text x="847" y="566" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Group medicine / document hits</text>
-<text x="847" y="595" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Ask one selected source</text>
+<text x="847" y="537" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Condition + positive use evidence</text>
+<text x="847" y="566" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Indications first; complete groups</text>
+<text x="847" y="595" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Group medicine / document hits</text>
 <text x="847" y="624" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Pin run through chat and quiz</text>
-<text x="847" y="653" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Shared evidence gate + safe fallback</text>
+<text x="847" y="653" font-family="Helvetica, Arial, sans-serif" font-size="17.5" fill="#153B5C" font-weight="400" text-anchor="start">Recheck context before teaching</text>
 <path d="M 425 568 L 455 568" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>
 <polygon points="455,568 445.0,573.0 445.0,563.0" fill="#0063C3"/>
 <path d="M 795 568 L 825 568" fill="none" stroke="#0063C3" stroke-width="2.5" stroke-linejoin="round"/>

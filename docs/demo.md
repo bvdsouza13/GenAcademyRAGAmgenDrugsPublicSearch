@@ -34,11 +34,11 @@ The loader checks XML/PDF hashes, source identity, exact page text and block/arc
 .venv-corpus/bin/python -m pytest tests/test_demo.py tests/test_demo_navigation.py -q
 ```
 
-The tests verify source integrity, reject altered/missing evidence and exercise navigation/quiz state under offline constraints. Actual release results are recorded in the [bulk-refactor release report](implementation/bulk-refactor-release-report.md), separately from this walkthrough. Historical demo descriptions based on PDF → XML → chunk alone are superseded by these five stops.
+The tests verify source integrity, reject altered/missing evidence and exercise navigation/quiz state under offline constraints. Actual release results are recorded in the [condition-search release report](implementation/condition-search-release.md), separately from this walkthrough. Historical demo descriptions based on PDF → XML → chunk alone are superseded by these five stops.
 
 ## Live remediation walkthrough
 
-1. Search **What is Prolia?**, then **ACTIMUNE**. Inspect relevant passages and use the suggested spelling with a separate Search click. Search unrelated text to see no-results behavior.
+1. Confirm **This is Test App for Educational Purposes** beside the logo. Search **What can treat migraine?** and inspect the indication excerpt, including preventive use and adult population. Try **What treats malaria?** to see the loaded-library no-evidence state. Then search **What is Prolia?**, then **ACTIMUNE**. Inspect relevant passages and use the suggested spelling with a separate Search click. Search unrelated text to see no-results behavior.
 2. Open a source, ask how it works, inspect citations, and request a knowledge check. Navigate away and back; choices and grading remain stable. Source limitations may require reading the original PDF.
 3. Open Admin. Compare **Records at last build** with the timestamp from **Verify stored library**. No repair is offered for a healthy library. Fault simulations belong in tests, not the live index.
 4. Run **Check search and generated answers** to distinguish key/model access from verified generation. View page coverage and retained storage under Details.

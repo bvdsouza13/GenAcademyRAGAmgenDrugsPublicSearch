@@ -180,3 +180,48 @@ def test_learner_render_requests_active_status_without_retained_history(library_
     at.sidebar.radio(key='nav').set_value('Admin').run()
     assert not at.exception
     assert s.last_status_included_history is True
+
+
+def test_treatment_results_keep_one_medicine_and_multiple_cited_passages(library_app):
+    from test_app_flows import source_passages
+    at,s=library_app
+    def condition_search(query,**kwargs):
+        s.calls.append(('condition_search',query))
+        hits=[{'id':str(i),'text':text,'product_name':'AIMOVIG','filename':'aimovig.pdf',
+               'metadata':{'product_id':'aimovig','document_id':'aimovig-label',
+                           'page_start':page,'section_title':section}}
+              for i,(text,page,section) in enumerate([
+                  ('AIMOVIG is indicated for the preventive treatment of migraine in adults.',2,'1 INDICATIONS AND USAGE'),
+                  ('The efficacy of AIMOVIG was evaluated as a preventive treatment of episodic or chronic migraine.',10,'14 CLINICAL STUDIES')])]
+        return SimpleNamespace(query=query,run_id='first',namespace='first',xml_hash='xml-sha',
+            hits=hits,groups=[],warnings=[],degraded=False,match_mode='treatment_evidence')
+    s.search_library=condition_search
+    at.run();at.text_input(key='library_query').set_value('What can treat migraine?');click(at,'Search')
+    assert not at.exception
+    assert len([b for b in at.button if b.label=='Ask about this source'])==1
+    assert {b.label for b in at.button if b.label.startswith('View PDF page')}=={'View PDF page 2','View PDF page 10'}
+    assert any('1 medicine' in c.value and '2 passages' in c.value for c in at.caption)
+    assert 'AIMOVIG is indicated for the preventive treatment of migraine in adults.' in source_passages(at)
+    at.run()
+    assert s.calls==[('condition_search','What can treat migraine?')]
+
+
+def test_no_treatment_match_explains_loaded_source_scope(library_app):
+    at,s=library_app
+    def no_match(query,**kwargs):
+        return SimpleNamespace(query=query,run_id='first',namespace='first',xml_hash='xml-sha',
+            hits=[],groups=[],warnings=[],degraded=False,match_mode='treatment_evidence')
+    s.search_library=no_match
+    at.run();at.text_input(key='library_query').set_value('What treats malaria?');click(at,'Search')
+    assert not at.exception
+    assert any('treatment' in m.value.lower() and 'loaded sources' in m.value.lower() for m in at.info)
+    assert not any(b.label=='Ask about this source' for b in at.button)
+
+
+def test_educational_test_app_notice_visible_across_main_and_demo(library_app):
+    at,_=library_app
+    at.run()
+    assert 'This is Test App for Educational Purposes' in [c.value for c in at.sidebar.caption]
+    at.sidebar.radio(key='nav').set_value('Demo tour').run()
+    assert not at.exception
+    assert 'This is Test App for Educational Purposes' in [c.value for c in at.sidebar.caption]

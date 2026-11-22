@@ -6,7 +6,8 @@ from ui.common import navigate, source_text, source_view, source_variant
 
 def render(service, results, active=None, filters=None):
     run_id = results.run_id
-    st.subheader('Matching source passages')
+    treatment_mode = getattr(results,'match_mode','content') == 'treatment_evidence'
+    st.subheader('Treatment evidence from your library' if treatment_mode else 'Matching source passages')
     st.caption(f'Library version: {run_id} · Results for “{results.query}”')
     st.caption('Scope: '+(', '.join(filters) if filters else 'All medicines and source documents'))
     if getattr(results,'outcome',None)=='clarification':
@@ -26,8 +27,19 @@ def render(service, results, active=None, filters=None):
     for hit in results.hits:
         meta = hit.get('metadata', {})
         grouped.setdefault((meta.get('product_id'),meta.get('document_id')), []).append(hit)
+    if treatment_mode and grouped:
+        medicine_count=len({product_id for product_id,_ in grouped})
+        source_count=len(grouped)
+        passage_count=len(results.hits)
+        st.caption(f"{medicine_count} medicine{'s' if medicine_count!=1 else ''} · "
+                   f"{source_count} source document{'s' if source_count!=1 else ''} · "
+                   f"{passage_count} passage{'s' if passage_count!=1 else ''}")
+        st.caption('Read the quoted uses and population limits. Results cover only the loaded library; preventive and acute uses can differ.')
     if not grouped:
-        st.info('No matching passages were found. Try another word or remove optional filters.')
+        if treatment_mode:
+            st.info('No matching treatment-use evidence was found in the loaded sources. Try another condition or adjust the filters. This does not rule out treatments outside this library.')
+        else:
+            st.info('No matching passages were found. Try another word or remove optional filters.')
     for (product_id,document_id), hits in grouped.items():
         first = hits[0]
         meta = first.get('metadata', {})

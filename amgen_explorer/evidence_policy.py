@@ -46,7 +46,7 @@ def incomplete_continuations(sources):
     return False
 
 
-def assess_evidence(evidence) -> EvidenceAssessment:
+def assess_evidence(evidence, *, question=None, corpus=None) -> EvidenceAssessment:
     result = EvidenceAssessment()
     try:
         policy = policy_for(evidence)
@@ -78,6 +78,15 @@ def assess_evidence(evidence) -> EvidenceAssessment:
     if incomplete_continuations(result.sources) or any('continuation context' in w.lower() for w in evidence.warnings):
         result.reasons.append('incomplete_continuations')
     if any('required context' in w.lower() for w in evidence.warnings): result.reasons.append('missing_required_context')
+    # Re-check the consumer's actual question, including retained answers and
+    # direct quiz callers. Source identity alone does not establish relevance.
+    if result.sources:
+        from .evidence_selection import condition_context
+        records=[{**p['metadata'],'_id':key,'source_text':p['text']} for key,p in result.sources.items()]
+        context=condition_context(question if question is not None else evidence.question,
+                                  records,corpus,product_id=evidence.product_id)
+        if context.active and {r['_id'] for r in context.records} != set(result.sources):
+            result.reasons.append('unrelated_treatment_context')
     result.reasons = list(dict.fromkeys(result.reasons))
     result.generation_eligible = result.quiz_eligible = not result.reasons
     return result

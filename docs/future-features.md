@@ -1,6 +1,6 @@
 # Future-feature roadmap
 
-Bulk source verification, whole-library content discovery and controlled chunk experiments are part of the current refactor rather than future proposals. Their actual verification scope belongs in the [release report](implementation/bulk-refactor-release-report.md). This roadmap replaces the earlier plan centered on manually accepting every passage.
+Bulk source verification, whole-library content discovery and controlled chunk experiments are part of the current refactor rather than future proposals. Their actual verification scope belongs in the [release report](implementation/condition-search-release.md). This roadmap replaces the earlier plan centered on manually accepting every passage.
 
 ## Evidence and source quality
 
@@ -18,7 +18,7 @@ Bulk source verification, whole-library content discovery and controlled chunk e
 |---|---|
 | Persistent learning paths | Bookmarks, accounts and progress across sessions/devices, with version-pinned evidence and privacy controls. |
 | Stronger assessments | More varied source-backed questions, hints and explanations beyond the current extractive reading quiz. |
-| Evaluated search improvements | Study reranking and section filters against held-out expected evidence; retain whole-library coverage and deterministic variant isolation. |
+| Evaluated search improvements | The current conservative treatment-use gate applies to discovery and learning context. Expand independently labeled synonyms, populations, qualifiers and sentence forms; study reranking and section filters against untouched holdouts. Retain source limits and variant isolation. |
 | Accessibility and export | Keyboard/screen-reader review, responsive layouts and exportable notes retaining source revision/citations. |
 
 ## Before shared hosting
