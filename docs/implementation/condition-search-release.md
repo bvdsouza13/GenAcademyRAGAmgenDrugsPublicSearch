@@ -50,7 +50,7 @@ Ignored local reports are under `output/condition-search/`: `release-regression.
 
 ## Delivery
 
-Feature branch: `condition-search-relevance`, based on main `579af1d`. Code, tests, current guides and regenerated diagrams are committed together on this branch before integration into main. Credentials, runtime data and diagnostic reports remain ignored. The original XML, active pointer and retained manifest/artifact hashes are checked against the 23-file pre-change snapshot; no ingestion, upsert or activation is part of this release.
+Feature branch: `condition-search-relevance`, based on main `579af1d`. Code, tests, current guides and regenerated diagrams were committed as `c1564d1` and pushed on this branch before fast-forward integration into local main. The merged checkout passed 80 focused service/context/UI tests, returned HTTP 200 with `ok` from its Streamlit health endpoint and displayed the educational notice in the native browser at `http://127.0.0.1:8501`. The documentation delivery commit follows the same feature-branch-to-main route. Credentials, runtime data and diagnostic reports remain ignored. The original XML, active pointer and retained manifest/artifact hashes are checked against the 23-file pre-change snapshot; no ingestion, upsert or activation is part of this release.
 
 Confidence is high for the exercised local workflows and failure contracts. Arbitrary clinical phrasing and model output still require the source checks and conservative fallback described below.
 

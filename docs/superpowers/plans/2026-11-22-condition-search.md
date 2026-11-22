@@ -40,7 +40,7 @@ Owner: root; independent reviewer checks the combined changes.
 
 - [x] Run focused and shuffled offline regressions; review real-corpus results and original held-out search behavior.
 - [x] Run bounded live read-only queries, verify zero corpus/index mutations and record limitations.
-- [ ] Refresh documentation/test grouping, commit, integrate into the user's local app and GitHub main under existing authorization, and verify launch.
+- [x] Refresh documentation/test grouping, commit, integrate into the user's local app and GitHub main under existing authorization, and verify launch.
 
 ## Confirmed additions — all context and educational release
 
@@ -49,4 +49,4 @@ Owner: root; independent reviewer checks the combined changes.
 - [x] Test ordinary mechanism/safety/storage/dose paths, direct quiz consumers and pinned generic-name catalog support.
 - [x] Add the educational Test App notice beside the logo in main and demo navigation.
 - [x] Regenerate solution, data-flow and deployment diagrams; refresh all current guides and write a consolidated fixes/release report.
-- [ ] Push the reviewed feature branch first; merge into main, verify the local release and push main.
+- [x] Push the reviewed feature branch first; merge into main, verify the local release and push main.
