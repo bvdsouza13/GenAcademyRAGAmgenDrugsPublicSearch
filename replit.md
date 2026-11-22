@@ -14,7 +14,7 @@ Use the **Demo tour** or open `/?demo=1` to see the prepared offline walkthrough
 
 The checked-in configuration keeps the app in local mode so the offline demo and local workflow remain available without sign-in. For a hosted pilot, set `[app].mode = "hosted"` and `auth_enabled = true` in `config/app.toml`, configure Streamlit's OIDC `[auth]` settings in the private `.streamlit/secrets.toml`, and add `ADMIN_EMAILS` as a Replit Secret containing comma-separated verified administrator email addresses. Do not commit a populated secrets file.
 
-Hosted learner pages require OIDC sign-in. Admin, source-management, and recovery pages also check the verified email allowlist in server-side Python; hiding a navigation item is not the authorization control. The prepared offline demo remains available without sign-in or provider credentials.
+Hosted learner pages require OIDC sign-in. Admin, source-management, and recovery pages check the verified email allowlist in server-side Python, and library-changing service operations repeat that role check; hiding a navigation item is not the authorization control. The prepared offline demo remains available without sign-in or provider credentials.
 
 ## Current limitations
 
@@ -24,7 +24,7 @@ Live search and generated answers require `PINECONE_API_KEY` and `OPENAI_API_KEY
 
 ## Durable library storage
 
-Local mode keeps the current file-based behavior. For a hosted Replit run, first add the project’s default bucket in **Tools → App Storage** and make sure the managed development database has the schema in `sql/amgen_library_storage.sql`. The schema is present in the development database for this Repl; Replit Publish will apply its schema change to production.
+Local mode keeps the current file-based behavior. For a hosted Replit run, first add the project’s default bucket in **Tools → App Storage** and make sure the managed development database has the schema in `sql/amgen_library_storage.sql` and `sql/amgen_admin_jobs.sql`. Apply the Admin-job migration before enabling hosted builds; publish the reviewed database schema change together with the code.
 
 With the original local files still available, seed storage once:
 
@@ -35,5 +35,7 @@ AMGEN_STORAGE_BACKEND=app_storage python scripts/manage_library_storage.py seed-
 This copies PDFs, generated XML, pinned source snapshots, chunk records, and lexical search artifacts into App Storage; it verifies each upload by reading it back and comparing its checksum. It also copies existing review decisions and interrupted-ingestion batch checkpoints from the local SQLite files into managed SQL without deleting the originals. The seed command refuses to replace an already-initialized remote inventory.
 
 Set `AMGEN_STORAGE_BACKEND=app_storage` in the hosted app’s environment after seeding. Startup restores the saved assets and validates the active library and citation files before search is available. The active pointer, reviews, and ingestion checkpoints use managed SQL. The default local preview does not contact App Storage.
+
+Hosted full-library builds are queued in managed SQL and run independently of the browser. The Admin page can be closed while a build runs; after reopening Admin, refresh the saved job status. A worker restart reclaims jobs with expired heartbeats and resumes from durable ingestion batch checkpoints. Activation happens only after complete verification, so a failed candidate does not replace the previous active library.
 
 The App Storage bucket is not configured in this workspace yet, so the real upload/restore round trip still needs a bucket before it can be verified here.

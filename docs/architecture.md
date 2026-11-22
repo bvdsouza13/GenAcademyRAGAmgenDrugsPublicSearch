@@ -38,7 +38,7 @@ Full PDFs and XML stay local. Pinecone receives chunk text plus flat provenance 
 
 [Editable SVG](diagrams/03-deployment.svg)
 
-The server listens on `127.0.0.1:8501`. One local Python process uses file/SQLite locks and resumable checkpoints. Admin navigation does not implement hosted authentication.
+Local mode uses the file/SQLite workflow and resumable ingestion checkpoints. Hosted mode rechecks the verified administrator allowlist at service operations, stores build jobs and ingestion checkpoints in managed SQL, and restores library assets through App Storage. Admin navigation is not the authorization boundary.
 
 | Artifact | Role |
 |---|---|
@@ -58,7 +58,7 @@ New runs explicitly use `bulk_source_verified_v1`; legacy manifests without a po
 
 The Pinecone adapter uses Documents API `2026-07`, integrated `llama-text-embed-v2`, 1,024 dimensions and cosine. The existing index schema is retained. Every prefixed chunk/query passes the conservative UTF-8 byte guard. The local lexical engine uses built-in SQLite FTS5 where available and deterministic token search otherwise. OpenAI Responses requests use `store=false`; citations and material source support are checked locally.
 
-Shared hosting would require server-enforced roles, durable shared storage, isolated learner state and operational recovery. No hosted deployment is claimed. See [setup](configuration-and-pinecone-setup.md), [technical notes](technical-plan-notes.md) and [future work](future-features.md).
+Hosted role checks and durable full-library build recovery are implemented, but no hosted deployment or real administrator account is claimed as verified. Learner isolation and operational setup still need validation before a pilot. See [setup](configuration-and-pinecone-setup.md), [technical notes](technical-plan-notes.md) and [future work](future-features.md).
 
 ## Verification and recovery flow
 

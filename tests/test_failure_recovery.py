@@ -166,6 +166,35 @@ def test_bulk_provider_fault_preserves_active_and_retries_are_bounded(isolated_l
     assert service.config.path('active_corpus_manifest').read_bytes() == before
 
 
+def test_durable_worker_interruption_keeps_previous_active_library(isolated_library, monkeypatch):
+    from amgen_explorer import admin_jobs
+
+    service, fake, _ = isolated_library
+    active = service.build_library(service.chunk_config(), activate=True)
+    before = service.config.path('active_corpus_manifest').read_bytes()
+    updates = []
+    monkeypatch.setattr('amgen_explorer.service.ExplorerService',
+                        lambda **_kwargs: service)
+    monkeypatch.setattr(admin_jobs, '_heartbeat', lambda *_args: None)
+    monkeypatch.setattr(admin_jobs, '_update',
+                        lambda _job, _worker, **values: updates.append(values))
+
+    def interrupted_upsert(_namespace, _records):
+        raise ProviderError('Synthetic interruption', 503)
+
+    monkeypatch.setattr(fake, 'upsert', interrupted_upsert)
+    job = {
+        'job_id': 'durable-job',
+        'payload': {'chunk_settings': service.chunk_config(800, 80).as_dict()},
+    }
+    admin_jobs._execute(service.config, job, 'worker')
+
+    assert service.active()['run_id'] == active['run_id']
+    assert service.config.path('active_corpus_manifest').read_bytes() == before
+    failure = next(update for update in updates if update.get('status') == 'failed')
+    assert 'previously active library was preserved' in failure['error']
+
+
 def test_partial_acknowledgement_retries_unchanged_batch_without_duplicate_ids(isolated_library, monkeypatch):
     service, fake, _ = isolated_library
     upsert = fake.upsert

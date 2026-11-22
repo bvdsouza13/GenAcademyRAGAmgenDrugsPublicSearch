@@ -19,6 +19,20 @@ def test_entire_library_build_is_explicit_and_independent_of_learner_filters(lib
     assert next(m for m in at.metric if m.label=='Records at last build').value=='3'
 
 
+def test_hosted_build_is_queued_instead_of_running_in_browser(library_app,monkeypatch):
+    from unittest.mock import Mock
+
+    at,s=library_app
+    s.config.settings['app']={'mode':'hosted'}
+    s.latest_admin_job=lambda:None
+    s.start_library_build=Mock(return_value={'job_id':'durable-job','status':'queued'})
+    monkeypatch.setattr('amgen_explorer.durable_library.backend_enabled',lambda:True)
+    at.run();navigate(at,'Admin')
+    click(at,'Build / update entire library')
+    s.start_library_build.assert_called_once_with()
+    assert not any(isinstance(c,tuple) and c[0]=='build_library' for c in s.calls)
+
+
 def test_failed_build_preserves_search_and_offers_full_retry_without_secrets(library_app):
     at,s=library_app;s.fail_build=True;at.run();navigate(at,'Admin')
     click(at,'Build / update entire library')

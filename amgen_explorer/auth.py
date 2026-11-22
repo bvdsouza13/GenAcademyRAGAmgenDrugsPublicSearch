@@ -37,7 +37,10 @@ def configured_admin_emails(raw: str | None = None) -> frozenset[str]:
 def user_is_admin(user: Any = None, admin_emails: frozenset[str] | None = None) -> bool:
     """Authorize only signed-in users with a verified, explicitly allowlisted email."""
     if user is None:
-        user = st.user
+        try:
+            user = st.user
+        except Exception:
+            return False
     if not user_is_logged_in(user):
         return False
     if _claim(user, "email_verified") is not True:
@@ -48,6 +51,18 @@ def user_is_admin(user: Any = None, admin_emails: frozenset[str] | None = None) 
     if admin_emails is None:
         admin_emails = configured_admin_emails()
     return email.strip().casefold() in admin_emails
+
+
+def admin_operation_allowed(settings: Mapping[str, Any], user: Any = None) -> bool:
+    """Check the role at a service boundary; local operator mode remains available."""
+    app = settings.get("app", {})
+    if app.get("mode") == "local" and app.get("auth_enabled") is False:
+        return True
+    return (
+        app.get("mode") == "hosted"
+        and app.get("auth_enabled") is True
+        and user_is_admin(user)
+    )
 
 
 def _oidc_is_configured() -> bool:

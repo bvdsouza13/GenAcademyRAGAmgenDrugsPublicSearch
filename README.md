@@ -123,4 +123,4 @@ The [condition-search release report](docs/implementation/condition-search-relea
 - [Technical contracts](docs/technical-plan-notes.md), [evaluation notes](evals/README.md), [prepared demo](docs/demo.md), [future work](docs/future-features.md)
 - [XML guide](XML/xml-tag-guide.md) and [structural XSD](XML/prescribing-information.xsd)
 
-The Admin view is a local operator workflow. Shared hosting, server-side authentication/authorization, persistent learner accounts and cross-device progress remain outside this version.
+Hosted Admin operations require a signed-in administrator allowlisted by verified email. With managed library storage and the Admin-job SQL migration configured, full-library builds run as durable jobs, can be checked after closing the browser, and resume from ingestion checkpoints after worker restarts. This code does not establish that a hosted deployment or real administrator account has been verified. Persistent learner accounts and cross-device progress remain outside this version.

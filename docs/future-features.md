@@ -21,12 +21,12 @@ Bulk source verification, whole-library content discovery and controlled chunk e
 | Evaluated search improvements | The current conservative treatment-use gate applies to discovery and learning context. Expand independently labeled synonyms, populations, qualifiers and sentence forms; study reranking and section filters against untouched holdouts. Retain source limits and variant isolation. |
 | Accessibility and export | Keyboard/screen-reader review, responsive layouts and exportable notes retaining source revision/citations. |
 
-## Before shared hosting
+## Remaining work before a hosted pilot
 
 | Required work | Acceptance boundary |
 |---|---|
-| Authentication and roles | Server-enforced learner/operator permissions; Admin navigation alone is insufficient. |
-| Durable jobs and recovery | Local exact repair and recovery now exist; add shared artifact storage, durable job cancellation, backups and a durable publication/conversation reference ledger before enabling cleanup. |
+| Authentication and roles | Hosted learner sign-in and service-level Admin checks are implemented; verify the real OIDC and administrator accounts before use. |
+| Durable jobs and recovery | Hosted builds use managed SQL jobs and resumable ingestion checkpoints; still add safe cancellation, backups and a durable publication/conversation reference ledger before enabling cleanup. |
 | Operations and spending | Readiness, bounded retries and recorded usage now exist; add quotas, alerts and provider billing reconciliation without credential or unnecessary chat logging. |
 
 Public hosting, inferred clinical fact normalization, new embedding providers and cross-medicine treatment recommendations are outside this refactor. Keep scientific/clinical evaluation distinct from software correctness and extraction provenance.

@@ -50,6 +50,14 @@ Uploading PDFs stores their bytes locally. Pinecone receives extracted chunk tex
 
 **Chunk experiments** change draft chunk size/overlap. Initial values are 600/80 conservative byte budgets, not exact tokenizer counts. **Test settings** builds a complete isolated candidate and compares compatible versions. **Use this configuration** selects it; **Revert to previous version** restores a retained library. Defaults/current-settings resets change controls only. Streamlit rerenders do not submit builds, searches or evaluations.
 
+## Hosted Admin security and durable builds
+
+Hosted Admin actions are checked again in the service layer against the signed-in user's verified email and the `ADMIN_EMAILS` allowlist. This covers source imports, full-library builds, repair, recovery, configuration activation, and revert; hiding Admin navigation is not treated as authorization. The local configuration remains available without sign-in.
+
+Before enabling hosted Admin, apply `sql/amgen_admin_jobs.sql` to the managed development database and confirm the full library-storage schema from `sql/amgen_library_storage.sql` is installed. Configure the OIDC settings, the verified-admin allowlist, and `AMGEN_STORAGE_BACKEND=app_storage` only after the App Storage bucket and seeded library have been checked. The SQL migration is required; hosted build submission fails clearly if its table is unavailable.
+
+Hosted builds are saved as durable SQL jobs and processed independently of the browser. Admin can close the page and later reopen it to check the latest job. A restarted worker reclaims a job after its heartbeat lease expires and resumes the same content-addressed build from persistent ingestion checkpoints. Candidate data is not activated until remote records, source coverage, and the local search artifact all pass verification; failed or interrupted attempts leave the previous active pointer unchanged. A retry is safe and reuses the same candidate identity.
+
 ## Persistence and troubleshooting
 
 Keep source files, XML and `data/` together. The registry defines expected inventory; manifests bind exact records, policy, source snapshots, namespace and lexical artifact. Retained snapshots resolve citations from older results and conversations. Keeping cloud records alone cannot restore local provenance.
@@ -59,14 +67,14 @@ Keep source files, XML and `data/` together. The registry defines expected inven
 | Missing credentials | Edit the ignored TOML file or export nonblank values; quote TOML strings. |
 | HTTP 401/403 or incompatible model/schema | Check provider permissions and app.toml; the app does not recreate the index. |
 | Missing registered PDF | Restore/import the intended file; removing it from the folder does not shrink expected coverage. |
-| Failed or interrupted build | Retry the unchanged build; the previous active version stays available. |
+| Failed or interrupted build | Local: retry the unchanged build. Hosted: return to Admin to check or retry the durable job; the previous active version stays available. |
 | Local artifact integrity failure | Rebuild and verify the library; cloud results cannot bypass local integrity checks. |
 | Semantic outage | Use visibly labeled local-text degraded results; restore provider access for semantic retrieval. |
 | Ambiguous variants | Select a result's source document before teaching; keep Repatha variants distinct. |
 | Source layout limitation | View the physical PDF page; do not infer table relationships from flattened text. |
 | Older conversation | Continue using its pinned version, or explicitly start a fresh search on the latest library. |
 
-Local Admin is not server-side authorization. Public/shared deployment requires authentication, roles and durable shared storage.
+These safeguards do not establish that a hosted deployment or real administrator account has been verified. Complete the OIDC, allowlist, App Storage round-trip and managed SQL setup before using real learner or administrator data.
 
 ## Optional search and reliability settings
 

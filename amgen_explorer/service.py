@@ -40,13 +40,28 @@ def _read_corpus(path: str, mtime_ns: int, size: int) -> Corpus:
 
 
 class ExplorerService:
-    def __init__(self, config=None):
+    def __init__(self, config=None, *, _start_admin_worker=True):
         self.config = config or load_config()
         errors = self.config.validate()
         if errors:
             raise ValueError(" ".join(errors))
         from .durable_library import restore_at_service_start
         self.storage_restore = restore_at_service_start(self.config)
+        if _start_admin_worker and self.config.settings["app"]["mode"] == "hosted":
+            from .durable_library import backend_enabled
+            if backend_enabled():
+                from .admin_jobs import start_worker
+                start_worker(self.config)
+
+    def _require_admin_operation(self):
+        from .auth import admin_operation_allowed
+        from .errors import UserFacingError
+        if not admin_operation_allowed(self.config.settings):
+            raise UserFacingError("This library operation is restricted to authorized administrators.")
+        if self.config.settings["app"]["mode"] == "hosted":
+            from .durable_library import backend_enabled
+            if not backend_enabled():
+                raise UserFacingError("Hosted library changes require configured durable managed storage.")
 
     @property
     def reviews(self):
@@ -78,6 +93,7 @@ class ExplorerService:
                 for path in sorted(directory.iterdir()) if path.is_file() and path.suffix.lower() == ".pdf"]
 
     def build(self):
+        self._require_admin_operation()
         from amgen_explorer.extraction import build_corpus
         report = build_corpus(self.config.path("source_dir"), self.config.path("xml_output"))
         _read_corpus.cache_clear()
@@ -128,6 +144,7 @@ class ExplorerService:
             raise
 
     def import_documents(self, files):
+        self._require_admin_operation()
         from .source_import import import_documents
         return import_documents(self.config, files, self._import_corpus())
 
@@ -136,18 +153,44 @@ class ExplorerService:
         return preview_library(self, chunk_config)
 
     def build_library(self, chunk_config, *, activate=True, on_progress=None):
+        self._require_admin_operation()
         from .library import build_library
         return build_library(self, chunk_config, activate=activate, on_progress=on_progress)
+
+    def start_library_build(self, chunk_config=None):
+        """Queue a hosted build so it does not depend on a browser connection."""
+        self._require_admin_operation()
+        from .durable_library import backend_enabled
+        if self.config.settings["app"]["mode"] != "hosted" or not backend_enabled():
+            raise ValueError("Durable Admin builds require hosted mode and managed library storage.")
+        from .admin_jobs import enqueue_build
+        settings = chunk_config or self.latest_library_settings()
+        return enqueue_build({"chunk_settings": settings.as_dict()})
+
+    def latest_admin_job(self):
+        self._require_admin_operation()
+        from .durable_library import backend_enabled
+        if not backend_enabled():
+            return None
+        from .admin_jobs import get_job
+        return get_job()
+
+    def admin_job(self, job_id):
+        self._require_admin_operation()
+        from .admin_jobs import get_job
+        return get_job(job_id)
 
     def library_status(self, *, include_history=True):
         from .library import status
         return status(self, include_history=include_history)
 
     def verify_library(self, run_id=None, *, repair=False, on_progress=None):
+        self._require_admin_operation()
         from .library_health import verify_library
         return verify_library(self, run_id, repair=repair, on_progress=on_progress)
 
     def recover_working_xml(self):
+        self._require_admin_operation()
         from .library import recover_working_xml
         return recover_working_xml(self)
 
@@ -156,6 +199,7 @@ class ExplorerService:
         return list_recoverable_versions(self)
 
     def restore_library_version(self, run_id):
+        self._require_admin_operation()
         from .library import restore_library_version
         return restore_library_version(self, run_id)
 
@@ -172,10 +216,12 @@ class ExplorerService:
         return self._pinned_corpus(run['xml_hash']) if run else None
 
     def use_configuration(self, run_id):
+        self._require_admin_operation()
         from .library import use_configuration
         return use_configuration(self, run_id)
 
     def revert_library(self):
+        self._require_admin_operation()
         from .library import revert_library
         return revert_library(self)
 
@@ -195,10 +241,12 @@ class ExplorerService:
         return evaluate_versions(self, baseline_run_id, candidate_run_id, suite_id, generate_answers=generate_answers)
 
     def test_chunk_configuration(self, chunk_config, suite_id='global-search', *, on_progress=None):
+        self._require_admin_operation()
         from .evaluation import test_chunk_configuration
         return test_chunk_configuration(self, chunk_config, suite_id, on_progress=on_progress)
 
     def review(self, block_id, decision, reviewer, note=""):
+        self._require_admin_operation()
         corpus = self.corpus()
         if corpus is None:
             raise ValueError("Build XML before recording a review.")
@@ -224,17 +272,20 @@ class ExplorerService:
         return fresh
 
     def load(self, plan, on_progress=None):
+        self._require_admin_operation()
         fresh = self._fresh_plan(plan)
         self._snapshot(fresh)
         return self.index.ingest(fresh, on_progress=on_progress)
 
     def publish(self, run_id, plan):
+        self._require_admin_operation()
         return self.index.activate(run_id, current_plan=self._fresh_plan(plan))
 
     def active(self):
         return self.index.active()
 
     def rollback(self, run_id):
+        self._require_admin_operation()
         return self.index.rollback(run_id)
 
     def _snapshot(self, plan):

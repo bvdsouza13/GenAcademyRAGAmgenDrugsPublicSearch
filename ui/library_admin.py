@@ -83,10 +83,15 @@ def render(service,corpus,active):
             st.dataframe(coverage['documents'],hide_index=True,width='stretch')
             if coverage['limitations']:st.dataframe(coverage['limitations'],hide_index=True,width='stretch')
     health_controls(service,status,active)
+    from amgen_explorer.durable_library import backend_enabled
+    hosted_mode=service.config.settings.get('app', {}).get('mode') == 'hosted'
+    durable_backend=backend_enabled()
+    if hosted_mode and not durable_backend:
+        st.error('Hosted library changes are disabled until durable managed storage is configured.')
     with st.expander('Import options'):
         replace_existing=st.checkbox('Replace matching filenames',help='Use only when intentionally replacing an existing source. Prior library snapshots remain available.')
-    uploads = st.file_uploader('Add source PDFs',type=['pdf'],accept_multiple_files=True,key='library_uploads')
-    if st.button('Import PDFs',disabled=not uploads):
+    uploads = st.file_uploader('Add source PDFs',type=['pdf'],accept_multiple_files=True,key='library_uploads',disabled=hosted_mode and not durable_backend)
+    if st.button('Import PDFs',disabled=not uploads or (hosted_mode and not durable_backend)):
         from amgen_explorer.source_import import SourceUpload
         ok,result = action('Import PDFs',lambda:service.import_documents([SourceUpload(filename=f.name,payload=f.getvalue(),replace_existing=replace_existing) for f in uploads]))
         if ok:
@@ -100,24 +105,49 @@ def render(service,corpus,active):
         st.dataframe(inventory,hide_index=True,width='stretch')
     else:
         st.info('No local source PDFs are available. Add the complete source collection before building.')
-    label = 'Retry entire library build' if st.session_state.get('library_build_failed') else 'Build / update entire library'
-    if st.button(label,type='primary',disabled=not inventory):
-        with st.status('Reading documents → Preparing text → Uploading → Checking search',expanded=True) as progress:
-            def update(report):
-                phase=report.get('stage') or report.get('phase') or report.get('status','Preparing text')
-                st.caption(f"{phase} · {report.get('succeeded',0):,} of {report.get('record_count',0):,} records processed")
-            ok,result=action('Build entire library',lambda:service.build_library(service.latest_library_settings(),activate=True,on_progress=update))
-            success=ok and result and result.get('status') in {'verified','active','published','ready','complete','searchable'}
-            st.session_state['library_build_failed']=not success
-            if success:
-                st.session_state['library_build_result']=result
-                progress.update(label='Ready · Entire library is searchable',state='complete',expanded=False)
-                st.success('The entire verified library is ready to search.')
-            else:
-                progress.update(label='Build incomplete · Previous searchable library preserved',state='error')
-                if ok:
-                    st.error('The build has not completed verification. The previous searchable library remains available. Retry the full build.')
+    hosted_jobs = hosted_mode and durable_backend
     result=st.session_state.get('library_build_result')
+    if hosted_jobs:
+        ok,job=action('Read build status',service.latest_admin_job)
+        if ok and job:
+            progress=job.get('progress') or {}
+            if job['status'] in {'queued','running'}:
+                st.info(f"Build {job['status']} · {progress.get('stage','Starting')} · "
+                        f"{progress.get('succeeded',0):,} of {progress.get('record_count',0):,} records processed.")
+                st.caption('The build runs independently of this browser. Close this page safely, then return to Admin to check its status.')
+            elif job['status']=='completed':
+                result=job.get('result') or {}
+                st.session_state['library_build_result']=result
+                st.success('The entire verified library is ready to search.')
+            elif job['status']=='failed':
+                st.error(job.get('error') or 'The build did not complete. The previously active library remains available.')
+            if st.button('Refresh build status',key='refresh_durable_build'):
+                st.rerun()
+        label='Retry entire library build' if job and job.get('status')=='failed' else 'Build / update entire library'
+        busy=bool(job and job.get('status') in {'queued','running'})
+        if st.button(label,type='primary',disabled=not inventory or busy,key='start_durable_build'):
+            ok,queued=action('Queue library build',service.start_library_build)
+            if ok:
+                st.session_state['library_build_job_id']=queued['job_id']
+                st.rerun()
+    elif not hosted_mode:
+        label = 'Retry entire library build' if st.session_state.get('library_build_failed') else 'Build / update entire library'
+        if st.button(label,type='primary',disabled=not inventory):
+            with st.status('Reading documents → Preparing text → Uploading → Checking search',expanded=True) as progress:
+                def update(report):
+                    phase=report.get('stage') or report.get('phase') or report.get('status','Preparing text')
+                    st.caption(f"{phase} · {report.get('succeeded',0):,} of {report.get('record_count',0):,} records processed")
+                ok,result=action('Build entire library',lambda:service.build_library(service.latest_library_settings(),activate=True,on_progress=update))
+                success=ok and result and result.get('status') in {'verified','active','published','ready','complete','searchable'}
+                st.session_state['library_build_failed']=not success
+                if success:
+                    st.session_state['library_build_result']=result
+                    progress.update(label='Ready · Entire library is searchable',state='complete',expanded=False)
+                    st.success('The entire verified library is ready to search.')
+                else:
+                    progress.update(label='Build incomplete · Previous searchable library preserved',state='error')
+                    if ok:
+                        st.error('The build has not completed verification. The previous searchable library remains available. Retry the full build.')
     if result:
         st.caption(f"Last completed build: {result.get('run_id','unknown')} · {result.get('record_count',0):,} verified records")
     if active or result:
