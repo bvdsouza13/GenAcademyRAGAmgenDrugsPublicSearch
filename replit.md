@@ -38,4 +38,4 @@ Set `AMGEN_STORAGE_BACKEND=app_storage` in the hosted app’s environment after 
 
 Hosted full-library builds are queued in managed SQL and run independently of the browser. The Admin page can be closed while a build runs; after reopening Admin, refresh the saved job status. A worker restart reclaims jobs with expired heartbeats and resumes from durable ingestion batch checkpoints. Activation happens only after complete verification, so a failed candidate does not replace the previous active library.
 
-The App Storage bucket is not configured in this workspace yet, so the real upload/restore round trip still needs a bucket before it can be verified here.
+The default App Storage bucket is configured, and the existing PDFs and generated XML have been seeded and checksum-verified through a clean-cache restore. This does not build or activate a searchable library. Use `python scripts/manage_library_storage.py verify-restore` to recheck the saved inventory; do not rerun `seed-local` against an initialized inventory.
